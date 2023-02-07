@@ -12,7 +12,7 @@ export class BlogsQueryRepository {
     pageSize: number,
     sortBy: string,
     pageNumber: number,
-    sortDirection: string | null,
+    sortDirection: string,
   ): Promise<PaginationViewModel<Blog[]>> {
     const filter: FilterQuery<Blog> = {
       $regex: searchNameTerm ?? '',
@@ -31,6 +31,6 @@ export class BlogsQueryRepository {
     return new PaginationViewModel(numberOfBlogs, pageNumber, pageSize, blogs);
   }
   async findBlog(id: string): Promise<Blog | null> {
-    return this.blogModel.findOne({ id }, { _id: false, __v: false });
+    return this.blogModel.findOne({ id }, { _id: false, __v: false }).lean();
   }
 }

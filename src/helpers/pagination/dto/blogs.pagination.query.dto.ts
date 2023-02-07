@@ -8,14 +8,14 @@ export class BlogsPaginationQueryDto {
   @IsOptional()
   @Transform(({ value }) => toNumber(value, { min: 1, default: 1 }))
   @IsNumber()
-  pageNumber: number | null = 1;
+  pageNumber = 1;
   @IsOptional()
   @Transform(({ value }) => toNumber(value, { min: 1, default: 10 }))
   @IsNumber()
-  pageSize: number | null = 10;
+  pageSize = 10;
   @IsOptional()
-  sortBy: string | null = 'createdAt';
+  sortBy = 'createdAt';
   @IsOptional()
   @Transform(({ value }) => checkSortBy(value))
-  sortDirection: string | null = 'desc';
+  sortDirection = 'desc';
 }

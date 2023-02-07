@@ -6,21 +6,17 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
-  async createBlog(blog: Blog): Promise<Blog> {
-    const newBlog = new this.blogModel(blog);
-    return newBlog.save();
+  // async createBlog(blog: Blog): Promise<string> {
+  //   const newBlog: BlogDocument = new this.blogModel(blog);
+  //   await newBlog.save();
+  //   return newBlog.id;
+  // }
+  async save(blog: BlogDocument): Promise<string> {
+    await blog.save();
+    return blog.id;
   }
-  async updateBlog(
-    blogId: string,
-    name: string,
-    description: string,
-    websiteUrl: string,
-  ) {
-    return this.blogModel.findOneAndUpdate(
-      { id: blogId },
-
-      { name, description, websiteUrl },
-    );
+  async findBlogById(id: string): Promise<BlogDocument | null> {
+    return this.blogModel.findOne({ id });
   }
   async deleteBlog(id: string): Promise<boolean> {
     const result = await this.blogModel.deleteOne({ id });

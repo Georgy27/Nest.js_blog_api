@@ -1,10 +1,9 @@
 interface ToNumberOptions {
-  default?: number;
-  min?: number;
-  max?: number;
+  default: number;
+  min: number;
 }
 
-export const toNumber = (value: string, opts: ToNumberOptions = {}): number => {
+export const toNumber = (value: string, opts: ToNumberOptions): number => {
   let newValue: number = Number.parseInt(value || String(opts.default), 10);
 
   if (Number.isNaN(newValue)) {
@@ -14,7 +13,6 @@ export const toNumber = (value: string, opts: ToNumberOptions = {}): number => {
   if (opts.min && newValue < opts.min) {
     newValue = opts.min;
   }
-
   return newValue;
 };
 

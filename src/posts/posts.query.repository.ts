@@ -11,7 +11,7 @@ export class PostsQueryRepository {
     pageSize: number,
     sortBy: string,
     pageNumber: number,
-    sortDirection: string | null,
+    sortDirection: string,
     blogId?: string,
   ): Promise<PaginationViewModel<Post[]>> {
     const filter: FilterQuery<Post> = {
@@ -27,11 +27,34 @@ export class PostsQueryRepository {
       .lean();
 
     const numberOfPosts = await this.postModel.countDocuments(filter);
+
+    // create function for mapping likes
+
+    //
     return new PaginationViewModel<Post[]>(
       numberOfPosts,
       pageNumber,
       pageSize,
       posts,
     );
+  }
+  async findPost(id: string) {
+    const newPost = await this.postModel.findOne({ id }, { _id: false }).lean();
+    if (!newPost) return null;
+    return {
+      id: newPost.id,
+      title: newPost.title,
+      shortDescription: newPost.shortDescription,
+      content: newPost.content,
+      blogId: newPost.blogId,
+      blogName: newPost.blogName,
+      createdAt: newPost.createdAt,
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
+    };
   }
 }

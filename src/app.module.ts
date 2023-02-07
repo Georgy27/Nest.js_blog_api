@@ -5,6 +5,7 @@ import { PostsModule } from './posts/posts.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BlogsModule } from './blogs/blogs.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -12,9 +13,10 @@ import { BlogsModule } from './blogs/blogs.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.DB_URI),
+    MongooseModule.forRoot(process.env.DB_URI || ''),
     BlogsModule,
     PostsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
