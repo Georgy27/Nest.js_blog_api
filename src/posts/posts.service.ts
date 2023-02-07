@@ -3,8 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from './schemas/post.schema';
 import { Model } from 'mongoose';
 import { PostsRepository } from './posts.repository';
-import { randomUUID } from 'crypto';
 import { BlogsRepository } from '../blogs/blogs.repository';
+import { CreatePostDto } from './dto/create.post.dto';
+import { UpdatePostDto } from './dto/update.post.dto';
 
 @Injectable()
 export class PostsService {
@@ -14,40 +15,27 @@ export class PostsService {
     private readonly postsRepository: PostsRepository,
     private readonly blogsRepository: BlogsRepository,
   ) {}
-  async createPost(
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string,
-  ): Promise<string | null> {
+  async createPost(createPostDto: CreatePostDto): Promise<string | null> {
     // find a blog
-    const blog = await this.blogsRepository.findBlogById(blogId);
+    const blog = await this.blogsRepository.findBlogById(createPostDto.blogId);
     if (!blog) return null;
     // create new post
-    const newPost = new this.postModel({
-      id: randomUUID(),
-      title,
-      shortDescription,
-      content,
-      blogId,
-      blogName: blog.name,
-      createdAt: new Date().toISOString(),
-    });
+    const newPost = new this.postModel();
+    newPost.createPost(createPostDto, blog.name);
+
     return this.postsRepository.save(newPost);
   }
   async updatePost(
     postId: string,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string,
+    updatePostDto: UpdatePostDto,
   ): Promise<string | null> {
+    // find post
     const post = await this.postsRepository.findPostById(postId);
     if (!post) return null;
-    post.title = title;
-    post.shortDescription = shortDescription;
-    post.content = content;
-    post.blogId = blogId;
+    // check for blogId
+    if (updatePostDto.blogId !== post.blogId) return null;
+    // update post
+    post.updatePost(updatePostDto);
     return this.postsRepository.save(post);
   }
   async deletePost(id: string): Promise<boolean> {

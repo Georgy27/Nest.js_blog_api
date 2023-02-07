@@ -39,8 +39,8 @@ export class PostsController {
     );
   }
   @Get(':id')
-  async getPostById(@Param('id') id: string): Promise<Posts | null> {
-    const post: Posts | null = await this.postsQueryRepository.findPost(id);
+  async getPostById(@Param('id') id: string) {
+    const post = await this.postsQueryRepository.findPost(id);
 
     if (!post) throw new NotFoundException();
     return post;
@@ -61,28 +61,18 @@ export class PostsController {
   @Post()
   @HttpCode(201)
   async createPost(@Body() createPostDto: CreatePostDto) {
-    const postId = await this.postsService.createPost(
-      createPostDto.title,
-      createPostDto.shortDescription,
-      createPostDto.content,
-      createPostDto.blogId,
-    );
+    const postId = await this.postsService.createPost(createPostDto);
     if (!postId) throw new NotFoundException();
     return this.postsQueryRepository.findPost(postId);
   }
-  @Put()
+  @Put(':id')
   @HttpCode(204)
   async updatePost(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<void> {
-    const updatedPost = await this.postsService.updatePost(
-      id,
-      updatePostDto.title,
-      updatePostDto.shortDescription,
-      updatePostDto.content,
-      updatePostDto.blogId,
-    );
+    const updatedPost = await this.postsService.updatePost(id, updatePostDto);
+    console.log(updatedPost);
     if (!updatedPost) throw new NotFoundException();
     return;
   }

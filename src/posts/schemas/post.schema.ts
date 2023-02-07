@@ -1,5 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { CreatePostDto } from '../dto/create.post.dto';
+import { randomUUID } from 'crypto';
+import { UpdatePostDto } from '../dto/update.post.dto';
 
 // @Schema({ id: false, versionKey: false })
 // class NewestLikes {
@@ -46,6 +49,25 @@ export class Post {
   createdAt: string;
   // @Prop({ required: true, type: ExtendedLikesInfoSchema })
   // extendedLikesInfo: ExtendedLikesInfo;
+
+  createPost(createPostDto: CreatePostDto, blogName: string) {
+    this.id = randomUUID();
+    this.title = createPostDto.title;
+    this.shortDescription = createPostDto.shortDescription;
+    this.content = createPostDto.content;
+    this.blogId = createPostDto.blogId;
+    this.blogName = blogName;
+    this.createdAt = new Date().toISOString();
+  }
+  updatePost(updatePostDto: UpdatePostDto) {
+    this.title = updatePostDto.title;
+    this.shortDescription = updatePostDto.shortDescription;
+    this.content = updatePostDto.content;
+  }
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
+PostSchema.methods = {
+  createPost: Post.prototype.createPost,
+  updatePost: Post.prototype.updatePost,
+};
