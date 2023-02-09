@@ -38,7 +38,7 @@ export class PostsService {
     post.updatePost(updatePostDto);
     return this.postsRepository.save(post);
   }
-  async deletePost(id: string): Promise<boolean> {
-    return this.postsRepository.deleteBlog(id);
+  async deletePostById(id: string): Promise<boolean> {
+    return this.postsRepository.deletePostById(id);
   }
 }

@@ -60,10 +60,14 @@ export class PostsController {
   }
   @Post()
   @HttpCode(201)
-  async createPost(@Body() createPostDto: CreatePostDto) {
+  async createPost(
+    @Body() createPostDto: CreatePostDto,
+  ): Promise<PostReactionViewModel> {
     const postId = await this.postsService.createPost(createPostDto);
     if (!postId) throw new NotFoundException();
-    return this.postsQueryRepository.findPost(postId);
+    const post = await this.postsQueryRepository.findPost(postId);
+    if (!post) throw new NotFoundException();
+    return post;
   }
   @Put(':id')
   @HttpCode(204)
@@ -79,7 +83,7 @@ export class PostsController {
   @Delete(':id')
   @HttpCode(204)
   async deletePostById(@Param('id') id: string): Promise<void> {
-    const deletedPost = await this.postsService.deletePost(id);
+    const deletedPost = await this.postsService.deletePostById(id);
     if (!deletedPost) throw new NotFoundException();
     return;
   }

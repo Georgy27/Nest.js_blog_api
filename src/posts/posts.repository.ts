@@ -13,8 +13,11 @@ export class PostsRepository {
   async findPostById(id: string): Promise<PostDocument | null> {
     return this.postModel.findOne({ id });
   }
-  async deleteBlog(id: string): Promise<boolean> {
+  async deletePostById(id: string): Promise<boolean> {
     const result = await this.postModel.deleteOne({ id });
     return result.deletedCount === 1;
+  }
+  async clearPosts() {
+    await this.postModel.deleteMany({});
   }
 }

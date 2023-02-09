@@ -6,11 +6,6 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
-  // async createBlog(blog: Blog): Promise<string> {
-  //   const newBlog: BlogDocument = new this.blogModel(blog);
-  //   await newBlog.save();
-  //   return newBlog.id;
-  // }
   async save(blog: BlogDocument): Promise<string> {
     await blog.save();
     return blog.id;

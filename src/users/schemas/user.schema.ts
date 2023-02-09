@@ -1,44 +1,13 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-
-// @Schema({ versionKey: false })
-// class AccountData {
-//   @Prop({ required: true, unique: true, type: String })
-//   login: string;
-//   @Prop({ required: true, unique: true, type: String })
-//   email: string;
-//   @Prop({ required: true, type: String })
-//   passwordHash: string;
-//   @Prop({ required: true, type: String })
-//   createdAt: string;
-// }
-// export const AccountDataSchema = SchemaFactory.createForClass(AccountData);
-//
-// @Schema({ versionKey: false })
-// class PasswordRecovery {
-//   @Prop({ required: true, type: String })
-//   recoveryCode: string;
-//   @Prop({ required: true, type: String })
-//   expirationDate: string;
-// }
-// export const PasswordRecoverySchema =
-//   SchemaFactory.createForClass(PasswordRecovery);
-//
-// @Schema({ versionKey: false })
-// class EmailConfirmation {
-//   @Prop({ required: true, type: String })
-//   confirmationCode: string;
-//   @Prop({ required: true, type: String })
-//   expirationDate: string;
-//   @Prop({ required: true, type: Boolean })
-//   isConfirmed: boolean;
-// }
-// export const EmailConfirmationSchema =
-//   SchemaFactory.createForClass(EmailConfirmation);
+import { CreateUserDto } from '../dto/create.user.dto';
+import { randomUUID } from 'crypto';
+import { add } from 'date-fns';
+import { IAccountData, IEmailConfirmation, IPasswordRecovery } from './index';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema({ id: false, versionKey: false })
+@Schema({ versionKey: false })
 export class User {
   @Prop({ required: true, unique: true })
   id: string;
@@ -50,14 +19,14 @@ export class User {
       createdAt: { required: true, type: String },
     }),
   )
-  accountData: Record<string, string>;
+  accountData: IAccountData;
   @Prop(
     raw({
-      recoveryCode: { required: true, type: String },
-      expirationDate: { required: true, type: String },
+      recoveryCode: { type: String },
+      expirationDate: { type: String },
     }),
   )
-  passwordRecovery: Record<string, string>;
+  passwordRecovery: IPasswordRecovery;
   @Prop(
     raw({
       confirmationCode: { required: true, type: String },
@@ -65,6 +34,30 @@ export class User {
       isConfirmed: { required: true, type: Boolean },
     }),
   )
-  emailConfirmation: Record<string, string | boolean>;
+  emailConfirmation: IEmailConfirmation;
+
+  createUser(createUserDto: CreateUserDto, passwordHash: string) {
+    this.id = randomUUID();
+    this.accountData = {
+      login: createUserDto.login,
+      email: createUserDto.email,
+      passwordHash,
+      createdAt: new Date().toISOString(),
+    };
+    this.passwordRecovery = {
+      recoveryCode: null,
+      expirationDate: null,
+    };
+    this.emailConfirmation = {
+      confirmationCode: randomUUID(),
+      expirationDate: add(new Date(), {
+        minutes: 1,
+      }).toISOString(),
+      isConfirmed: false,
+    };
+  }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.methods = {
+  createUser: User.prototype.createUser,
+};
