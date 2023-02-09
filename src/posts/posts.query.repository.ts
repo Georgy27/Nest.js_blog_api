@@ -16,8 +16,10 @@ export class PostsQueryRepository {
     blogId?: string,
   ): Promise<PaginationViewModel<PostReactionViewModel[]>> {
     const filter: FilterQuery<Post> = {
-      $regex: blogId ?? '',
-      $options: 'i',
+      blogId: {
+        $regex: blogId ?? '',
+        $options: 'i',
+      },
     };
 
     const posts: Post[] = await this.postModel

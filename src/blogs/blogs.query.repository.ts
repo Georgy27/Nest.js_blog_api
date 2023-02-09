@@ -15,10 +15,12 @@ export class BlogsQueryRepository {
     sortDirection: string,
   ): Promise<PaginationViewModel<Blog[]>> {
     const filter: FilterQuery<Blog> = {
-      $regex: searchNameTerm ?? '',
-      $options: 'i',
+      name: {
+        $regex: searchNameTerm ?? '',
+        $options: 'i',
+      },
     };
-
+    console.log(filter);
     const blogs = await this.blogModel
       .find(filter, { _id: false, __v: false })
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
