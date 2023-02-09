@@ -17,8 +17,10 @@ export class UsersQueryRepository {
       sortDirection,
       sortBy,
     } = usersPaginationDto;
+    const searchTermFilter = [];
+
     const filter: FilterQuery<User> = {
-      $or: [
+      $and: [
         {
           'accountData.login': {
             $regex: searchLoginTerm ?? '',
@@ -33,9 +35,11 @@ export class UsersQueryRepository {
         },
       ],
     };
+    const sortArg = 'accountData.'.concat(sortBy);
+
     const users: User[] = await this.userModel
       .find(filter, { _id: false, 'accountData.passwordHash': false })
-      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .sort({ [sortArg]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .lean();
