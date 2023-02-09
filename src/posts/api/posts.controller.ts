@@ -12,13 +12,13 @@ import {
 } from '@nestjs/common';
 import { PostPaginationQueryDto } from '../../helpers/pagination/dto/posts.pagination.query.dto';
 import { PaginationViewModel } from '../../helpers/pagination/pagination.view.model.wrapper';
-import { Post as Posts } from '../schemas/post.schema';
 import { PostsService } from '../posts.service';
 import { PostsQueryRepository } from '../posts.query.repository';
 import { CommentsQueryRepository } from '../../comments/comments.query.repository';
 import { Comment } from '../../comments/schemas/comment.schema';
 import { CreatePostDto } from '../dto/create.post.dto';
 import { UpdatePostDto } from '../dto/update.post.dto';
+import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
 
 @Controller('posts')
 export class PostsController {
@@ -30,7 +30,7 @@ export class PostsController {
   @Get()
   async getAllPosts(
     @Query() postsPaginationDto: PostPaginationQueryDto,
-  ): Promise<PaginationViewModel<Posts[]>> {
+  ): Promise<PaginationViewModel<PostReactionViewModel[]>> {
     return this.postsQueryRepository.findPosts(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
@@ -39,7 +39,7 @@ export class PostsController {
     );
   }
   @Get(':id')
-  async getPostById(@Param('id') id: string) {
+  async getPostById(@Param('id') id: string): Promise<PostReactionViewModel> {
     const post = await this.postsQueryRepository.findPost(id);
 
     if (!post) throw new NotFoundException();

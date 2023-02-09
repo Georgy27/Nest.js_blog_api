@@ -16,5 +16,6 @@ import { BlogsModule } from '../blogs/blogs.module';
   ],
   controllers: [PostsController],
   providers: [PostsService, PostsQueryRepository, PostsRepository],
+  exports: [PostsQueryRepository, PostsService, PostsRepository],
 })
 export class PostsModule {}

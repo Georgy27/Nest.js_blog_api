@@ -30,7 +30,7 @@ export class Blog {
       description: description,
       websiteUrl: websiteUrl,
       createdAt: new Date().toISOString(),
-      isMembership: true,
+      isMembership: false,
     });
   }
 }
