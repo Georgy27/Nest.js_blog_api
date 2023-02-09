@@ -17,10 +17,9 @@ export class UsersQueryRepository {
       sortDirection,
       sortBy,
     } = usersPaginationDto;
-    const searchTermFilter = [];
 
     const filter: FilterQuery<User> = {
-      $and: [
+      $or: [
         {
           'accountData.login': {
             $regex: searchLoginTerm ?? '',
