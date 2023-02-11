@@ -4,6 +4,7 @@ import { User, UserDocument } from './schemas/user.schema';
 import { FilterQuery, Model } from 'mongoose';
 import { UsersPaginationQueryDto } from '../helpers/pagination/dto/users.pagination.query.dto';
 import { PaginationViewModel } from '../helpers/pagination/pagination.view.model.wrapper';
+import { userQueryFilter } from '../helpers/filter/user.query.filter';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -18,22 +19,11 @@ export class UsersQueryRepository {
       sortBy,
     } = usersPaginationDto;
 
-    const filter: FilterQuery<User> = {
-      $or: [
-        {
-          'accountData.login': {
-            $regex: searchLoginTerm ?? '',
-            $options: 'i',
-          },
-        },
-        {
-          'accountData.email': {
-            $regex: searchEmailTerm ?? '',
-            $options: 'i',
-          },
-        },
-      ],
-    };
+    const filter: FilterQuery<User> = userQueryFilter(
+      searchLoginTerm,
+      searchEmailTerm,
+    );
+
     const sortArg = 'accountData.'.concat(sortBy);
 
     const users: User[] = await this.userModel
