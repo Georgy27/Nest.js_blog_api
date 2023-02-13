@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PostPaginationQueryDto } from '../../helpers/pagination/dto/posts.pagination.query.dto';
 import { PaginationViewModel } from '../../helpers/pagination/pagination.view.model.wrapper';
@@ -19,6 +20,7 @@ import { Comment } from '../../comments/schemas/comment.schema';
 import { CreatePostDto } from '../dto/create.post.dto';
 import { UpdatePostDto } from '../dto/update.post.dto';
 import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
+import { BasicAuthGuard } from '../../guards/basic.auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -58,6 +60,7 @@ export class PostsController {
       postId,
     );
   }
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
   async createPost(
@@ -69,6 +72,7 @@ export class PostsController {
     if (!post) throw new NotFoundException();
     return post;
   }
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updatePost(
@@ -80,6 +84,7 @@ export class PostsController {
     if (!updatedPost) throw new NotFoundException();
     return;
   }
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deletePostById(@Param('id') id: string): Promise<void> {

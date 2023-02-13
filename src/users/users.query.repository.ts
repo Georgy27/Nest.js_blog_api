@@ -5,11 +5,14 @@ import { FilterQuery, Model } from 'mongoose';
 import { UsersPaginationQueryDto } from '../helpers/pagination/dto/users.pagination.query.dto';
 import { PaginationViewModel } from '../helpers/pagination/pagination.view.model.wrapper';
 import { userQueryFilter } from '../helpers/filter/user.query.filter';
+import { UserViewModel } from './types/user.view.model';
 
 @Injectable()
 export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-  async findUsers(usersPaginationDto: UsersPaginationQueryDto) {
+  async findUsers(
+    usersPaginationDto: UsersPaginationQueryDto,
+  ): Promise<PaginationViewModel<UserViewModel[]>> {
     const {
       searchLoginTerm,
       searchEmailTerm,
