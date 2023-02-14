@@ -8,6 +8,8 @@ import { BlogsModule } from './blogs/blogs.module';
 import { CommentsModule } from './comments/comments.module';
 import { UsersModule } from './users/users.module';
 import { TestingModule } from './testingAllData/testing.module';
+import { MailModule } from './mail/mail.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { TestingModule } from './testingAllData/testing.module';
     CommentsModule,
     UsersModule,
     TestingModule,
+    MailModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

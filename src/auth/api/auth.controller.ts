@@ -9,7 +9,7 @@ export class AuthController {
   @Post('registration')
   @HttpCode(204)
   async registration(@Body() authDto: AuthDto) {
-    return;
+    return this.authService.registration(authDto);
   }
   @Post('login')
   async login(@Body() loginDto: LoginDto) {}

@@ -44,8 +44,7 @@ export class UsersService {
     // prepare user
     const preparedUser = await this.prepareUser(createUserDto, passwordHash);
     // create user
-    const newUser = await this.usersRepository.createUser(preparedUser);
-    return newUser;
+    return this.usersRepository.createUser(preparedUser);
   }
   async createUserByAdmin(createUserDto: CreateUserDto): Promise<string> {
     const { password, login, email } = createUserDto;
@@ -55,10 +54,14 @@ export class UsersService {
     // check that user with the given login or email does not exist
     const checkUserLogin = await this.usersRepository.findUserByLogin(login);
     if (checkUserLogin)
-      throw new BadRequestException('This login already exists');
+      throw new BadRequestException([
+        { message: 'This login already exists', field: 'login' },
+      ]);
     const checkUserEmail = await this.usersRepository.findUserByEmail(email);
     if (checkUserEmail)
-      throw new BadRequestException('This email already exists');
+      throw new BadRequestException([
+        { message: 'This email already exists', field: 'email' },
+      ]);
     // create user
     // const newUser = new this.userModel();
     // newUser.createUser(createUserDto, passwordHash);

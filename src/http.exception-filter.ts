@@ -29,7 +29,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       responseBody.message.forEach((m) =>
         errorsResponse.errorsMessages.push(m),
       );
-      response.status(status).json(errorsResponse);
+      return response.status(status).json(errorsResponse);
     }
     if (status === 401) {
       response.status(status);
