@@ -32,10 +32,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       response.status(status).json(errorsResponse);
     }
     if (status === 401) {
-      response.status(status).json('Unauthorized');
+      response.status(status);
     }
     if (status === 404) {
-      response.status(status).json('Not Found');
+      response.status(status);
     } else {
       response.status(status).json({
         statusCode: status,

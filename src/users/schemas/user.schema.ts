@@ -36,28 +36,28 @@ export class User {
   )
   emailConfirmation: IEmailConfirmation;
 
-  createUser(createUserDto: CreateUserDto, passwordHash: string) {
-    this.id = randomUUID();
-    this.accountData = {
-      login: createUserDto.login,
-      email: createUserDto.email,
-      passwordHash,
-      createdAt: new Date().toISOString(),
-    };
-    this.passwordRecovery = {
-      recoveryCode: null,
-      expirationDate: null,
-    };
-    this.emailConfirmation = {
-      confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), {
-        minutes: 1,
-      }).toISOString(),
-      isConfirmed: false,
-    };
-  }
+  // createUser(createUserDto: CreateUserDto, passwordHash: string) {
+  //   this.id = randomUUID();
+  //   this.accountData = {
+  //     login: createUserDto.login,
+  //     email: createUserDto.email,
+  //     passwordHash,
+  //     createdAt: new Date().toISOString(),
+  //   };
+  //   this.passwordRecovery = {
+  //     recoveryCode: null,
+  //     expirationDate: null,
+  //   };
+  //   this.emailConfirmation = {
+  //     confirmationCode: randomUUID(),
+  //     expirationDate: add(new Date(), {
+  //       minutes: 1,
+  //     }).toISOString(),
+  //     isConfirmed: false,
+  //   };
+  // }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
-UserSchema.methods = {
-  createUser: User.prototype.createUser,
-};
+// UserSchema.methods = {
+//   createUser: User.prototype.createUser,
+// };

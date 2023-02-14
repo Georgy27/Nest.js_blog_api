@@ -18,6 +18,7 @@ import { BasicAuthGuard } from '../../guards/basic.auth.guard';
 import { PaginationViewModel } from '../../helpers/pagination/pagination.view.model.wrapper';
 import { UserViewModel } from '../types/user.view.model';
 
+@UseGuards(BasicAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
@@ -30,16 +31,14 @@ export class UsersController {
   ): Promise<PaginationViewModel<UserViewModel[]>> {
     return this.usersQueryRepository.findUsers(usersPaginationDto);
   }
-  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
-  async createUser(
+  async createUserByAdmin(
     @Body() createUserDto: CreateUserDto,
   ): Promise<UserViewModel> {
-    const userId = await this.usersService.createUser(createUserDto);
+    const userId = await this.usersService.createUserByAdmin(createUserDto);
     return this.usersQueryRepository.findUser(userId);
   }
-  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteUserById(@Param('id') id: string): Promise<void> {
