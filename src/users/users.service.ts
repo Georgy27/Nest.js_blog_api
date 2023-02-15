@@ -74,4 +74,15 @@ export class UsersService {
   async deleteUserById(id: string): Promise<boolean> {
     return this.usersRepository.deleteUserById(id);
   }
+  async updateConfirmation(user: UserDocument): Promise<string> {
+    user.emailConfirmation.isConfirmed = true;
+    return this.usersRepository.save(user);
+  }
+  async updateConfirmationCode(user: UserDocument): Promise<string> {
+    user.emailConfirmation.confirmationCode = randomUUID();
+    user.emailConfirmation.expirationDate = add(new Date(), {
+      minutes: 1,
+    }).toISOString();
+    return this.usersRepository.save(user);
+  }
 }

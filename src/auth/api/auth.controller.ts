@@ -8,11 +8,19 @@ export class AuthController {
   constructor(private authService: AuthService) {}
   @Post('registration')
   @HttpCode(204)
-  async registration(@Body() authDto: AuthDto) {
+  async registration(@Body() authDto: AuthDto): Promise<void> {
     return this.authService.registration(authDto);
+  }
+  @Post('registration-confirmation')
+  @HttpCode(204)
+  async registrationConfirmation(@Body() code: string): Promise<void> {
+    return this.authService.confirmEmail(code);
+  }
+  @Post('registration-email-resending')
+  @HttpCode(204)
+  async registrationEmailResending(@Body() email: string): Promise<void> {
+    return this.authService.resendEmail(email);
   }
   @Post('login')
   async login(@Body() loginDto: LoginDto) {}
-  @Post('registration-confirmation')
-  async registrationConfirmation() {}
 }

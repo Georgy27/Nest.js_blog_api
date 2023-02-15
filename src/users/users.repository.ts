@@ -18,12 +18,19 @@ export class UsersRepository {
     return result.deletedCount === 1;
   }
   async clearUsers() {
-    await this.userModel.deleteMany({});
+    return this.userModel.deleteMany({});
   }
   async findUserByLogin(login: string): Promise<User | null> {
     return this.userModel.findOne({ 'accountData.login': login });
   }
-  async findUserByEmail(email: string): Promise<User | null> {
+  async findUserByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ 'accountData.email': email });
+  }
+  async findUserByEmailConfirmationCode(
+    code: string,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findOne({
+      'emailConfirmation.confirmationCode': code,
+    });
   }
 }
