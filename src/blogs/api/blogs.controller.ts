@@ -23,7 +23,7 @@ import { PostsQueryRepository } from '../../posts/posts.query.repository';
 import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
 import { CreatePostByBlogIdDto } from '../dto/create.post.blogId.dto';
 import { PostsService } from '../../posts/posts.service';
-import { BasicAuthGuard } from '../../guards/basic.auth.guard';
+import { BasicAuthGuard } from '../../common/guards/basic.auth.guard';
 
 @Controller('blogs')
 export class BlogsController {

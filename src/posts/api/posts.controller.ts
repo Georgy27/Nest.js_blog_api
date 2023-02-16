@@ -20,7 +20,7 @@ import { Comment } from '../../comments/schemas/comment.schema';
 import { CreatePostDto } from '../dto/create.post.dto';
 import { UpdatePostDto } from '../dto/update.post.dto';
 import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
-import { BasicAuthGuard } from '../../guards/basic.auth.guard';
+import { BasicAuthGuard } from '../../common/guards/basic.auth.guard';
 
 @Controller('posts')
 export class PostsController {

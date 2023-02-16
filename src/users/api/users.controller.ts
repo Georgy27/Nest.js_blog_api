@@ -14,7 +14,7 @@ import { UsersService } from '../users.service';
 import { UsersQueryRepository } from '../users.query.repository';
 import { UsersPaginationQueryDto } from '../../helpers/pagination/dto/users.pagination.query.dto';
 import { CreateUserDto } from '../dto/create.user.dto';
-import { BasicAuthGuard } from '../../guards/basic.auth.guard';
+import { BasicAuthGuard } from '../../common/guards/basic.auth.guard';
 import { PaginationViewModel } from '../../helpers/pagination/pagination.view.model.wrapper';
 import { UserViewModel } from '../types/user.view.model';
 

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { CreateUserDto } from './dto/create.user.dto';
 import * as bcrypt from 'bcrypt';
@@ -62,11 +66,6 @@ export class UsersService {
       throw new BadRequestException([
         { message: 'This email already exists', field: 'email' },
       ]);
-    // create user
-    // const newUser = new this.userModel();
-    // newUser.createUser(createUserDto, passwordHash);
-    //
-    // return this.usersRepository.save(newUser);
     const preparedUser = await this.prepareUser(createUserDto, passwordHash);
     const newUser = await this.usersRepository.createUser(preparedUser);
     return newUser.id;
@@ -84,5 +83,17 @@ export class UsersService {
       minutes: 1,
     }).toISOString();
     return this.usersRepository.save(user);
+  }
+  async validateUserByLoginOrEmail(
+    loginOrEmail: string,
+    password: string,
+  ): Promise<User> {
+    const user = await this.usersRepository.findUserByLoginOrEmail(
+      loginOrEmail,
+    );
+    if (!user) throw new UnauthorizedException();
+    const check = await bcrypt.compare(password, user.accountData.passwordHash);
+    if (!check) throw new UnauthorizedException();
+    return user;
   }
 }
