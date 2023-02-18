@@ -1,11 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   HttpCode,
   Ip,
   Post,
-  Req,
   Res,
   UnauthorizedException,
   UseGuards,
@@ -13,14 +13,21 @@ import {
 import { AuthDto } from '../dto/auth.dto';
 import { LoginDto } from '../dto/login.dto';
 import { AuthService } from '../auth.service';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { JwtRtPayload } from '../strategies';
-import { GetJwtPayloadDecorator } from '../../common/decorators/getJwtPayload.decorator';
+import { JwtAtPayload, JwtRtPayload } from '../strategies';
+import { GetJwtRtPayloadDecorator } from '../../common/decorators/getJwtRtPayload.decorator';
+import { EmailDto } from '../dto/email.dto';
+import { NewPasswordDto } from '../dto/new-password.dto';
+import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
+import { UsersQueryRepository } from '../../users/users.query.repository';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly userQueryRepository: UsersQueryRepository,
+  ) {}
   @Post('registration')
   @HttpCode(204)
   async registration(@Body() authDto: AuthDto): Promise<void> {
@@ -59,11 +66,52 @@ export class AuthController {
   @Post('logout')
   @HttpCode(204)
   async logout(
-    @GetJwtPayloadDecorator() user: JwtRtPayload,
+    @GetJwtRtPayloadDecorator() user: JwtRtPayload,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<void> {
     const { userId, deviceId, iat } = user;
     const logoutUser = await this.authService.logout(userId, deviceId, iat);
-    return res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken');
+  }
+  @UseGuards(AuthGuard('jwt-refresh'))
+  @Post('refresh-token')
+  async refreshToken(
+    @GetJwtRtPayloadDecorator() user: JwtRtPayload,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ accessToken: string }> {
+    const { userId, deviceId, iat } = user;
+    const { accessToken, refreshToken } = await this.authService.refreshTokin(
+      userId,
+      deviceId,
+      iat,
+    );
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    return { accessToken };
+  }
+  @Post('password-recovery')
+  @HttpCode(204)
+  async passwordRecovery(@Body() emailDto: EmailDto): Promise<void> {
+    await this.authService.passwordRecovery(emailDto.email);
+  }
+  @Post('new-password')
+  @HttpCode(204)
+  async newPassword(@Body() newPasswordDto: NewPasswordDto): Promise<void> {
+    await this.authService.confirmNewPassword(
+      newPasswordDto.recoveryCode,
+      newPasswordDto.newPassword,
+    );
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  async me(@GetJwtAtPayloadDecorator() userId: string) {
+    const user = await this.userQueryRepository.findUser(userId);
+    return {
+      email: user.email,
+      login: user.login,
+      userId: user.id,
+    };
   }
 }

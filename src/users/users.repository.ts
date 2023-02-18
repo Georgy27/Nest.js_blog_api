@@ -26,21 +26,28 @@ export class UsersRepository {
   async findUserByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ 'accountData.email': email });
   }
-  async findUserByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
-    return this.userModel
-      .findOne({
-        $or: [
-          { 'accountData.email': loginOrEmail },
-          { 'accountData.login': loginOrEmail },
-        ],
-      })
-      .lean();
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findOne({
+      $or: [
+        { 'accountData.email': loginOrEmail },
+        { 'accountData.login': loginOrEmail },
+      ],
+    });
   }
   async findUserByEmailConfirmationCode(
     code: string,
   ): Promise<UserDocument | null> {
     return this.userModel.findOne({
       'emailConfirmation.confirmationCode': code,
+    });
+  }
+  async findUserByPasswordRecoveryCode(
+    code: string,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findOne({
+      'passwordRecovery.recoveryCode': code,
     });
   }
 }

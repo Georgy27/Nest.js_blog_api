@@ -96,4 +96,24 @@ export class UsersService {
     if (!check) throw new UnauthorizedException();
     return user;
   }
+  async setPasswordRecoveryCode(user: UserDocument): Promise<UserDocument> {
+    const passwordRecoveryInfo = {
+      recoveryCode: randomUUID(),
+      expirationDate: add(new Date(), { minutes: 1 }).toISOString(),
+    };
+    user.passwordRecovery = passwordRecoveryInfo;
+    await this.usersRepository.save(user);
+    return user;
+  }
+  async updatePasswordHash(
+    user: UserDocument,
+    passwordHash: string,
+  ): Promise<string> {
+    user.accountData.passwordHash = passwordHash;
+    return this.usersRepository.save(user);
+  }
+  async clearRecoveryCode(user: UserDocument) {
+    user.passwordRecovery.recoveryCode = null;
+    user.passwordRecovery.expirationDate = null;
+  }
 }

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/schemas/user.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 import { UsersRepository } from '../users/users.repository';
 import { MailService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
@@ -15,6 +15,7 @@ import { SecurityDevices } from '../security-devices/schemas/security.devices.sc
 import { SecurityDevicesService } from '../security-devices/security.devices.service';
 import { ConfigService } from '@nestjs/config';
 import { SecurityDevicesRepository } from '../security-devices/security.devices.repository';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -77,15 +78,39 @@ export class AuthService {
     return tokens;
   }
   async logout(userId: string, deviceId: string, iat: number) {
+    console.log(userId, deviceId, iat);
+    console.log(typeof userId, typeof deviceId, typeof iat);
     const lastActiveDate = new Date(iat * 1000).toISOString();
     const logOutUser =
-      await this.securityDevicesRepository.deleteSessionByDeviceId(
+      await this.securityDevicesService.deleteSessionByDeviceId(
         userId,
         deviceId,
         lastActiveDate,
       );
     if (!logOutUser) throw new UnauthorizedException();
+
     return logOutUser;
+  }
+  async refreshTokin(userId: string, deviceId: string, iat: number) {
+    // check if the token is valid
+    const lastActiveDate = new Date(iat * 1000).toISOString();
+    const isValidRt = await this.securityDevicesRepository.findLastActiveDate(
+      userId,
+      lastActiveDate,
+    );
+    if (!isValidRt) throw new UnauthorizedException();
+
+    // if valid, create new pair of tokens
+    const tokens = await this.getTokens(userId, deviceId);
+    const issuedAt = await this.getIssuedAtFromRefreshToken(
+      tokens.refreshToken,
+    );
+    await this.securityDevicesService.updateLastActiveDate(
+      userId,
+      deviceId,
+      issuedAt,
+    );
+    return tokens;
   }
   async confirmEmail(code: string): Promise<void> {
     // check that user exists
@@ -131,6 +156,48 @@ export class AuthService {
       console.log(error);
     }
   }
+
+  async passwordRecovery(email: string) {
+    const user = await this.usersRepository.findUserByLoginOrEmail(email);
+    if (!user) return;
+
+    const updatedUser = await this.usersService.setPasswordRecoveryCode(user);
+    if (!updatedUser.passwordRecovery.recoveryCode) return;
+
+    try {
+      await this.mailService.sendUserConfirmation(
+        updatedUser,
+        updatedUser.passwordRecovery.recoveryCode,
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async confirmNewPassword(
+    recoveryCode: string,
+    newPassword: string,
+  ): Promise<void> {
+    // check if user exists
+    const user = await this.usersRepository.findUserByPasswordRecoveryCode(
+      recoveryCode,
+    );
+    if (!user)
+      throw new BadRequestException([
+        {
+          message: 'User with the given recovery code does not exist',
+          field: 'recoveryCode',
+        },
+      ]);
+    // check if recoveryCode is valid
+    const checkRecoveryCode = this.checkPasswordRecoveryCode(user);
+    // prepare password
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(newPassword, passwordSalt);
+    // update user password hash in db
+    await this.usersService.updatePasswordHash(user, passwordHash);
+    // set recoveryCode and expirationCode to null
+    await this.usersService.clearRecoveryCode(user);
+  }
   checkUserConfirmationCode(user: User, code: string) {
     if (user.emailConfirmation.isConfirmed) {
       throw new BadRequestException([
@@ -156,6 +223,23 @@ export class AuthService {
         },
       ]);
     }
+    return true;
+  }
+  checkPasswordRecoveryCode(user: User) {
+    if (!user.passwordRecovery.expirationDate)
+      throw new BadRequestException([
+        {
+          message: 'User does not has an expiration date',
+          field: 'recoveryCode',
+        },
+      ]);
+    if (new Date().toISOString() > user.passwordRecovery.expirationDate)
+      throw new BadRequestException([
+        {
+          message: 'User with the given recovery code does not exist',
+          field: 'recoveryCode',
+        },
+      ]);
     return true;
   }
   async getTokens(userId: string, deviceId: string) {
