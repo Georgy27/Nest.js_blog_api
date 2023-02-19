@@ -24,6 +24,7 @@ import { BasicAuthGuard } from '../../common/guards/basic.auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
+import { CommentViewModel } from '../../comments';
 
 @Controller('posts')
 export class PostsController {
@@ -84,13 +85,13 @@ export class PostsController {
     @Param('postId') postId: string,
     @Body() createCommentForPostDto: CreateCommentForPostDto,
     @GetJwtAtPayloadDecorator() userId: string,
-  ): Promise<Comment> {
+  ): Promise<CommentViewModel> {
     const newComment = await this.postsService.createCommentForSpecifiedPost(
       postId,
       createCommentForPostDto,
       userId,
     );
-    const commentToView = await this.commentsQueryRepository.findComment(
+    const commentToView = await this.commentsQueryRepository.getMappedComment(
       newComment,
     );
     if (!commentToView) throw new NotFoundException();

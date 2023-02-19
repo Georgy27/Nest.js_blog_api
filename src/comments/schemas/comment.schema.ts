@@ -11,16 +11,16 @@ export class CommentatorInfo {
 export const CommentatorInfoSchema =
   SchemaFactory.createForClass(CommentatorInfo);
 
-@Schema({ _id: false, versionKey: false })
-export class LikesInfo {
-  @Prop({ required: true, type: Number })
-  likesCount: number;
-  @Prop({ required: true, type: Number })
-  dislikesCount: number;
-  @Prop({ required: true, type: String })
-  myStatus: string;
-}
-export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
+// @Schema({ _id: false, versionKey: false })
+// export class LikesInfo {
+//   @Prop({ required: true, type: Number })
+//   likesCount: number;
+//   @Prop({ required: true, type: Number })
+//   dislikesCount: number;
+//   @Prop({ required: true, type: String })
+//   myStatus: string;
+// }
+// export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
 
 export type CommentDocument = HydratedDocument<Comment>;
 
@@ -36,8 +36,8 @@ export class Comment {
   commentatorInfo: CommentatorInfo;
   @Prop({ required: true, type: String })
   createdAt: string;
-  @Prop({ required: true, type: LikesInfoSchema })
-  likesInfo: LikesInfo;
+  // @Prop({ required: true, type: LikesInfoSchema })
+  // likesInfo: LikesInfo;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);

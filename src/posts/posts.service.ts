@@ -42,10 +42,8 @@ export class PostsService {
     const isPost = await this.postsRepository.findPostById(postId);
     if (!isPost) throw new NotFoundException();
     // get user login
-    const userLogin: User | null = await this.usersRepository.findUserById(
-      userId,
-    );
-    if (!userLogin) throw new NotFoundException();
+    const user: User | null = await this.usersRepository.findUserById(userId);
+    if (!user) throw new NotFoundException();
     // if it exists, create new comment
     const newComment: Comment = {
       id: randomUUID(),
@@ -53,14 +51,9 @@ export class PostsService {
       content: createCommentForPostDto.content,
       commentatorInfo: {
         userId: userId,
-        userLogin: userLogin.accountData.login,
+        userLogin: user.accountData.login,
       },
       createdAt: new Date().toISOString(),
-      likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-      },
     };
     return this.commentsRepository.createComment(newComment);
   }

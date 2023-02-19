@@ -15,4 +15,7 @@ export class CommentsRepository {
     const newComment = await this.commentModel.create({ ...comment });
     return newComment.id;
   }
+  async findComment(id: string): Promise<CommentDocument | null> {
+    return this.commentModel.findOne({ id }, { _id: false, postId: false });
+  }
 }
