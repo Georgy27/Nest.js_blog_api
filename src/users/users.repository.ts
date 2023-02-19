@@ -20,6 +20,9 @@ export class UsersRepository {
   async clearUsers() {
     return this.userModel.deleteMany({});
   }
+  async findUserById(id: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ id });
+  }
   async findUserByLogin(login: string): Promise<User | null> {
     return this.userModel.findOne({ 'accountData.login': login });
   }

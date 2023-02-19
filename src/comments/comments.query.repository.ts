@@ -31,6 +31,8 @@ export class CommentsQueryRepository {
     );
   }
   async findComment(id: string): Promise<Comment | null> {
-    return this.commentModel.findOne({ id }).lean();
+    return this.commentModel
+      .findOne({ id }, { _id: false, postId: false })
+      .lean();
   }
 }

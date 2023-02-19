@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from './schemas/post.schema';
 import { Model } from 'mongoose';
@@ -6,6 +6,12 @@ import { PostsRepository } from './posts.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { CreatePostDto } from './dto/create.post.dto';
 import { UpdatePostDto } from './dto/update.post.dto';
+import { CreateCommentForPostDto } from './dto/createCommentForPost.dto';
+import { UsersRepository } from '../users/users.repository';
+import { randomUUID } from 'crypto';
+import { Comment } from '../comments/schemas/comment.schema';
+import { User } from '../users/schemas/user.schema';
+import { CommentsRepository } from '../comments/comments.repository';
 
 @Injectable()
 export class PostsService {
@@ -14,6 +20,8 @@ export class PostsService {
     private postModel: Model<PostDocument>,
     private readonly postsRepository: PostsRepository,
     private readonly blogsRepository: BlogsRepository,
+    private readonly usersRepository: UsersRepository,
+    private readonly commentsRepository: CommentsRepository,
   ) {}
   async createPost(createPostDto: CreatePostDto): Promise<string | null> {
     // find a blog
@@ -24,6 +32,37 @@ export class PostsService {
     newPost.createPost(createPostDto, blog.name);
 
     return this.postsRepository.save(newPost);
+  }
+  async createCommentForSpecifiedPost(
+    postId: string,
+    createCommentForPostDto: CreateCommentForPostDto,
+    userId: string,
+  ): Promise<string> {
+    // check if the post exists
+    const isPost = await this.postsRepository.findPostById(postId);
+    if (!isPost) throw new NotFoundException();
+    // get user login
+    const userLogin: User | null = await this.usersRepository.findUserById(
+      userId,
+    );
+    if (!userLogin) throw new NotFoundException();
+    // if it exists, create new comment
+    const newComment: Comment = {
+      id: randomUUID(),
+      postId,
+      content: createCommentForPostDto.content,
+      commentatorInfo: {
+        userId: userId,
+        userLogin: userLogin.accountData.login,
+      },
+      createdAt: new Date().toISOString(),
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+      },
+    };
+    return this.commentsRepository.createComment(newComment);
   }
   async updatePost(
     postId: string,

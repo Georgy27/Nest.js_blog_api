@@ -21,6 +21,9 @@ import { CreatePostDto } from '../dto/create.post.dto';
 import { UpdatePostDto } from '../dto/update.post.dto';
 import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
 import { BasicAuthGuard } from '../../common/guards/basic.auth.guard';
+import { AuthGuard } from '@nestjs/passport';
+import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
+import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -52,6 +55,8 @@ export class PostsController {
     @Query() postsPaginationDto: PostPaginationQueryDto,
     @Param('postId') postId: string,
   ): Promise<PaginationViewModel<Comment[]>> {
+    const isPost = await this.postsQueryRepository.findPost(postId);
+    if (!isPost) throw new NotFoundException();
     return this.commentsQueryRepository.findCommentsByPostId(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
@@ -71,6 +76,25 @@ export class PostsController {
     const post = await this.postsQueryRepository.findPost(postId);
     if (!post) throw new NotFoundException();
     return post;
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':postId/comments')
+  @HttpCode(201)
+  async createCommentForSpecifiedPost(
+    @Param('postId') postId: string,
+    @Body() createCommentForPostDto: CreateCommentForPostDto,
+    @GetJwtAtPayloadDecorator() userId: string,
+  ): Promise<Comment> {
+    const newComment = await this.postsService.createCommentForSpecifiedPost(
+      postId,
+      createCommentForPostDto,
+      userId,
+    );
+    const commentToView = await this.commentsQueryRepository.findComment(
+      newComment,
+    );
+    if (!commentToView) throw new NotFoundException();
+    return commentToView;
   }
   @UseGuards(BasicAuthGuard)
   @Put(':id')

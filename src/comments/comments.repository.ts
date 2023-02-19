@@ -11,4 +11,8 @@ export class CommentsRepository {
   async clearComments() {
     await this.commentModel.deleteMany({});
   }
+  async createComment(comment: Comment): Promise<string> {
+    const newComment = await this.commentModel.create({ ...comment });
+    return newComment.id;
+  }
 }
