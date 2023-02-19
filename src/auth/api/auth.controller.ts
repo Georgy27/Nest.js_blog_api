@@ -21,6 +21,7 @@ import { EmailDto } from '../dto/email.dto';
 import { NewPasswordDto } from '../dto/new-password.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
 import { UsersQueryRepository } from '../../users/users.query.repository';
+import { ConfirmationCodeDto } from '../dto/confirmationCode.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -35,15 +36,18 @@ export class AuthController {
   }
   @Post('registration-confirmation')
   @HttpCode(204)
-  async registrationConfirmation(@Body() code: string): Promise<void> {
-    return this.authService.confirmEmail(code);
+  async registrationConfirmation(
+    @Body() codeDto: ConfirmationCodeDto,
+  ): Promise<void> {
+    return this.authService.confirmEmail(codeDto.code);
   }
   @Post('registration-email-resending')
   @HttpCode(204)
-  async registrationEmailResending(@Body() email: string): Promise<void> {
-    return this.authService.resendEmail(email);
+  async registrationEmailResending(@Body() emailDto: EmailDto): Promise<void> {
+    return this.authService.resendEmail(emailDto.email);
   }
   @Post('login')
+  @HttpCode(200)
   async login(
     @Body() loginDto: LoginDto,
     @Ip() ip: string,
