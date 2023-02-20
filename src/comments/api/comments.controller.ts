@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   NotFoundException,
@@ -18,6 +19,7 @@ import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayloa
 import { Request } from 'express';
 import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
+import { UpdateCommentDto } from '../dto/update-comment.dto';
 
 @Controller('comments')
 export class CommentsController {
@@ -54,5 +56,28 @@ export class CommentsController {
       commentId,
       userId,
     );
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':commentId')
+  @HttpCode(204)
+  async updateComment(
+    @Param('commentId') commentId: string,
+    @Body() updateCommentDto: UpdateCommentDto,
+    @GetJwtAtPayloadDecorator() userId: string,
+  ): Promise<void> {
+    return this.commentsService.updateComment(
+      commentId,
+      updateCommentDto,
+      userId,
+    );
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':commentId')
+  @HttpCode(204)
+  async deleteComment(
+    @Param('commentId') commentId: string,
+    @GetJwtAtPayloadDecorator() userId: string,
+  ): Promise<void> {
+    return this.commentsService.deleteComment(commentId, userId);
   }
 }

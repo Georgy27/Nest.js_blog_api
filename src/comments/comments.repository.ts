@@ -8,6 +8,10 @@ export class CommentsRepository {
   constructor(
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
   ) {}
+  async save(comment: CommentDocument): Promise<string> {
+    await comment.save();
+    return comment.id;
+  }
   async clearComments() {
     await this.commentModel.deleteMany({});
   }
@@ -17,5 +21,9 @@ export class CommentsRepository {
   }
   async findComment(id: string): Promise<CommentDocument | null> {
     return this.commentModel.findOne({ id }, { _id: false, postId: false });
+  }
+  async delete(comment: CommentDocument): Promise<string> {
+    await comment.delete();
+    return comment.id;
   }
 }

@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UpdateReactionDto } from './dto/update-reaction.dto';
 import { CommentsRepository } from './comments.repository';
 import { UsersRepository } from '../users/users.repository';
 import { ReactionsRepository } from '../reactions/reactions.repository';
 import { ReactionsService } from '../reactions/reactions.service';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
 export class CommentsService {
@@ -32,5 +37,30 @@ export class CommentsService {
       user.accountData.login,
       updateReactionDto.likeStatus,
     );
+  }
+  async updateComment(
+    commentId: string,
+    updatecommentDto: UpdateCommentDto,
+    userId: string,
+  ): Promise<void> {
+    // find comment
+    const comment = await this.commentsRepository.findComment(commentId);
+    if (!comment) throw new NotFoundException();
+    // check user
+    if (comment.commentatorInfo.userId !== userId)
+      throw new ForbiddenException();
+    // update
+    comment.content = updatecommentDto.content;
+    await this.commentsRepository.save(comment);
+  }
+  async deleteComment(commentId: string, userId: string) {
+    // find comment
+    const comment = await this.commentsRepository.findComment(commentId);
+    if (!comment) throw new NotFoundException();
+    // check user
+    if (comment.commentatorInfo.userId !== userId)
+      throw new ForbiddenException();
+    // delete
+    await this.commentsRepository.delete(comment);
   }
 }
