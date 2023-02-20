@@ -25,19 +25,25 @@ export class CommentsQueryRepository {
     pageNumber: number,
     sortDirection: string,
     postId: string,
-  ): Promise<PaginationViewModel<Comment[]>> {
+    userId: string | null,
+  ): Promise<PaginationViewModel<CommentViewModel[]>> {
     const comments = await this.commentModel
       .find({ postId }, { _id: false, postId: false })
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .lean();
+    const commentsWithLikesInfo = await Promise.all(
+      comments.map(async (comment) => {
+        return this.addReactionsInfoToComment(comment, userId);
+      }),
+    );
     const numberOfComments = await this.commentModel.countDocuments({ postId });
-    return new PaginationViewModel<Comment[]>(
+    return new PaginationViewModel<CommentViewModel[]>(
       numberOfComments,
       pageNumber,
       pageSize,
-      comments,
+      commentsWithLikesInfo,
     );
   }
   async getMappedComment(id: string): Promise<CommentViewModel | null> {

@@ -25,6 +25,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
 import { CommentViewModel } from '../../comments';
+import { UpdateReactionPostDto } from './update-reaction-post.dto';
+import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('posts')
 export class PostsController {
@@ -32,6 +35,7 @@ export class PostsController {
     private readonly postsService: PostsService,
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly commentsQueryRepository: CommentsQueryRepository,
+    private jwtService: JwtService,
   ) {}
   @Get()
   async getAllPosts(
@@ -55,15 +59,22 @@ export class PostsController {
   async getAllCommentsForPostId(
     @Query() postsPaginationDto: PostPaginationQueryDto,
     @Param('postId') postId: string,
-  ): Promise<PaginationViewModel<Comment[]>> {
+    @GetAccessToken() token: string | null,
+  ): Promise<PaginationViewModel<CommentViewModel[]>> {
     const isPost = await this.postsQueryRepository.findPost(postId);
     if (!isPost) throw new NotFoundException();
+    let userId: null | string = null;
+    if (token) {
+      const payload: any = await this.jwtService.decode(token);
+      userId = payload.userId;
+    }
     return this.commentsQueryRepository.findCommentsByPostId(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
       postsPaginationDto.pageNumber,
       postsPaginationDto.sortDirection,
       postId,
+      userId,
     );
   }
   @UseGuards(BasicAuthGuard)
@@ -108,6 +119,20 @@ export class PostsController {
     console.log(updatedPost);
     if (!updatedPost) throw new NotFoundException();
     return;
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':postId/like-status')
+  @HttpCode(204)
+  async updateReactionToPost(
+    @Param('postId') postId: string,
+    @Body() updateReactionPostDto: UpdateReactionPostDto,
+    @GetJwtAtPayloadDecorator() userId: string,
+  ): Promise<void> {
+    return this.postsService.updateReactionToPost(
+      postId,
+      updateReactionPostDto,
+      userId,
+    );
   }
   @UseGuards(BasicAuthGuard)
   @Delete(':id')

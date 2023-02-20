@@ -8,6 +8,8 @@ import { PostsRepository } from './posts.repository';
 import { CommentsModule } from '../comments/comments.module';
 import { BlogsModule } from '../blogs/blogs.module';
 import { UsersModule } from '../users/users.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ReactionsModule } from '../reactions/reactions.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { UsersModule } from '../users/users.module';
     CommentsModule,
     BlogsModule,
     UsersModule,
+    ReactionsModule,
+    JwtModule.register({}),
   ],
   controllers: [PostsController],
   providers: [PostsService, PostsQueryRepository, PostsRepository],

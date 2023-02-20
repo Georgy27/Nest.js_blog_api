@@ -7,16 +7,13 @@ import {
   NotFoundException,
   Param,
   Put,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from '../comments.service';
 import { CommentsQueryRepository } from '../comments.query.repository';
-import { Comment } from '../schemas/comment.schema';
-import { UpdateReactionDto } from '../dto/update-reaction.dto';
+import { UpdateReactionCommentDto } from '../dto/update-reaction-comment.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
-import { Request } from 'express';
 import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
@@ -46,13 +43,13 @@ export class CommentsController {
   @UseGuards(AuthGuard('jwt'))
   @Put(':commentId/like-status')
   @HttpCode(204)
-  async updateReaction(
+  async updateReactionToComment(
     @Param('commentId') commentId: string,
-    @Body() updateReactionDto: UpdateReactionDto,
+    @Body() updateReactionCommentDto: UpdateReactionCommentDto,
     @GetJwtAtPayloadDecorator() userId: string,
   ): Promise<void> {
-    return this.commentsService.updateReaction(
-      updateReactionDto,
+    return this.commentsService.updateReactionToComment(
+      updateReactionCommentDto,
       commentId,
       userId,
     );

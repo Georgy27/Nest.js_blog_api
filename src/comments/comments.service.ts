@@ -3,12 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateReactionDto } from './dto/update-reaction.dto';
 import { CommentsRepository } from './comments.repository';
 import { UsersRepository } from '../users/users.repository';
 import { ReactionsRepository } from '../reactions/reactions.repository';
 import { ReactionsService } from '../reactions/reactions.service';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { UpdateReactionCommentDto } from './dto/update-reaction-comment.dto';
 
 @Injectable()
 export class CommentsService {
@@ -18,8 +18,8 @@ export class CommentsService {
     private readonly reactionsRepository: ReactionsRepository,
     private readonly reactionsService: ReactionsService,
   ) {}
-  async updateReaction(
-    updateReactionDto: UpdateReactionDto,
+  async updateReactionToComment(
+    updateReactionCommentDto: UpdateReactionCommentDto,
     commentId: string,
     userId: string,
   ): Promise<void> {
@@ -35,7 +35,7 @@ export class CommentsService {
       commentId,
       userId,
       user.accountData.login,
-      updateReactionDto.likeStatus,
+      updateReactionCommentDto.likeStatus,
     );
   }
   async updateComment(

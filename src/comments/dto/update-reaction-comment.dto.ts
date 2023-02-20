@@ -1,10 +1,10 @@
-import { IsEnum, IsString, IsUrl, Length } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 import {
   reactionStatusEnum,
   reactionStatusEnumKeys,
 } from '../../helpers/reaction';
 
-export class UpdateReactionDto {
+export class UpdateReactionCommentDto {
   @IsEnum(reactionStatusEnum)
   @IsString()
   likeStatus: reactionStatusEnumKeys;
