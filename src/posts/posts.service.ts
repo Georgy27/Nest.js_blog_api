@@ -33,8 +33,7 @@ export class PostsService {
   async createPost(createPostDto: CreatePostDto): Promise<string | null> {
     // find a blog
     const blog = await this.blogsRepository.findBlogById(createPostDto.blogId);
-    if (!blog)
-      throw new BadRequestException({ message: 'Invalid blogId', field: blog });
+    if (!blog) throw new NotFoundException();
     // create new post
     const newPost = new this.postModel();
     newPost.createPost(createPostDto, blog.name);

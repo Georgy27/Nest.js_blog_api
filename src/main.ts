@@ -9,7 +9,7 @@ import { TrimPipe } from './pipes/trim.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  // useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.enableCors();
   app.use(cookieParser());
   app.useGlobalPipes(

@@ -6,22 +6,23 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { BlogsQueryRepository } from '../../blogs/blogs.query.repository';
+import { BlogsQueryRepository } from '../../../blogs/blogs.query.repository';
 
 export function BlogIsExist(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
     registerDecorator({
+      name: 'BlogIsExist',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
-      validator: BlogIsExistRule,
+      validator: BlogIsExistValidator,
     });
   };
 }
 
 @ValidatorConstraint({ name: 'BlogIsExist', async: false })
 @Injectable()
-export class BlogIsExistRule implements ValidatorConstraintInterface {
+export class BlogIsExistValidator implements ValidatorConstraintInterface {
   constructor(private blogsQueryRepository: BlogsQueryRepository) {}
 
   async validate(value: string) {
