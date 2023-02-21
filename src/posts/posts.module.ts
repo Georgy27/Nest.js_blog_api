@@ -11,6 +11,7 @@ import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ReactionsModule } from '../reactions/reactions.module';
 import { Reaction, ReactionSchema } from '../reactions/schemas/reaction.schema';
+import { BlogIsExistValidator } from '../common/decorators/validation/blogId-validation.decorator';
 
 @Module({
   imports: [
@@ -25,7 +26,12 @@ import { Reaction, ReactionSchema } from '../reactions/schemas/reaction.schema';
     JwtModule.register({}),
   ],
   controllers: [PostsController],
-  providers: [PostsService, PostsQueryRepository, PostsRepository],
+  providers: [
+    PostsService,
+    PostsQueryRepository,
+    PostsRepository,
+    // BlogIsExistValidator,
+  ],
   exports: [PostsQueryRepository, PostsService, PostsRepository],
 })
 export class PostsModule {}
