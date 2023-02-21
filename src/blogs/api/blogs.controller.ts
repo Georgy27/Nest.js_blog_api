@@ -24,6 +24,9 @@ import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.mode
 import { CreatePostByBlogIdDto } from '../dto/create.post.blogId.dto';
 import { PostsService } from '../../posts/posts.service';
 import { BasicAuthGuard } from '../../common/guards/basic.auth.guard';
+import { PostViewModel } from '../../posts';
+import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('blogs')
 export class BlogsController {
@@ -32,6 +35,7 @@ export class BlogsController {
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly postsService: PostsService,
+    private jwtService: JwtService,
   ) {}
   @Get()
   async getAllBlogs(
@@ -55,16 +59,24 @@ export class BlogsController {
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
     @Query() postsPaginationDto: PostPaginationQueryDto,
-  ): Promise<PaginationViewModel<PostReactionViewModel[]>> {
+    @GetAccessToken() token: string | null,
+  ): Promise<PaginationViewModel<PostViewModel[]>> {
     // check if the blog exists
     const getBlogByPostId = await this.blogsQueryRepository.findBlog(blogId);
     if (!getBlogByPostId) throw new NotFoundException();
+
+    let userId: null | string = null;
+    if (token) {
+      const payload: any = await this.jwtService.decode(token);
+      userId = payload.userId;
+    }
     // return all posts for this blogId
     return this.postsQueryRepository.findPosts(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
       postsPaginationDto.pageNumber,
       postsPaginationDto.sortDirection,
+      userId,
       blogId,
     );
   }
@@ -90,10 +102,10 @@ export class BlogsController {
   ) {
     // create post
     const newCreatePostDto = { ...createPostDto, blogId: blogId };
-    const newPost = await this.postsService.createPost(newCreatePostDto);
-    if (!newPost) throw new NotFoundException();
+    const newPostId = await this.postsService.createPost(newCreatePostDto);
+    if (!newPostId) throw new NotFoundException();
     // return post to user
-    return this.postsQueryRepository.findPost(newPost);
+    return this.postsQueryRepository.getMappedPost(newPostId);
   }
   @UseGuards(BasicAuthGuard)
   @Put(':id')

@@ -28,6 +28,7 @@ import { CommentViewModel } from '../../comments';
 import { UpdateReactionPostDto } from './update-reaction-post.dto';
 import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
+import { PostViewModel } from '../index';
 
 @Controller('posts')
 export class PostsController {
@@ -40,17 +41,32 @@ export class PostsController {
   @Get()
   async getAllPosts(
     @Query() postsPaginationDto: PostPaginationQueryDto,
+    @GetAccessToken() token: string | null,
   ): Promise<PaginationViewModel<PostReactionViewModel[]>> {
+    let userId: null | string = null;
+    if (token) {
+      const payload: any = await this.jwtService.decode(token);
+      userId = payload.userId;
+    }
     return this.postsQueryRepository.findPosts(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
       postsPaginationDto.pageNumber,
       postsPaginationDto.sortDirection,
+      userId,
     );
   }
   @Get(':id')
-  async getPostById(@Param('id') id: string): Promise<PostReactionViewModel> {
-    const post = await this.postsQueryRepository.findPost(id);
+  async getPostById(
+    @Param('id') id: string,
+    @GetAccessToken() token: string | null,
+  ): Promise<PostReactionViewModel> {
+    let userId: null | string = null;
+    if (token) {
+      const payload: any = await this.jwtService.decode(token);
+      userId = payload.userId;
+    }
+    const post = await this.postsQueryRepository.findPost(id, userId);
 
     if (!post) throw new NotFoundException();
     return post;
@@ -61,7 +77,7 @@ export class PostsController {
     @Param('postId') postId: string,
     @GetAccessToken() token: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
-    const isPost = await this.postsQueryRepository.findPost(postId);
+    const isPost = await this.postsQueryRepository.getMappedPost(postId);
     if (!isPost) throw new NotFoundException();
     let userId: null | string = null;
     if (token) {
@@ -82,10 +98,10 @@ export class PostsController {
   @HttpCode(201)
   async createPost(
     @Body() createPostDto: CreatePostDto,
-  ): Promise<PostReactionViewModel> {
+  ): Promise<PostViewModel> {
     const postId = await this.postsService.createPost(createPostDto);
     if (!postId) throw new NotFoundException();
-    const post = await this.postsQueryRepository.findPost(postId);
+    const post = await this.postsQueryRepository.getMappedPost(postId);
     if (!post) throw new NotFoundException();
     return post;
   }

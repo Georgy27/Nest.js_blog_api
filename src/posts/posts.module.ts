@@ -10,10 +10,14 @@ import { BlogsModule } from '../blogs/blogs.module';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ReactionsModule } from '../reactions/reactions.module';
+import { Reaction, ReactionSchema } from '../reactions/schemas/reaction.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
+    MongooseModule.forFeature([
+      { name: Reaction.name, schema: ReactionSchema },
+    ]),
     CommentsModule,
     BlogsModule,
     UsersModule,
