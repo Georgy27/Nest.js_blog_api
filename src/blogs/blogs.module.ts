@@ -7,6 +7,7 @@ import { BlogsRepository } from './blogs.repository';
 import { BlogsQueryRepository } from './blogs.query.repository';
 import { PostsModule } from '../posts/posts.module';
 import { JwtModule } from '@nestjs/jwt';
+import { BlogIsExistValidator } from '../common/decorators/validation/blogId-validation.decorator';
 
 @Module({
   imports: [
@@ -15,7 +16,12 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({}),
   ],
   controllers: [BlogsController],
-  providers: [BlogsService, BlogsRepository, BlogsQueryRepository],
+  providers: [
+    BlogsService,
+    BlogsRepository,
+    BlogsQueryRepository,
+    BlogIsExistValidator,
+  ],
   exports: [BlogsRepository],
 })
 export class BlogsModule {}

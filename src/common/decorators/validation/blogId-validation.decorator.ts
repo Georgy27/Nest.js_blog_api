@@ -20,10 +20,10 @@ export function BlogIsExist(validationOptions?: ValidationOptions) {
   };
 }
 
-@ValidatorConstraint({ name: 'BlogIsExist', async: false })
+@ValidatorConstraint({ name: 'BlogIsExist', async: true })
 @Injectable()
 export class BlogIsExistValidator implements ValidatorConstraintInterface {
-  constructor(private blogsQueryRepository: BlogsQueryRepository) {}
+  constructor(private readonly blogsQueryRepository: BlogsQueryRepository) {}
 
   async validate(value: string) {
     try {

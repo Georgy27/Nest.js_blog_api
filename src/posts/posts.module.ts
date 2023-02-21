@@ -26,12 +26,7 @@ import { BlogIsExistValidator } from '../common/decorators/validation/blogId-val
     JwtModule.register({}),
   ],
   controllers: [PostsController],
-  providers: [
-    PostsService,
-    PostsQueryRepository,
-    PostsRepository,
-    // BlogIsExistValidator,
-  ],
+  providers: [PostsService, PostsQueryRepository, PostsRepository],
   exports: [PostsQueryRepository, PostsService, PostsRepository],
 })
 export class PostsModule {}
