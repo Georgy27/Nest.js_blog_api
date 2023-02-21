@@ -5,12 +5,14 @@ import { ValidationError } from 'class-validator';
 import { prepareErrorResult } from './pipes/validation.pipe';
 import { HttpExceptionFilter } from './http.exception-filter';
 import cookieParser from 'cookie-parser';
+import { TrimPipe } from './pipes/trim.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.use(cookieParser());
   app.useGlobalPipes(
+    new TrimPipe(),
     new ValidationPipe({
       whitelist: true,
       transform: true,
