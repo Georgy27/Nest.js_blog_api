@@ -11,7 +11,7 @@ export class UpdatePostDto {
   @Length(1, 1000)
   @IsString()
   content: string;
-  @Validate(BlogIsExist)
+  @BlogIsExist()
   @IsString()
   blogId: string;
 }
