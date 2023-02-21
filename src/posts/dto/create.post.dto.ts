@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsString, IsUUID, Length } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -11,5 +11,6 @@ export class CreatePostDto {
   @Length(1, 1000)
   content: string;
   @IsString()
+  @IsUUID()
   blogId: string;
 }

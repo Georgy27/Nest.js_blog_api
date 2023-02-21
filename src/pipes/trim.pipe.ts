@@ -25,15 +25,11 @@ export class TrimPipe implements PipeTransform {
     return values;
   }
   transform(values: any, metadata: ArgumentMetadata) {
-    console.log('inside transform');
-    console.log(values);
     const { type } = metadata;
     if (this.isObj(values) && type === 'body') {
       return this.trim(values);
+    } else {
+      return values;
     }
-    console.log('still inside');
-    throw new BadRequestException([
-      { message: 'Validation failed', field: 'email' },
-    ]);
   }
 }

@@ -26,6 +26,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (!responseBody) {
         throw new Error('Bad request. Error is of wrong type.');
       }
+
       responseBody.message.forEach((m) =>
         errorsResponse.errorsMessages.push(m),
       );
