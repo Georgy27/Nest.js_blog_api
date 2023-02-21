@@ -34,6 +34,7 @@ export class BlogsService {
     blog.name = name;
     blog.description = description;
     blog.websiteUrl = websiteUrl;
+    console.log(blog);
     return this.blogsRepository.save(blog);
   }
   async deleteBlog(id: string): Promise<boolean> {

@@ -1,15 +1,17 @@
-import { IsString, Length } from 'class-validator';
+import { IsString, Length, Validate } from 'class-validator';
+import { BlogIsExistRule } from '../../common/decorators/blogId-validation.decorator';
 
 export class UpdatePostDto {
-  @IsString()
   @Length(1, 30)
+  @IsString()
   title: string;
-  @IsString()
   @Length(1, 100)
-  shortDescription: string;
   @IsString()
+  shortDescription: string;
   @Length(1, 1000)
+  @IsString()
   content: string;
+  @Validate(BlogIsExistRule)
   @IsString()
   blogId: string;
 }

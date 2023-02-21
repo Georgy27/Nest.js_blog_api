@@ -24,7 +24,7 @@ export const CommentatorInfoSchema =
 
 export type CommentDocument = HydratedDocument<Comment>;
 
-@Schema({ versionKey: false })
+@Schema({ id: false, versionKey: false })
 export class Comment {
   @Prop({ required: true, unique: true, type: String })
   id: string;

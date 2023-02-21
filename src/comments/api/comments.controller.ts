@@ -75,6 +75,7 @@ export class CommentsController {
     @Param('commentId') commentId: string,
     @GetJwtAtPayloadDecorator() userId: string,
   ): Promise<void> {
+    console.log(commentId, userId);
     return this.commentsService.deleteComment(commentId, userId);
   }
 }

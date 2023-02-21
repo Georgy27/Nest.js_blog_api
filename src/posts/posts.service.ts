@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from './schemas/post.schema';
 import { Model } from 'mongoose';
@@ -12,7 +16,7 @@ import { randomUUID } from 'crypto';
 import { Comment } from '../comments/schemas/comment.schema';
 import { User } from '../users/schemas/user.schema';
 import { CommentsRepository } from '../comments/comments.repository';
-import { UpdateReactionPostDto } from './api/update-reaction-post.dto';
+import { UpdateReactionPostDto } from './dto/update-reaction-post.dto';
 import { ReactionsService } from '../reactions/reactions.service';
 
 @Injectable()
@@ -29,7 +33,8 @@ export class PostsService {
   async createPost(createPostDto: CreatePostDto): Promise<string | null> {
     // find a blog
     const blog = await this.blogsRepository.findBlogById(createPostDto.blogId);
-    if (!blog) return null;
+    if (!blog)
+      throw new BadRequestException({ message: 'Invalid blogId', field: blog });
     // create new post
     const newPost = new this.postModel();
     newPost.createPost(createPostDto, blog.name);

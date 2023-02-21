@@ -25,7 +25,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
 import { CommentViewModel } from '../../comments';
-import { UpdateReactionPostDto } from './update-reaction-post.dto';
+import { UpdateReactionPostDto } from '../dto/update-reaction-post.dto';
 import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { PostViewModel } from '../index';

@@ -10,6 +10,7 @@ export class CommentsRepository {
   ) {}
   async save(comment: CommentDocument): Promise<string> {
     await comment.save();
+    console.log(comment);
     return comment.id;
   }
   async clearComments() {
@@ -20,10 +21,10 @@ export class CommentsRepository {
     return newComment.id;
   }
   async findComment(id: string): Promise<CommentDocument | null> {
-    return this.commentModel.findOne({ id }, { _id: false, postId: false });
+    return this.commentModel.findOne({ id }, { postId: false });
   }
-  async delete(comment: CommentDocument): Promise<string> {
-    await comment.delete();
-    return comment.id;
+  async deleteComment(id: string): Promise<boolean> {
+    const result = await this.commentModel.deleteOne({ id });
+    return result.deletedCount === 1;
   }
 }

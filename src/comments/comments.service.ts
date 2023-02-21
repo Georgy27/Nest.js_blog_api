@@ -56,11 +56,12 @@ export class CommentsService {
   async deleteComment(commentId: string, userId: string) {
     // find comment
     const comment = await this.commentsRepository.findComment(commentId);
+    console.log(comment);
     if (!comment) throw new NotFoundException();
     // check user
     if (comment.commentatorInfo.userId !== userId)
       throw new ForbiddenException();
     // delete
-    await this.commentsRepository.delete(comment);
+    await this.commentsRepository.deleteComment(commentId);
   }
 }

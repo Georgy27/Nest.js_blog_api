@@ -1,4 +1,5 @@
-import { IsString, IsUUID, Length } from 'class-validator';
+import { IsString, Length, Validate } from 'class-validator';
+import { BlogIsExistRule } from '../../common/decorators/blogId-validation.decorator';
 
 export class CreatePostDto {
   @IsString()
@@ -10,7 +11,7 @@ export class CreatePostDto {
   @IsString()
   @Length(1, 1000)
   content: string;
+  @Validate(BlogIsExistRule)
   @IsString()
-  @IsUUID()
   blogId: string;
 }
