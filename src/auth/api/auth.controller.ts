@@ -22,6 +22,7 @@ import { NewPasswordDto } from '../dto/new-password.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
 import { UsersQueryRepository } from '../../users/users.query.repository';
 import { ConfirmationCodeDto } from '../dto/confirmationCode.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -66,6 +67,7 @@ export class AuthController {
     });
     return { accessToken };
   }
+  @SkipThrottle()
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('logout')
   @HttpCode(204)
@@ -77,6 +79,7 @@ export class AuthController {
     const logoutUser = await this.authService.logout(userId, deviceId, iat);
     res.clearCookie('refreshToken');
   }
+  @SkipThrottle()
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh-token')
   async refreshToken(
@@ -108,6 +111,7 @@ export class AuthController {
       newPasswordDto.newPassword,
     );
   }
+  @SkipThrottle()
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
   async me(@GetJwtAtPayloadDecorator() userId: string) {

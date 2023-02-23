@@ -3,7 +3,9 @@ import { BlogsRepository } from '../../blogs/blogs.repository';
 import { PostsRepository } from '../../posts/posts.repository';
 import { UsersRepository } from '../../users/users.repository';
 import { CommentsRepository } from '../../comments/comments.repository';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('testing/all-data')
 export class TestingController {
   constructor(

@@ -29,7 +29,9 @@ import { UpdateReactionPostDto } from '../dto/update-reaction-post.dto';
 import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { PostViewModel } from '../index';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(

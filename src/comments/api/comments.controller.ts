@@ -17,7 +17,9 @@ import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayloa
 import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('comments')
 export class CommentsController {
   constructor(

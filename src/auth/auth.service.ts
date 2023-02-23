@@ -78,8 +78,6 @@ export class AuthService {
     return tokens;
   }
   async logout(userId: string, deviceId: string, iat: number) {
-    console.log(userId, deviceId, iat);
-    console.log(typeof userId, typeof deviceId, typeof iat);
     const lastActiveDate = new Date(iat * 1000).toISOString();
     const logOutUser =
       await this.securityDevicesService.deleteSessionByDeviceId(
@@ -248,14 +246,16 @@ export class AuthService {
         { userId },
         {
           secret: this.config.get<string>('JWT_AT_SECRET'),
-          expiresIn: 60 * 15,
+          // expiresIn: 60 * 15,
+          expiresIn: 10,
         },
       ),
       this.jwtService.signAsync(
         { userId, deviceId },
         {
           secret: this.config.get<string>('JWT_RT_SECRET'),
-          expiresIn: 60 * 60 * 24 * 7,
+          // expiresIn: 60 * 60 * 24 * 7,
+          expiresIn: 20,
         },
       ),
     ]);
