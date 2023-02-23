@@ -82,6 +82,7 @@ export class AuthController {
   @SkipThrottle()
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh-token')
+  @HttpCode(200)
   async refreshToken(
     @GetJwtRtPayloadDecorator() user: JwtRtPayload,
     @Res({ passthrough: true }) res: Response,

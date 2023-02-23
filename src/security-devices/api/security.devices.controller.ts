@@ -1,4 +1,11 @@
-import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { GetJwtRtPayloadDecorator } from '../../common/decorators/getJwtRtPayload.decorator';
 import { JwtRtPayload } from '../../auth/strategies';
 import { SecurityDevicesQueryRepository } from '../security.devices.query.repository';
@@ -25,6 +32,7 @@ export class SecurityDevicesController {
   }
   @UseGuards(AuthGuard('jwt-refresh'))
   @Delete()
+  @HttpCode(204)
   async deleteAllDevicesSessionsButActive(
     @GetJwtRtPayloadDecorator() user: JwtRtPayload,
   ) {
@@ -34,7 +42,8 @@ export class SecurityDevicesController {
     );
   }
   @UseGuards(AuthGuard('jwt-refresh'))
-  @Delete()
+  @Delete(':deviceId')
+  @HttpCode(204)
   async deleteDeviceSessionById(
     @Param('deviceId') deviceId: string,
     @GetJwtRtPayloadDecorator() user: JwtRtPayload,
