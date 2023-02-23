@@ -27,13 +27,12 @@ export class SecurityDevicesRepository {
   async deleteSessionByDeviceId(
     userId: string,
     deviceId: string,
-    lastActiveDate: string,
   ): Promise<boolean> {
     const deletedToken = await this.securityDevicesModel.deleteOne({
       userId,
       deviceId,
-      lastActiveDate,
     });
+    console.log(deletedToken);
     return deletedToken.deletedCount === 1;
   }
 

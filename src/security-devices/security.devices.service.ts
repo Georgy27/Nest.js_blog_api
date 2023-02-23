@@ -18,12 +18,10 @@ export class SecurityDevicesService {
   async deleteSessionByDeviceId(
     userId: string,
     deviceId: string,
-    lastActiveDate: string,
   ): Promise<boolean> {
     return this.securityDevicesRepository.deleteSessionByDeviceId(
       userId,
       deviceId,
-      lastActiveDate,
     );
   }
   async updateLastActiveDate(
@@ -46,12 +44,7 @@ export class SecurityDevicesService {
       deviceId,
     );
   }
-  async logoutDevice(
-    userId: string,
-    deviceId: string,
-    iat: number,
-  ): Promise<boolean> {
-    const lastActiveDate = new Date(iat * 1000).toISOString();
+  async logoutDevice(userId: string, deviceId: string): Promise<boolean> {
     const isSession =
       await this.securityDevicesRepository.findSessionByDeviceId(deviceId);
     if (!isSession) throw new NotFoundException();
@@ -59,7 +52,6 @@ export class SecurityDevicesService {
     return this.securityDevicesRepository.deleteSessionByDeviceId(
       userId,
       deviceId,
-      lastActiveDate,
     );
   }
 }

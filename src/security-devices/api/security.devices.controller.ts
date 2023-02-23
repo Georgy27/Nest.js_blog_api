@@ -48,11 +48,6 @@ export class SecurityDevicesController {
     @Param('deviceId') deviceId: string,
     @GetJwtRtPayloadDecorator() user: JwtRtPayload,
   ): Promise<boolean> {
-    console.log(deviceId);
-    return this.securityDevicesService.logoutDevice(
-      user.userId,
-      deviceId,
-      user.iat,
-    );
+    return this.securityDevicesService.logoutDevice(user.userId, deviceId);
   }
 }

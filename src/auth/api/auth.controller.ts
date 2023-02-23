@@ -75,8 +75,8 @@ export class AuthController {
     @GetJwtRtPayloadDecorator() user: JwtRtPayload,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
-    const { userId, deviceId, iat } = user;
-    const logoutUser = await this.authService.logout(userId, deviceId, iat);
+    const { userId, deviceId } = user;
+    const logoutUser = await this.authService.logout(userId, deviceId);
     res.clearCookie('refreshToken');
   }
   @SkipThrottle()

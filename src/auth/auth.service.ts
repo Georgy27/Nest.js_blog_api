@@ -77,13 +77,11 @@ export class AuthService {
     await this.securityDevicesService.createNewDevice(deviceInfo);
     return tokens;
   }
-  async logout(userId: string, deviceId: string, iat: number) {
-    const lastActiveDate = new Date(iat * 1000).toISOString();
+  async logout(userId: string, deviceId: string) {
     const logOutUser =
       await this.securityDevicesService.deleteSessionByDeviceId(
         userId,
         deviceId,
-        lastActiveDate,
       );
     if (!logOutUser) throw new UnauthorizedException();
 
@@ -246,16 +244,16 @@ export class AuthService {
         { userId },
         {
           secret: this.config.get<string>('JWT_AT_SECRET'),
-          // expiresIn: 60 * 15,
-          expiresIn: 8,
+          expiresIn: 60 * 15,
+          //expiresIn: 8,
         },
       ),
       this.jwtService.signAsync(
         { userId, deviceId },
         {
           secret: this.config.get<string>('JWT_RT_SECRET'),
-          //   expiresIn: 60 * 60 * 24 * 7,
-          expiresIn: 18,
+          expiresIn: 60 * 60 * 24 * 7,
+          //expiresIn: 18,
         },
       ),
     ]);
