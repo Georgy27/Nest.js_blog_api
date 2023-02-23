@@ -53,9 +53,9 @@ export class SecurityDevicesService {
   ): Promise<boolean> {
     const lastActiveDate = new Date(iat * 1000).toISOString();
     const isSession =
-      await this.securityDevicesRepository.findSessionByDeviceId(userId);
+      await this.securityDevicesRepository.findSessionByDeviceId(deviceId);
     if (!isSession) throw new NotFoundException();
-    if (isSession.deviceId !== deviceId) throw new ForbiddenException();
+    if (isSession.userId !== userId) throw new ForbiddenException();
     return this.securityDevicesRepository.deleteSessionByDeviceId(
       userId,
       deviceId,
