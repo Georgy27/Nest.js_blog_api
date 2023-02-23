@@ -63,4 +63,7 @@ export class SecurityDevicesRepository {
       deviceId: { $ne: deviceId },
     });
   }
+  async clearSessions() {
+    await this.securityDevicesModel.deleteMany({});
+  }
 }

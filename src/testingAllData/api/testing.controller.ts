@@ -4,6 +4,7 @@ import { PostsRepository } from '../../posts/posts.repository';
 import { UsersRepository } from '../../users/users.repository';
 import { CommentsRepository } from '../../comments/comments.repository';
 import { SkipThrottle } from '@nestjs/throttler';
+import { SecurityDevicesRepository } from '../../security-devices/security.devices.repository';
 
 @SkipThrottle()
 @Controller('testing/all-data')
@@ -13,6 +14,7 @@ export class TestingController {
     private readonly postsRepository: PostsRepository,
     private readonly usersRepository: UsersRepository,
     private readonly commentsRepository: CommentsRepository,
+    private readonly securityDevicesRepository: SecurityDevicesRepository,
   ) {}
   @Delete()
   @HttpCode(204)
@@ -22,6 +24,7 @@ export class TestingController {
       this.postsRepository.clearPosts(),
       this.usersRepository.clearUsers(),
       this.commentsRepository.clearComments(),
+      this.securityDevicesRepository.clearSessions(),
     ]);
 
     return;
