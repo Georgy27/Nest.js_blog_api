@@ -41,6 +41,8 @@ export class AuthService {
       throw new BadRequestException([
         { message: 'This email already exists', field: 'email' },
       ]);
+    // create tokens
+
     // create user
     const newUser: User = await this.usersService.createUser(user);
     // send email
@@ -62,8 +64,13 @@ export class AuthService {
       loginDto.loginOrEmail,
       loginDto.password,
     );
+
     const deviceId = randomUUID();
-    const tokens = await this.getTokens(user.id, deviceId);
+    const tokens = await this.getTokens(
+      user.id,
+      user.accountData.login,
+      deviceId,
+    );
     const issuedAt = await this.getIssuedAtFromRefreshToken(
       tokens.refreshToken,
     );
@@ -87,7 +94,12 @@ export class AuthService {
 
     return logOutUser;
   }
-  async refreshTokin(userId: string, deviceId: string, iat: number) {
+  async refreshTokin(
+    userId: string,
+    userLogin: string,
+    deviceId: string,
+    iat: number,
+  ) {
     // check if the token is valid
     const lastActiveDate = new Date(iat * 1000).toISOString();
     const isValidRt = await this.securityDevicesRepository.findLastActiveDate(
@@ -97,7 +109,7 @@ export class AuthService {
     if (!isValidRt) throw new UnauthorizedException();
 
     // if valid, create new pair of tokens
-    const tokens = await this.getTokens(userId, deviceId);
+    const tokens = await this.getTokens(userId, userLogin, deviceId);
     const issuedAt = await this.getIssuedAtFromRefreshToken(
       tokens.refreshToken,
     );
@@ -238,10 +250,10 @@ export class AuthService {
       ]);
     return true;
   }
-  async getTokens(userId: string, deviceId: string) {
+  async getTokens(userId: string, userLogin: string, deviceId: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
-        { userId },
+        { userId, userLogin },
         {
           secret: this.config.get<string>('JWT_AT_SECRET'),
           expiresIn: 60 * 15,
@@ -249,7 +261,7 @@ export class AuthService {
         },
       ),
       this.jwtService.signAsync(
-        { userId, deviceId },
+        { userId, userLogin, deviceId },
         {
           secret: this.config.get<string>('JWT_RT_SECRET'),
           expiresIn: 60 * 60 * 24 * 7,

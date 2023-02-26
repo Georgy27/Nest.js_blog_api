@@ -87,9 +87,10 @@ export class AuthController {
     @GetJwtRtPayloadDecorator() user: JwtRtPayload,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
-    const { userId, deviceId, iat } = user;
+    const { userId, userLogin, deviceId, iat } = user;
     const { accessToken, refreshToken } = await this.authService.refreshTokin(
       userId,
+      userLogin,
       deviceId,
       iat,
     );
@@ -115,8 +116,8 @@ export class AuthController {
   @SkipThrottle()
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  async me(@GetJwtAtPayloadDecorator() userId: string) {
-    const user = await this.userQueryRepository.findUser(userId);
+  async me(@GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload) {
+    const user = await this.userQueryRepository.findUser(jwtAtPayload.userId);
     return {
       email: user.email,
       login: user.login,

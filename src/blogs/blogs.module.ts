@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './schemas/blog.schema';
-import { BlogsController } from './api/blogs.controller';
+import { BlogsController } from './api/blogger/blogs.controller';
 import { BlogsService } from './blogs.service';
 import { BlogsRepository } from './blogs.repository';
 import { BlogsQueryRepository } from './blogs.query.repository';

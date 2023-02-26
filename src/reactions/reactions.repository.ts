@@ -18,4 +18,7 @@ export class ReactionsRepository {
       .findOneAndUpdate(filter, newReaction, { upsert: true, new: true })
       .lean();
   }
+  async dropReactions() {
+    await this.reactionsModel.deleteMany({});
+  }
 }

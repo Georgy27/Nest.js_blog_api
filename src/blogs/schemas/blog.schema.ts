@@ -1,6 +1,7 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { randomUUID } from 'crypto';
+import { IBlogOwnerInfo } from './index';
 export type BlogDocument = HydratedDocument<Blog>;
 
 @Schema({ id: false, versionKey: false })
@@ -17,11 +18,19 @@ export class Blog {
   createdAt: string;
   @Prop({ required: true })
   isMembership: boolean;
-
+  @Prop(
+    raw({
+      userId: { required: true, type: String },
+      userLogin: { required: true, type: String },
+    }),
+  )
+  blogOwnerInfo: IBlogOwnerInfo;
   static createBlog(
     name: string,
     description: string,
     websiteUrl: string,
+    userId: string,
+    userLogin: string,
     Blog: BlogModelType,
   ) {
     return new Blog({
@@ -31,6 +40,10 @@ export class Blog {
       websiteUrl: websiteUrl,
       createdAt: new Date().toISOString(),
       isMembership: false,
+      blogOwnerInfo: {
+        userId: userId,
+        userLogin: userLogin,
+      },
     });
   }
 }
@@ -46,6 +59,8 @@ export type BlogModelStaticType = {
     name: string,
     description: string,
     websiteUrl: string,
+    userId: string,
+    userLogin: string,
     Blog: BlogModelType,
   ) => BlogDocument;
 };

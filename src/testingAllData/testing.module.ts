@@ -5,6 +5,7 @@ import { PostsModule } from '../posts/posts.module';
 import { CommentsModule } from '../comments/comments.module';
 import { UsersModule } from '../users/users.module';
 import { SecurityDevicesModule } from '../security-devices/security.devices.module';
+import { ReactionsModule } from '../reactions/reactions.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SecurityDevicesModule } from '../security-devices/security.devices.modu
     CommentsModule,
     UsersModule,
     SecurityDevicesModule,
+    ReactionsModule,
   ],
   controllers: [TestingController],
 })

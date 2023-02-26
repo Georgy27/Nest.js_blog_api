@@ -16,7 +16,6 @@ import { PaginationViewModel } from '../../helpers/pagination/pagination.view.mo
 import { PostsService } from '../posts.service';
 import { PostsQueryRepository } from '../posts.query.repository';
 import { CommentsQueryRepository } from '../../comments/comments.query.repository';
-import { Comment } from '../../comments/schemas/comment.schema';
 import { CreatePostDto } from '../dto/create.post.dto';
 import { UpdatePostDto } from '../dto/update.post.dto';
 import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
@@ -30,6 +29,7 @@ import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator
 import { JwtService } from '@nestjs/jwt';
 import { PostViewModel } from '../index';
 import { SkipThrottle } from '@nestjs/throttler';
+import { JwtAtPayload } from '../../auth/strategies';
 
 @SkipThrottle()
 @Controller('posts')
@@ -113,12 +113,12 @@ export class PostsController {
   async createCommentForSpecifiedPost(
     @Param('postId') postId: string,
     @Body() createCommentForPostDto: CreateCommentForPostDto,
-    @GetJwtAtPayloadDecorator() userId: string,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<CommentViewModel> {
     const newComment = await this.postsService.createCommentForSpecifiedPost(
       postId,
       createCommentForPostDto,
-      userId,
+      jwtAtPayload.userId,
     );
     const commentToView = await this.commentsQueryRepository.getMappedComment(
       newComment,
@@ -144,12 +144,12 @@ export class PostsController {
   async updateReactionToPost(
     @Param('postId') postId: string,
     @Body() updateReactionPostDto: UpdateReactionPostDto,
-    @GetJwtAtPayloadDecorator() userId: string,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
     return this.postsService.updateReactionToPost(
       postId,
       updateReactionPostDto,
-      userId,
+      jwtAtPayload.userId,
     );
   }
   @UseGuards(BasicAuthGuard)

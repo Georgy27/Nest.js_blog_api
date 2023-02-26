@@ -1,14 +1,18 @@
 import { CreatePostDto } from '../dto/create.post.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Post, PostDocument } from '../schemas/post.schema';
 import { PostsRepository } from '../posts.repository';
 import { BlogsRepository } from '../../blogs/blogs.repository';
 import { InjectModel } from '@nestjs/mongoose';
+import { JwtAtPayload } from '../../auth/strategies';
 
 export class CreatePostForSpecifiedBlogCommand {
-  constructor(public createPostDto: CreatePostDto) {}
+  constructor(
+    public createPostDto: CreatePostDto,
+    public jwtAtPayload: JwtAtPayload,
+  ) {}
 }
 @CommandHandler(CreatePostForSpecifiedBlogCommand)
 export class CreatePostForSpecifiedBlogUseCase
@@ -28,6 +32,9 @@ export class CreatePostForSpecifiedBlogUseCase
       command.createPostDto.blogId,
     );
     if (!blog) throw new NotFoundException();
+    // validate
+    if (command.jwtAtPayload.userId !== blog.blogOwnerInfo.userId)
+      throw new ForbiddenException();
     // create new post
     const newPost = new this.postModel();
     newPost.createPost(command.createPostDto, blog.name);

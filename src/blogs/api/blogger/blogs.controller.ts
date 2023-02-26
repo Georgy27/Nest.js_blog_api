@@ -11,31 +11,34 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsService } from '../blogs.service';
-import { BlogsQueryRepository } from '../blogs.query.repository';
-import { CreateBlogDto } from '../dto/create.blog.dto';
-import { UpdateBlogDto } from '../dto/update.blog.dto';
-import { Blog } from '../schemas/blog.schema';
-import { BlogsPaginationQueryDto } from '../../helpers/pagination/dto/blogs.pagination.query.dto';
-import { PaginationViewModel } from '../../helpers/pagination/pagination.view.model.wrapper';
-import { PostPaginationQueryDto } from '../../helpers/pagination/dto/posts.pagination.query.dto';
-import { PostsQueryRepository } from '../../posts/posts.query.repository';
-import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
-import { CreatePostByBlogIdDto } from '../dto/create.post.blogId.dto';
-import { PostsService } from '../../posts/posts.service';
-import { BasicAuthGuard } from '../../common/guards/basic.auth.guard';
-import { PostViewModel } from '../../posts';
-import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
+import { BlogsService } from '../../blogs.service';
+import { BlogsQueryRepository } from '../../blogs.query.repository';
+import { CreateBlogDto } from '../../dto/create.blog.dto';
+import { UpdateBlogDto } from '../../dto/update.blog.dto';
+import { Blog } from '../../schemas/blog.schema';
+import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
+import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
+import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/posts.pagination.query.dto';
+import { PostsQueryRepository } from '../../../posts/posts.query.repository';
+import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
+import { CreatePostByBlogIdDto } from '../../dto/create.post.blogId.dto';
+import { PostsService } from '../../../posts/posts.service';
+import { BasicAuthGuard } from '../../../common/guards/basic.auth.guard';
+import { PostViewModel } from '../../../posts';
+import { GetAccessToken } from '../../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateBlogCommand } from '../use-cases/create-blog-use-case';
-import { CreatePostForSpecifiedBlogCommand } from '../../posts/use-cases/create-post-for-specified-blog-use-case';
-import { UpdateBlogCommand } from '../use-cases/update-blog-use-case';
-import { DeleteBlogCommand } from '../use-cases/delete-blog-use-case';
+import { CreateBlogCommand } from '../../use-cases/create-blog-use-case';
+import { CreatePostForSpecifiedBlogCommand } from '../../../posts/use-cases/create-post-for-specified-blog-use-case';
+import { UpdateBlogCommand } from '../../use-cases/update-blog-use-case';
+import { DeleteBlogCommand } from '../../use-cases/delete-blog-use-case';
+import { AuthGuard } from '@nestjs/passport';
+import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
+import { JwtAtPayload } from '../../../auth/strategies';
 
 @SkipThrottle()
-@Controller('blogs')
+@Controller('blogger/blogs')
 export class BlogsController {
   constructor(
     private readonly blogsService: BlogsService,
@@ -45,16 +48,19 @@ export class BlogsController {
     private jwtService: JwtService,
     private commandBus: CommandBus,
   ) {}
+  @UseGuards(AuthGuard('jwt'))
   @Get()
-  async getAllBlogs(
+  async getAllBlogsForUser(
     @Query() blogsPaginationDto: BlogsPaginationQueryDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<PaginationViewModel<Blog[]>> {
-    return this.blogsQueryRepository.findBlogs(
+    return this.blogsQueryRepository.findBlogsForUser(
       blogsPaginationDto.searchNameTerm,
       blogsPaginationDto.pageSize,
       blogsPaginationDto.sortBy,
       blogsPaginationDto.pageNumber,
       blogsPaginationDto.sortDirection,
+      jwtAtPayload,
     );
   }
   @Get(':id')
@@ -88,54 +94,58 @@ export class BlogsController {
       blogId,
     );
   }
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   @HttpCode(201)
-  async createBlog(@Body() createBlogDto: CreateBlogDto): Promise<Blog> {
+  async createBlog(
+    @Body() createBlogDto: CreateBlogDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
+  ): Promise<Blog> {
     const blogId = await this.commandBus.execute(
-      new CreateBlogCommand(createBlogDto),
+      new CreateBlogCommand(createBlogDto, jwtAtPayload),
     );
     const blog = await this.blogsQueryRepository.findBlog(blogId);
     if (!blog) throw new NotFoundException();
     return blog;
   }
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Post(':blogId/posts')
   @HttpCode(201)
   async createPostForSpecifiedBlog(
     @Param('blogId') blogId: string,
     @Body() createPostDto: CreatePostByBlogIdDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ) {
     // create post
     const newCreatePostDto = { ...createPostDto, blogId: blogId };
     const newPostId: string | null = await this.commandBus.execute(
-      new CreatePostForSpecifiedBlogCommand(newCreatePostDto),
+      new CreatePostForSpecifiedBlogCommand(newCreatePostDto, jwtAtPayload),
     );
     if (!newPostId) throw new NotFoundException();
     // return post to user
     return this.postsQueryRepository.getMappedPost(newPostId);
   }
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   @HttpCode(204)
   async updateBlog(
     @Param('id') id: string,
     @Body() updateBlogDto: UpdateBlogDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
-    const updatedBlog: string | null = await this.commandBus.execute(
-      new UpdateBlogCommand(id, updateBlogDto),
+    return this.commandBus.execute(
+      new UpdateBlogCommand(id, updateBlogDto, jwtAtPayload.userId),
     );
-    if (!updatedBlog) throw new NotFoundException();
-    return;
   }
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   @HttpCode(204)
-  async deleteBlogById(@Param('id') id: string): Promise<void> {
-    const deletedBlog: boolean = await this.commandBus.execute(
-      new DeleteBlogCommand(id),
+  async deleteBlogById(
+    @Param('id') blogId: string,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
+  ): Promise<void> {
+    return this.commandBus.execute(
+      new DeleteBlogCommand(blogId, jwtAtPayload.userId),
     );
-    if (!deletedBlog) throw new NotFoundException();
-    return;
   }
 }

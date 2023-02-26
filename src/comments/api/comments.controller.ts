@@ -18,6 +18,7 @@ import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator
 import { JwtService } from '@nestjs/jwt';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { SkipThrottle } from '@nestjs/throttler';
+import { JwtAtPayload } from '../../auth/strategies';
 
 @SkipThrottle()
 @Controller('comments')
@@ -48,12 +49,12 @@ export class CommentsController {
   async updateReactionToComment(
     @Param('commentId') commentId: string,
     @Body() updateReactionCommentDto: UpdateReactionCommentDto,
-    @GetJwtAtPayloadDecorator() userId: string,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
     return this.commentsService.updateReactionToComment(
       updateReactionCommentDto,
       commentId,
-      userId,
+      jwtAtPayload.userId,
     );
   }
   @UseGuards(AuthGuard('jwt'))
@@ -62,12 +63,12 @@ export class CommentsController {
   async updateComment(
     @Param('commentId') commentId: string,
     @Body() updateCommentDto: UpdateCommentDto,
-    @GetJwtAtPayloadDecorator() userId: string,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
     return this.commentsService.updateComment(
       commentId,
       updateCommentDto,
-      userId,
+      jwtAtPayload.userId,
     );
   }
   @UseGuards(AuthGuard('jwt'))
@@ -75,9 +76,8 @@ export class CommentsController {
   @HttpCode(204)
   async deleteComment(
     @Param('commentId') commentId: string,
-    @GetJwtAtPayloadDecorator() userId: string,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
-    console.log(commentId, userId);
-    return this.commentsService.deleteComment(commentId, userId);
+    return this.commentsService.deleteComment(commentId, jwtAtPayload.userId);
   }
 }

@@ -3,9 +3,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogModelType } from '../schemas/blog.schema';
 import { BlogsRepository } from '../blogs.repository';
+import { JwtAtPayload } from '../../auth/strategies';
 
 export class CreateBlogCommand {
-  constructor(public createBlogDto: CreateBlogDto) {}
+  constructor(
+    public createBlogDto: CreateBlogDto,
+    public jwtAtPayload: JwtAtPayload,
+  ) {}
 }
 @CommandHandler(CreateBlogCommand)
 export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
@@ -15,12 +19,16 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
   ) {}
   async execute(command: CreateBlogCommand) {
     const { name, description, websiteUrl } = command.createBlogDto;
+    const { userId, userLogin } = command.jwtAtPayload;
     const newBlog = this.blogModel.createBlog(
       name,
       description,
       websiteUrl,
+      userId,
+      userLogin,
       this.blogModel,
     );
+    console.log(newBlog);
     return this.blogsRepository.save(newBlog);
   }
 }
