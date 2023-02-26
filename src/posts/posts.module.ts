@@ -12,9 +12,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { ReactionsModule } from '../reactions/reactions.module';
 import { Reaction, ReactionSchema } from '../reactions/schemas/reaction.schema';
 import { BlogIsExistValidator } from '../common/decorators/validation/blogId-validation.decorator';
+import { CreatePostForSpecifiedBlogUseCase } from './use-cases/create-post-for-specified-blog-use-case';
+import { CqrsModule } from '@nestjs/cqrs';
 
+const useCases = [CreatePostForSpecifiedBlogUseCase];
 @Module({
   imports: [
+    CqrsModule,
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
     MongooseModule.forFeature([
       { name: Reaction.name, schema: ReactionSchema },
@@ -26,7 +30,7 @@ import { BlogIsExistValidator } from '../common/decorators/validation/blogId-val
     JwtModule.register({}),
   ],
   controllers: [PostsController],
-  providers: [PostsService, PostsQueryRepository, PostsRepository],
+  providers: [PostsService, PostsQueryRepository, PostsRepository, ...useCases],
   exports: [PostsQueryRepository, PostsService, PostsRepository],
 })
 export class PostsModule {}

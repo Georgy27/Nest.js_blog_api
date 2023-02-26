@@ -28,6 +28,11 @@ import { PostViewModel } from '../../posts';
 import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateBlogCommand } from '../use-cases/create-blog-use-case';
+import { CreatePostForSpecifiedBlogCommand } from '../../posts/use-cases/create-post-for-specified-blog-use-case';
+import { UpdateBlogCommand } from '../use-cases/update-blog-use-case';
+import { DeleteBlogCommand } from '../use-cases/delete-blog-use-case';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -38,6 +43,7 @@ export class BlogsController {
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly postsService: PostsService,
     private jwtService: JwtService,
+    private commandBus: CommandBus,
   ) {}
   @Get()
   async getAllBlogs(
@@ -86,10 +92,8 @@ export class BlogsController {
   @Post()
   @HttpCode(201)
   async createBlog(@Body() createBlogDto: CreateBlogDto): Promise<Blog> {
-    const blogId = await this.blogsService.createBlog(
-      createBlogDto.name,
-      createBlogDto.description,
-      createBlogDto.websiteUrl,
+    const blogId = await this.commandBus.execute(
+      new CreateBlogCommand(createBlogDto),
     );
     const blog = await this.blogsQueryRepository.findBlog(blogId);
     if (!blog) throw new NotFoundException();
@@ -104,7 +108,9 @@ export class BlogsController {
   ) {
     // create post
     const newCreatePostDto = { ...createPostDto, blogId: blogId };
-    const newPostId = await this.postsService.createPost(newCreatePostDto);
+    const newPostId: string | null = await this.commandBus.execute(
+      new CreatePostForSpecifiedBlogCommand(newCreatePostDto),
+    );
     if (!newPostId) throw new NotFoundException();
     // return post to user
     return this.postsQueryRepository.getMappedPost(newPostId);
@@ -116,11 +122,8 @@ export class BlogsController {
     @Param('id') id: string,
     @Body() updateBlogDto: UpdateBlogDto,
   ): Promise<void> {
-    const updatedBlog = await this.blogsService.updateBlog(
-      id,
-      updateBlogDto.name,
-      updateBlogDto.description,
-      updateBlogDto.websiteUrl,
+    const updatedBlog: string | null = await this.commandBus.execute(
+      new UpdateBlogCommand(id, updateBlogDto),
     );
     if (!updatedBlog) throw new NotFoundException();
     return;
@@ -129,7 +132,9 @@ export class BlogsController {
   @Delete(':id')
   @HttpCode(204)
   async deleteBlogById(@Param('id') id: string): Promise<void> {
-    const deletedBlog = await this.blogsService.deleteBlog(id);
+    const deletedBlog: boolean = await this.commandBus.execute(
+      new DeleteBlogCommand(id),
+    );
     if (!deletedBlog) throw new NotFoundException();
     return;
   }
