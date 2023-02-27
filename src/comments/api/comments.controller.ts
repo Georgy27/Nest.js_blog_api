@@ -14,11 +14,12 @@ import { CommentsQueryRepository } from '../comments.query.repository';
 import { UpdateReactionCommentDto } from '../dto/update-reaction-comment.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
-import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAtPayload } from '../../auth/strategies';
+import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-from-AT.guard';
+import { GetPayloadFromAt } from '../../common/decorators/getAccessToken.decorator';
 
 @SkipThrottle()
 @Controller('comments')
@@ -28,17 +29,12 @@ export class CommentsController {
     private readonly commentsQueryRepository: CommentsQueryRepository,
     private jwtService: JwtService,
   ) {}
+  @UseGuards(ExtractUserPayloadFromAt)
   @Get(':id')
   async getCommentById(
     @Param('id') id: string,
-    @GetAccessToken() token: string | null,
+    @GetPayloadFromAt() userId: string | null,
   ) {
-    let userId: null | string = null;
-    if (token) {
-      const payload: any = await this.jwtService.decode(token);
-      userId = payload.userId;
-    }
-
     const comment = await this.commentsQueryRepository.findComment(id, userId);
     if (!comment) throw new NotFoundException();
     return comment;

@@ -20,12 +20,9 @@ import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.p
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/posts.pagination.query.dto';
 import { PostsQueryRepository } from '../../../posts/posts.query.repository';
-import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
 import { CreatePostByBlogIdDto } from '../../dto/create.post.blogId.dto';
 import { PostsService } from '../../../posts/posts.service';
-import { BasicAuthGuard } from '../../../common/guards/basic.auth.guard';
 import { PostViewModel } from '../../../posts';
-import { GetAccessToken } from '../../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
@@ -36,6 +33,9 @@ import { DeleteBlogCommand } from '../../use-cases/delete-blog-use-case';
 import { AuthGuard } from '@nestjs/passport';
 import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
 import { JwtAtPayload } from '../../../auth/strategies';
+import { UpdatePostForBloggerDto } from '../../dto/update.post.blogger.dto';
+import { ExtractUserPayloadFromAt } from '../../../common/guards/exctract-payload-from-AT.guard';
+import { GetPayloadFromAt } from '../../../common/decorators/getAccessToken.decorator';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
@@ -69,21 +69,17 @@ export class BlogsController {
     if (!blog) throw new NotFoundException();
     return blog;
   }
+  @UseGuards(ExtractUserPayloadFromAt)
   @Get(':blogId/posts')
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
     @Query() postsPaginationDto: PostPaginationQueryDto,
-    @GetAccessToken() token: string | null,
+    @GetPayloadFromAt() userId: string | null,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
     // check if the blog exists
     const getBlogByPostId = await this.blogsQueryRepository.findBlog(blogId);
     if (!getBlogByPostId) throw new NotFoundException();
 
-    let userId: null | string = null;
-    if (token) {
-      const payload: any = await this.jwtService.decode(token);
-      userId = payload.userId;
-    }
     // return all posts for this blogId
     return this.postsQueryRepository.findPosts(
       postsPaginationDto.pageSize,
@@ -101,7 +97,7 @@ export class BlogsController {
     @Body() createBlogDto: CreateBlogDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<Blog> {
-    const blogId = await this.commandBus.execute(
+    const blogId: string = await this.commandBus.execute(
       new CreateBlogCommand(createBlogDto, jwtAtPayload),
     );
     const blog = await this.blogsQueryRepository.findBlog(blogId);
@@ -137,6 +133,14 @@ export class BlogsController {
       new UpdateBlogCommand(id, updateBlogDto, jwtAtPayload.userId),
     );
   }
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':blogId/posts/:postId')
+  @HttpCode(204)
+  async updatePost(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+    @Body() updatePostForBloggerDto: UpdatePostForBloggerDto,
+  ) {}
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   @HttpCode(204)

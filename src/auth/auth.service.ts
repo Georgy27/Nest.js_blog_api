@@ -113,6 +113,10 @@ export class AuthService {
     const issuedAt = await this.getIssuedAtFromRefreshToken(
       tokens.refreshToken,
     );
+    const issuedAt2 = await this.getIssuedAtFromRefreshToken(
+      tokens.accessToken,
+    );
+
     await this.securityDevicesService.updateLastActiveDate(
       userId,
       deviceId,
@@ -269,6 +273,7 @@ export class AuthService {
         },
       ),
     ]);
+
     return {
       accessToken,
       refreshToken,

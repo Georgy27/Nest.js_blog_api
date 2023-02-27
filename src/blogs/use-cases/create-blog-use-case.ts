@@ -17,7 +17,7 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
     @InjectModel(Blog.name) private blogModel: BlogModelType,
     private readonly blogsRepository: BlogsRepository,
   ) {}
-  async execute(command: CreateBlogCommand) {
+  async execute(command: CreateBlogCommand): Promise<string> {
     const { name, description, websiteUrl } = command.createBlogDto;
     const { userId, userLogin } = command.jwtAtPayload;
     const newBlog = this.blogModel.createBlog(
@@ -28,7 +28,6 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
       userLogin,
       this.blogModel,
     );
-    console.log(newBlog);
     return this.blogsRepository.save(newBlog);
   }
 }

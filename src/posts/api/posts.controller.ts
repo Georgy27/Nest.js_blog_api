@@ -25,11 +25,12 @@ import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
 import { CommentViewModel } from '../../comments';
 import { UpdateReactionPostDto } from '../dto/update-reaction-post.dto';
-import { GetAccessToken } from '../../common/decorators/getAccessToken.decorator';
+import { GetPayloadFromAt } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { PostViewModel } from '../index';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAtPayload } from '../../auth/strategies';
+import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-from-AT.guard';
 
 @SkipThrottle()
 @Controller('posts')
@@ -40,16 +41,12 @@ export class PostsController {
     private readonly commentsQueryRepository: CommentsQueryRepository,
     private jwtService: JwtService,
   ) {}
+  @UseGuards(ExtractUserPayloadFromAt)
   @Get()
   async getAllPosts(
     @Query() postsPaginationDto: PostPaginationQueryDto,
-    @GetAccessToken() token: string | null,
+    @GetPayloadFromAt() userId: string | null,
   ): Promise<PaginationViewModel<PostReactionViewModel[]>> {
-    let userId: null | string = null;
-    if (token) {
-      const payload: any = await this.jwtService.decode(token);
-      userId = payload.userId;
-    }
     return this.postsQueryRepository.findPosts(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
@@ -58,34 +55,27 @@ export class PostsController {
       userId,
     );
   }
+  @UseGuards(ExtractUserPayloadFromAt)
   @Get(':id')
   async getPostById(
     @Param('id') id: string,
-    @GetAccessToken() token: string | null,
+    @GetPayloadFromAt() userId: string | null,
   ): Promise<PostReactionViewModel> {
-    let userId: null | string = null;
-    if (token) {
-      const payload: any = await this.jwtService.decode(token);
-      userId = payload.userId;
-    }
     const post = await this.postsQueryRepository.findPost(id, userId);
 
     if (!post) throw new NotFoundException();
     return post;
   }
+  @UseGuards(ExtractUserPayloadFromAt)
   @Get(':postId/comments')
   async getAllCommentsForPostId(
     @Query() postsPaginationDto: PostPaginationQueryDto,
     @Param('postId') postId: string,
-    @GetAccessToken() token: string | null,
+    @GetPayloadFromAt() userId: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
     const isPost = await this.postsQueryRepository.getMappedPost(postId);
     if (!isPost) throw new NotFoundException();
-    let userId: null | string = null;
-    if (token) {
-      const payload: any = await this.jwtService.decode(token);
-      userId = payload.userId;
-    }
+
     return this.commentsQueryRepository.findCommentsByPostId(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
