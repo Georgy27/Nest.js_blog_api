@@ -3,6 +3,7 @@ import { HydratedDocument } from 'mongoose';
 import { CreatePostDto } from '../dto/create.post.dto';
 import { randomUUID } from 'crypto';
 import { UpdatePostDto } from '../dto/update.post.dto';
+import { UpdatePostForBloggerDto } from '../../blogs/dto/update.post.blogger.dto';
 
 export type PostDocument = HydratedDocument<Post>;
 
@@ -32,7 +33,7 @@ export class Post {
     this.blogName = blogName;
     this.createdAt = new Date().toISOString();
   }
-  updatePost(updatePostDto: UpdatePostDto) {
+  updatePost(updatePostDto: UpdatePostForBloggerDto) {
     this.title = updatePostDto.title;
     this.shortDescription = updatePostDto.shortDescription;
     this.content = updatePostDto.content;

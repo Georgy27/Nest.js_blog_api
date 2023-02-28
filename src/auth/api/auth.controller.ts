@@ -24,7 +24,7 @@ import { UsersQueryRepository } from '../../users/users.query.repository';
 import { ConfirmationCodeDto } from '../dto/confirmationCode.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 
-@Controller('auth')
+@Controller('/api/auth')
 export class AuthController {
   constructor(
     private authService: AuthService,

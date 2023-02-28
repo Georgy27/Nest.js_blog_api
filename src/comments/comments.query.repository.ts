@@ -96,7 +96,6 @@ export class CommentsQueryRepository {
       );
       if (reactionStatus) myStatus = reactionStatus.status;
     }
-
     return {
       id: comment.id,
       content: comment.content,

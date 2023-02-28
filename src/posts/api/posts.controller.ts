@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   NotFoundException,
@@ -17,7 +16,6 @@ import { PostsService } from '../posts.service';
 import { PostsQueryRepository } from '../posts.query.repository';
 import { CommentsQueryRepository } from '../../comments/comments.query.repository';
 import { CreatePostDto } from '../dto/create.post.dto';
-import { UpdatePostDto } from '../dto/update.post.dto';
 import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
 import { BasicAuthGuard } from '../../common/guards/basic.auth.guard';
 import { AuthGuard } from '@nestjs/passport';
@@ -25,15 +23,15 @@ import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
 import { CommentViewModel } from '../../comments';
 import { UpdateReactionPostDto } from '../dto/update-reaction-post.dto';
-import { GetPayloadFromAt } from '../../common/decorators/getAccessToken.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { PostViewModel } from '../index';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAtPayload } from '../../auth/strategies';
 import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-from-AT.guard';
+import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
 
 @SkipThrottle()
-@Controller('posts')
+@Controller('api/posts')
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
@@ -45,7 +43,7 @@ export class PostsController {
   @Get()
   async getAllPosts(
     @Query() postsPaginationDto: PostPaginationQueryDto,
-    @GetPayloadFromAt() userId: string | null,
+    @GetUserIdFromAtDecorator() userId: string | null,
   ): Promise<PaginationViewModel<PostReactionViewModel[]>> {
     return this.postsQueryRepository.findPosts(
       postsPaginationDto.pageSize,
@@ -59,7 +57,7 @@ export class PostsController {
   @Get(':id')
   async getPostById(
     @Param('id') id: string,
-    @GetPayloadFromAt() userId: string | null,
+    @GetUserIdFromAtDecorator() userId: string | null,
   ): Promise<PostReactionViewModel> {
     const post = await this.postsQueryRepository.findPost(id, userId);
 
@@ -71,7 +69,7 @@ export class PostsController {
   async getAllCommentsForPostId(
     @Query() postsPaginationDto: PostPaginationQueryDto,
     @Param('postId') postId: string,
-    @GetPayloadFromAt() userId: string | null,
+    @GetUserIdFromAtDecorator() userId: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
     const isPost = await this.postsQueryRepository.getMappedPost(postId);
     if (!isPost) throw new NotFoundException();
@@ -84,18 +82,6 @@ export class PostsController {
       postId,
       userId,
     );
-  }
-  @UseGuards(BasicAuthGuard)
-  @Post()
-  @HttpCode(201)
-  async createPost(
-    @Body() createPostDto: CreatePostDto,
-  ): Promise<PostViewModel> {
-    const postId = await this.postsService.createPost(createPostDto);
-    if (!postId) throw new NotFoundException();
-    const post = await this.postsQueryRepository.getMappedPost(postId);
-    if (!post) throw new NotFoundException();
-    return post;
   }
   @UseGuards(AuthGuard('jwt'))
   @Post(':postId/comments')
@@ -116,18 +102,6 @@ export class PostsController {
     if (!commentToView) throw new NotFoundException();
     return commentToView;
   }
-  @UseGuards(BasicAuthGuard)
-  @Put(':id')
-  @HttpCode(204)
-  async updatePost(
-    @Param('id') id: string,
-    @Body() updatePostDto: UpdatePostDto,
-  ): Promise<void> {
-    const updatedPost = await this.postsService.updatePost(id, updatePostDto);
-    console.log(updatedPost);
-    if (!updatedPost) throw new NotFoundException();
-    return;
-  }
   @UseGuards(AuthGuard('jwt'))
   @Put(':postId/like-status')
   @HttpCode(204)
@@ -141,13 +115,5 @@ export class PostsController {
       updateReactionPostDto,
       jwtAtPayload.userId,
     );
-  }
-  @UseGuards(BasicAuthGuard)
-  @Delete(':id')
-  @HttpCode(204)
-  async deletePostById(@Param('id') id: string): Promise<void> {
-    const deletedPost = await this.postsService.deletePostById(id);
-    if (!deletedPost) throw new NotFoundException();
-    return;
   }
 }

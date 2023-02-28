@@ -35,10 +35,12 @@ import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPay
 import { JwtAtPayload } from '../../../auth/strategies';
 import { UpdatePostForBloggerDto } from '../../dto/update.post.blogger.dto';
 import { ExtractUserPayloadFromAt } from '../../../common/guards/exctract-payload-from-AT.guard';
-import { GetPayloadFromAt } from '../../../common/decorators/getAccessToken.decorator';
+import { GetUserIdFromAtDecorator } from '../../../common/decorators/getUserIdFromAt.decorator';
+import { UpdatePostCommand } from '../../../posts/use-cases/update-post-use-case';
+import { DeletePostCommand } from '../../../posts/use-cases/delete-post-use-case';
 
 @SkipThrottle()
-@Controller('blogger/blogs')
+@Controller('api/blogger/blogs')
 export class BlogsController {
   constructor(
     private readonly blogsService: BlogsService,
@@ -50,44 +52,17 @@ export class BlogsController {
   ) {}
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async getAllBlogsForUser(
+  async getAllBlogsForBlogger(
     @Query() blogsPaginationDto: BlogsPaginationQueryDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<PaginationViewModel<Blog[]>> {
-    return this.blogsQueryRepository.findBlogsForUser(
+    return this.blogsQueryRepository.findBlogs(
       blogsPaginationDto.searchNameTerm,
       blogsPaginationDto.pageSize,
       blogsPaginationDto.sortBy,
       blogsPaginationDto.pageNumber,
       blogsPaginationDto.sortDirection,
       jwtAtPayload,
-    );
-  }
-  @Get(':id')
-  async getBlogById(@Param('id') id: string): Promise<Blog | null> {
-    const blog = await this.blogsQueryRepository.findBlog(id);
-    if (!blog) throw new NotFoundException();
-    return blog;
-  }
-  @UseGuards(ExtractUserPayloadFromAt)
-  @Get(':blogId/posts')
-  async getPostsByBlogId(
-    @Param('blogId') blogId: string,
-    @Query() postsPaginationDto: PostPaginationQueryDto,
-    @GetPayloadFromAt() userId: string | null,
-  ): Promise<PaginationViewModel<PostViewModel[]>> {
-    // check if the blog exists
-    const getBlogByPostId = await this.blogsQueryRepository.findBlog(blogId);
-    if (!getBlogByPostId) throw new NotFoundException();
-
-    // return all posts for this blogId
-    return this.postsQueryRepository.findPosts(
-      postsPaginationDto.pageSize,
-      postsPaginationDto.sortBy,
-      postsPaginationDto.pageNumber,
-      postsPaginationDto.sortDirection,
-      userId,
-      blogId,
     );
   }
   @UseGuards(AuthGuard('jwt'))
@@ -140,7 +115,11 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
     @Body() updatePostForBloggerDto: UpdatePostForBloggerDto,
-  ) {}
+  ): Promise<void> {
+    return this.commandBus.execute(
+      new UpdatePostCommand(blogId, postId, updatePostForBloggerDto),
+    );
+  }
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   @HttpCode(204)
@@ -151,5 +130,14 @@ export class BlogsController {
     return this.commandBus.execute(
       new DeleteBlogCommand(blogId, jwtAtPayload.userId),
     );
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':blogId/posts/:postId')
+  @HttpCode(204)
+  async deletePostById(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+  ): Promise<void> {
+    return this.commandBus.execute(new DeletePostCommand(blogId, postId));
   }
 }

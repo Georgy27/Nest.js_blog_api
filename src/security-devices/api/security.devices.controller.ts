@@ -15,7 +15,7 @@ import { SecurityDevicesService } from '../security.devices.service';
 import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
-@Controller('security/devices')
+@Controller('api/security/devices')
 export class SecurityDevicesController {
   constructor(
     private readonly securityDevicesQueryRepository: SecurityDevicesQueryRepository,

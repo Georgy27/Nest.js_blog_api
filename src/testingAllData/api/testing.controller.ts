@@ -8,7 +8,7 @@ import { SecurityDevicesRepository } from '../../security-devices/security.devic
 import { ReactionsRepository } from '../../reactions/reactions.repository';
 
 @SkipThrottle()
-@Controller('testing/all-data')
+@Controller('api/testing/all-data')
 export class TestingController {
   constructor(
     private readonly blogsRepository: BlogsRepository,

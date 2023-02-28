@@ -64,19 +64,19 @@ export class PostsService {
     };
     return this.commentsRepository.createComment(newComment);
   }
-  async updatePost(
-    postId: string,
-    updatePostDto: UpdatePostDto,
-  ): Promise<string | null> {
-    // find post
-    const post = await this.postsRepository.findPostById(postId);
-    if (!post) return null;
-    // check for blogId
-    if (updatePostDto.blogId !== post.blogId) return null;
-    // update post
-    post.updatePost(updatePostDto);
-    return this.postsRepository.save(post);
-  }
+  // async updatePost(
+  //   postId: string,
+  //   updatePostDto: UpdatePostDto,
+  // ): Promise<string | null> {
+  //   // find post
+  //   const post = await this.postsRepository.findPostById(postId);
+  //   if (!post) return null;
+  //   // check for blogId
+  //   if (updatePostDto.blogId !== post.blogId) return null;
+  //   // update post
+  //   post.updatePost(updatePostDto);
+  //   return this.postsRepository.save(post);
+  // }
   async updateReactionToPost(
     postId: string,
     updateReactionPostDto: UpdateReactionPostDto,
@@ -97,7 +97,7 @@ export class PostsService {
       updateReactionPostDto.likeStatus,
     );
   }
-  async deletePostById(id: string): Promise<boolean> {
-    return this.postsRepository.deletePostById(id);
-  }
+  // async deletePostById(id: string): Promise<boolean> {
+  //   return this.postsRepository.deletePostById(id);
+  // }
 }

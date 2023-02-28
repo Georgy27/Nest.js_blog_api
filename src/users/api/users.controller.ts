@@ -19,7 +19,7 @@ import { PaginationViewModel } from '../../helpers/pagination/pagination.view.mo
 import { UserViewModel } from '../types/user.view.model';
 
 @UseGuards(BasicAuthGuard)
-@Controller('users')
+@Controller('api/users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,

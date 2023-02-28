@@ -19,10 +19,10 @@ import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAtPayload } from '../../auth/strategies';
 import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-from-AT.guard';
-import { GetPayloadFromAt } from '../../common/decorators/getAccessToken.decorator';
+import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
 
 @SkipThrottle()
-@Controller('comments')
+@Controller('api/comments')
 export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService,
@@ -33,7 +33,7 @@ export class CommentsController {
   @Get(':id')
   async getCommentById(
     @Param('id') id: string,
-    @GetPayloadFromAt() userId: string | null,
+    @GetUserIdFromAtDecorator() userId: string | null,
   ) {
     const comment = await this.commentsQueryRepository.findComment(id, userId);
     if (!comment) throw new NotFoundException();
