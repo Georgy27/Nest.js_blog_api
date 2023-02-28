@@ -14,8 +14,14 @@ import { Reaction, ReactionSchema } from '../reactions/schemas/reaction.schema';
 import { BlogIsExistValidator } from '../common/decorators/validation/blogId-validation.decorator';
 import { CreatePostForSpecifiedBlogUseCase } from './use-cases/create-post-for-specified-blog-use-case';
 import { CqrsModule } from '@nestjs/cqrs';
+import { UpdatePostUseCase } from './use-cases/update-post-use-case';
+import { DeletePostUseCase } from './use-cases/delete-post-use-case';
 
-const useCases = [CreatePostForSpecifiedBlogUseCase];
+const useCases = [
+  CreatePostForSpecifiedBlogUseCase,
+  UpdatePostUseCase,
+  DeletePostUseCase,
+];
 @Module({
   imports: [
     CqrsModule,
