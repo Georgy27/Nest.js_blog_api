@@ -12,12 +12,18 @@ import { BasicAuthGuard } from '../../../common/guards/basic.auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { BindBlogWithUserCommand } from '../../use-cases/bind-blog-with-user-use-case';
 import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
+import { BlogsQueryRepository } from '../../blogs.query.repository';
+import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
+import { Blog } from '../../schemas/blog.schema';
 
 @SkipThrottle()
 @UseGuards(BasicAuthGuard)
 @Controller('api/sa/blogs')
 export class BlogsSuperAdminController {
-  constructor(private commandBus: CommandBus) {}
+  constructor(
+    private commandBus: CommandBus,
+    private readonly blogsQueryRepository: BlogsQueryRepository,
+  ) {}
   @Put(':id/bind-with-user/:userId')
   @HttpCode(204)
   async bindBlogWithUser(
@@ -29,13 +35,13 @@ export class BlogsSuperAdminController {
   @Get()
   async getBlogsForSuperAdmin(
     @Query() blogsPaginationDto: BlogsPaginationQueryDto,
-  ) {
-    // return this.blogsQueryRepository.findBlogs(
-    //   blogsPaginationDto.searchNameTerm,
-    //   blogsPaginationDto.pageSize,
-    //   blogsPaginationDto.sortBy,
-    //   blogsPaginationDto.pageNumber,
-    //   blogsPaginationDto.sortDirection,
-    // );
+  ): Promise<PaginationViewModel<Blog[]>> {
+    return this.blogsQueryRepository.findBlogsForSuperAdmin(
+      blogsPaginationDto.searchNameTerm,
+      blogsPaginationDto.pageSize,
+      blogsPaginationDto.sortBy,
+      blogsPaginationDto.pageNumber,
+      blogsPaginationDto.sortDirection,
+    );
   }
 }

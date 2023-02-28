@@ -11,7 +11,6 @@ import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ReactionsModule } from '../reactions/reactions.module';
 import { Reaction, ReactionSchema } from '../reactions/schemas/reaction.schema';
-import { BlogIsExistValidator } from '../common/decorators/validation/blogId-validation.decorator';
 import { CreatePostForSpecifiedBlogUseCase } from './use-cases/create-post-for-specified-blog-use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdatePostUseCase } from './use-cases/update-post-use-case';

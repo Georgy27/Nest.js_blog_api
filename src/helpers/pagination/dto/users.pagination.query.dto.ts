@@ -1,8 +1,19 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { checkSortBy, toNumber } from '../helpers';
 
+enum IBanStatus {
+  all = 'all',
+  banned = 'banned',
+  notBanned = 'notBanned',
+}
+export type banStatusEnumKeys = keyof typeof IBanStatus;
+
 export class UsersPaginationQueryDto {
+  @IsOptional()
+  @IsEnum(IBanStatus)
+  @IsString()
+  banStatus: banStatusEnumKeys = 'all';
   @IsOptional()
   searchLoginTerm: string | null = null;
   @IsOptional()

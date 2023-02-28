@@ -13,3 +13,8 @@ export interface IEmailConfirmation {
   expirationDate: string;
   isConfirmed: boolean;
 }
+export interface IBanInfo {
+  isBanned: boolean;
+  banDate: string | null;
+  banReason: string | null;
+}

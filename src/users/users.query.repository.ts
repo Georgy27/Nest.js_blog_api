@@ -20,11 +20,13 @@ export class UsersQueryRepository {
       pageSize,
       sortDirection,
       sortBy,
+      banStatus,
     } = usersPaginationDto;
 
     const filter: FilterQuery<User> = userQueryFilter(
       searchLoginTerm,
       searchEmailTerm,
+      banStatus,
     );
 
     const sortArg = 'accountData.'.concat(sortBy);
@@ -41,6 +43,11 @@ export class UsersQueryRepository {
         login: user.accountData.login,
         email: user.accountData.email,
         createdAt: user.accountData.createdAt,
+        banInfo: {
+          isBanned: user.banInfo.isBanned,
+          banDate: user.banInfo.banDate,
+          banReason: user.banInfo.banReason,
+        },
       };
     });
     const numberOfUsers = await this.userModel.countDocuments(filter);
@@ -51,7 +58,7 @@ export class UsersQueryRepository {
       newUsers,
     );
   }
-  async findUser(id: string) {
+  async findUser(id: string): Promise<UserViewModel> {
     const user: User = await this.userModel
       .findOne({ id }, { _id: false, 'accountData.passwordHash': false })
       .lean();
@@ -61,6 +68,11 @@ export class UsersQueryRepository {
       login: user.accountData.login,
       email: user.accountData.email,
       createdAt: user.accountData.createdAt,
+      banInfo: {
+        isBanned: user.banInfo.isBanned,
+        banDate: user.banInfo.banDate,
+        banReason: user.banInfo.banReason,
+      },
     };
   }
 }

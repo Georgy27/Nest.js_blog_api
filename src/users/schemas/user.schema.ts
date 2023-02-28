@@ -3,7 +3,12 @@ import { HydratedDocument } from 'mongoose';
 import { CreateUserDto } from '../dto/create.user.dto';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
-import { IAccountData, IEmailConfirmation, IPasswordRecovery } from './index';
+import {
+  IAccountData,
+  IBanInfo,
+  IEmailConfirmation,
+  IPasswordRecovery,
+} from './index';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -35,6 +40,14 @@ export class User {
     }),
   )
   emailConfirmation: IEmailConfirmation;
+  @Prop(
+    raw({
+      isBanned: { required: true, type: Boolean },
+      banDate: { type: String },
+      banReason: { type: String },
+    }),
+  )
+  banInfo: IBanInfo;
 
   // createUser(createUserDto: CreateUserDto, passwordHash: string) {
   //   this.id = randomUUID();

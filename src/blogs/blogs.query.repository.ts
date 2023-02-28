@@ -31,6 +31,29 @@ export class BlogsQueryRepository {
     const numberOfBlogs = await this.blogModel.countDocuments(filter);
     return new PaginationViewModel(numberOfBlogs, pageNumber, pageSize, blogs);
   }
+  async findBlogsForSuperAdmin(
+    searchNameTerm: string | null,
+    pageSize: number,
+    sortBy: string,
+    pageNumber: number,
+    sortDirection: string,
+  ) {
+    const filter = {
+      name: {
+        $regex: searchNameTerm ?? '',
+        $options: 'i',
+      },
+    };
+    const blogs = await this.blogModel
+      .find(filter, { _id: false, __v: false })
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .lean();
+
+    const numberOfBlogs = await this.blogModel.countDocuments(filter);
+    return new PaginationViewModel(numberOfBlogs, pageNumber, pageSize, blogs);
+  }
   async findBlog(id: string): Promise<Blog | null> {
     return this.blogModel
       .findOne({ id }, { _id: false, __v: false, blogOwnerInfo: false })

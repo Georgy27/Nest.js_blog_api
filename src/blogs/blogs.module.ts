@@ -12,14 +12,22 @@ import { CreateBlogUseCase } from './use-cases/create-blog-use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateBlogUseCase } from './use-cases/update-blog-use-case';
 import { DeleteBlogUseCase } from './use-cases/delete-blog-use-case';
+import { BindBlogWithUserUseCase } from './use-cases/bind-blog-with-user-use-case';
+import { UsersModule } from '../users/users.module';
 
-const useCases = [CreateBlogUseCase, UpdateBlogUseCase, DeleteBlogUseCase];
+const useCases = [
+  CreateBlogUseCase,
+  UpdateBlogUseCase,
+  DeleteBlogUseCase,
+  BindBlogWithUserUseCase,
+];
 @Module({
   imports: [
     CqrsModule,
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     forwardRef(() => PostsModule),
     JwtModule.register({}),
+    UsersModule,
   ],
   controllers: [BlogsController],
   providers: [
