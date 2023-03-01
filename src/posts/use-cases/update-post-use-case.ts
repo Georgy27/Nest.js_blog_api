@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { UpdatePostForBloggerDto } from '../../blogs/dto/update.post.blogger.dto';
 import { PostsRepository } from '../posts.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BlogsRepository } from '../../blogs/blogs.repository';
 
 export class UpdatePostCommand {
   constructor(
@@ -19,8 +20,12 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
     @InjectModel(Post.name)
     private postModel: Model<PostDocument>,
     private readonly postsRepository: PostsRepository,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
   async execute(command: UpdatePostCommand) {
+    // check if blog exists
+    const isBlog = await this.blogsRepository.findBlogById(command.blogId);
+    if (!isBlog) throw new NotFoundException();
     // find post
     const post = await this.postsRepository.findPostById(command.postId);
     if (!post) throw new NotFoundException();

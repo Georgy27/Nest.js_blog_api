@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './schemas/blog.schema';
-import { BlogsController } from './api/blogger/blogs.controller';
+import { BloggersController } from './api/blogger/bloggers.controller';
 import { BlogsService } from './blogs.service';
 import { BlogsRepository } from './blogs.repository';
 import { BlogsQueryRepository } from './blogs.query.repository';
@@ -14,6 +14,8 @@ import { UpdateBlogUseCase } from './use-cases/update-blog-use-case';
 import { DeleteBlogUseCase } from './use-cases/delete-blog-use-case';
 import { BindBlogWithUserUseCase } from './use-cases/bind-blog-with-user-use-case';
 import { UsersModule } from '../users/users.module';
+import { BlogsSuperAdminController } from './api/super-admin/blogs-super-admin.controller';
+import { BlogsController } from './api/public/blogs.controller';
 
 const useCases = [
   CreateBlogUseCase,
@@ -29,7 +31,7 @@ const useCases = [
     JwtModule.register({}),
     UsersModule,
   ],
-  controllers: [BlogsController],
+  controllers: [BloggersController, BlogsController, BlogsSuperAdminController],
   providers: [
     BlogsService,
     BlogsRepository,

@@ -37,7 +37,7 @@ import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPay
 
 @SkipThrottle()
 @Controller('blogger/blogs')
-export class BlogsController {
+export class BloggersController {
   constructor(
     private readonly blogsService: BlogsService,
     private readonly blogsQueryRepository: BlogsQueryRepository,

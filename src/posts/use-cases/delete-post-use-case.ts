@@ -4,6 +4,7 @@ import { Post, PostDocument } from '../schemas/post.schema';
 import { Model } from 'mongoose';
 import { PostsRepository } from '../posts.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BlogsRepository } from '../../blogs/blogs.repository';
 
 export class DeletePostCommand {
   constructor(public blogId: string, public postId: string) {}
@@ -14,8 +15,12 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
     @InjectModel(Post.name)
     private postModel: Model<PostDocument>,
     private readonly postsRepository: PostsRepository,
+    private readonly blogsRepository: BlogsRepository,
   ) {}
   async execute(command: DeletePostCommand): Promise<void> {
+    // check if blog exists
+    const isBlog = await this.blogsRepository.findBlogById(command.blogId);
+    if (!isBlog) throw new NotFoundException();
     // find post
     const post = await this.postsRepository.findPostById(command.postId);
     if (!post) throw new NotFoundException();

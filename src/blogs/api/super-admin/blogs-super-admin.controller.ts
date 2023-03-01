@@ -24,18 +24,11 @@ export class BlogsSuperAdminController {
     private commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
-  @Put(':id/bind-with-user/:userId')
-  @HttpCode(204)
-  async bindBlogWithUser(
-    @Param('id') blogId: string,
-    @Param('userId') userId: string,
-  ) {
-    return this.commandBus.execute(new BindBlogWithUserCommand(blogId, userId));
-  }
   @Get()
   async getBlogsForSuperAdmin(
     @Query() blogsPaginationDto: BlogsPaginationQueryDto,
   ): Promise<PaginationViewModel<Blog[]>> {
+    console.log('inside blogs');
     return this.blogsQueryRepository.findBlogsForSuperAdmin(
       blogsPaginationDto.searchNameTerm,
       blogsPaginationDto.pageSize,
@@ -43,5 +36,13 @@ export class BlogsSuperAdminController {
       blogsPaginationDto.pageNumber,
       blogsPaginationDto.sortDirection,
     );
+  }
+  @Put(':id/bind-with-user/:userId')
+  @HttpCode(204)
+  async bindBlogWithUser(
+    @Param('id') blogId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.commandBus.execute(new BindBlogWithUserCommand(blogId, userId));
   }
 }
