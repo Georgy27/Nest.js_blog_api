@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -20,6 +21,8 @@ import { UserViewModel } from '../../types/user.view.model';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserByAdminCommand } from '../../use-cases/create-user-admin-use-case';
 import { DeleteUserByAdminCommand } from './delete-user-admin-use-case';
+import { BanUserDto } from '../../dto/ban.user.dto';
+import { BanOrUnbanUserByAdminCommand } from '../../use-cases/ban-unban-user-admin-user-case';
 
 @UseGuards(BasicAuthGuard)
 @Controller('api/sa/users')
@@ -44,6 +47,16 @@ export class UsersSuperAdminController {
       new CreateUserByAdminCommand(createUserDto),
     );
     return this.usersQueryRepository.findUser(userId);
+  }
+  @Put(':id/ban')
+  @HttpCode(204)
+  async banOrUnbanUser(
+    @Param('id') id: string,
+    @Body() banUserDto: BanUserDto,
+  ) {
+    return this.commandBus.execute(
+      new BanOrUnbanUserByAdminCommand(id, banUserDto),
+    );
   }
   @Delete(':id')
   @HttpCode(204)

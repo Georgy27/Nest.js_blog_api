@@ -22,6 +22,7 @@ export class ReactionsService {
       addedAt: new Date().toISOString(),
       userId,
       userLogin,
+      isUserBanned: false,
     };
     return this.reactionsRepository.updateReaction(newReaction);
   }

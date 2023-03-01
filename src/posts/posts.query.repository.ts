@@ -77,15 +77,18 @@ export class PostsQueryRepository {
     const likes = await this.reactionModel.countDocuments({
       parentId: post.id,
       status: reactionStatusEnum.Like,
+      isUserBanned: false,
     });
     const dislikes = await this.reactionModel.countDocuments({
       parentId: post.id,
       status: reactionStatusEnum.Dislike,
+      isUserBanned: false,
     });
     const newestLikes = await this.reactionModel
       .find({
         parentId: post.id,
         status: reactionStatusEnum.Like,
+        isUserBanned: false,
       })
       .sort({
         addedAt: 'desc',
@@ -104,6 +107,7 @@ export class PostsQueryRepository {
         {
           parentId: post.id,
           userId: userId,
+          isUserBanned: false,
         },
         { _id: false },
       );

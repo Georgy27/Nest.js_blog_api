@@ -20,5 +20,7 @@ export class Reaction {
   userId: string;
   @Prop({ required: true, type: String })
   userLogin: string;
+  @Prop({ required: true, type: Boolean, default: false })
+  isUserBanned: boolean;
 }
 export const ReactionSchema = SchemaFactory.createForClass(Reaction);

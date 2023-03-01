@@ -60,11 +60,13 @@ export class AuthService {
     ip: string,
     userAgent: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
+    // find user and check if its banned
     const user = await this.usersService.validateUserByLoginOrEmail(
       loginDto.loginOrEmail,
       loginDto.password,
     );
-
+    if (user.banInfo.isBanned) throw new UnauthorizedException();
+    // tokens
     const deviceId = randomUUID();
     const tokens = await this.getTokens(
       user.id,
@@ -74,6 +76,7 @@ export class AuthService {
     const issuedAt = await this.getIssuedAtFromRefreshToken(
       tokens.refreshToken,
     );
+    // generate device session
     const deviceInfo: SecurityDevices = {
       ip,
       deviceName: userAgent,

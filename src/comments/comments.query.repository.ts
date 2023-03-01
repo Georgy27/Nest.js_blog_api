@@ -28,7 +28,10 @@ export class CommentsQueryRepository {
     userId: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
     const comments = await this.commentModel
-      .find({ postId }, { _id: false, postId: false })
+      .find(
+        { postId, 'commentatorInfo.isUserBanned': false },
+        { _id: false, postId: false },
+      )
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -48,7 +51,10 @@ export class CommentsQueryRepository {
   }
   async getMappedComment(id: string): Promise<CommentViewModel | null> {
     const comment = await this.commentModel
-      .findOne({ id }, { _id: false, postId: false })
+      .findOne(
+        { id, 'commentatorInfo.isUserBanned': false },
+        { _id: false, postId: false },
+      )
       .lean();
     if (!comment) return null;
     return {
@@ -68,7 +74,10 @@ export class CommentsQueryRepository {
   }
   async findComment(id: string, userId: null | string) {
     const comment = await this.commentModel
-      .findOne({ id }, { _id: false, postId: false })
+      .findOne(
+        { id, 'commentatorInfo.isUserBanned': false },
+        { _id: false, postId: false },
+      )
       .lean();
     if (!comment) return null;
     return this.addReactionsInfoToComment(comment, userId);
@@ -80,10 +89,12 @@ export class CommentsQueryRepository {
     const likes = await this.reactionModel.countDocuments({
       parentId: comment.id,
       status: reactionStatusEnum.Like,
+      isUserBanned: false,
     });
     const dislikes = await this.reactionModel.countDocuments({
       parentId: comment.id,
       status: reactionStatusEnum.Dislike,
+      isUserBanned: false,
     });
     let myStatus: reactionStatusEnumKeys = 'None';
     if (userId) {
@@ -91,6 +102,7 @@ export class CommentsQueryRepository {
         {
           parentId: comment.id,
           userId: userId,
+          isUserBanned: false,
         },
         { _id: false },
       );

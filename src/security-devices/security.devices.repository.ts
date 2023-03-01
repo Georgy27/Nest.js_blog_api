@@ -65,4 +65,7 @@ export class SecurityDevicesRepository {
   async clearSessions() {
     await this.securityDevicesModel.deleteMany({});
   }
+  async deleteAllUserSessions(userId: string) {
+    return this.securityDevicesModel.deleteMany({ userId });
+  }
 }

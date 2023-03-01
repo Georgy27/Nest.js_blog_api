@@ -59,6 +59,7 @@ export class PostsService {
       commentatorInfo: {
         userId: userId,
         userLogin: user.accountData.login,
+        isUserBanned: user.banInfo.isBanned,
       },
       createdAt: new Date().toISOString(),
     };

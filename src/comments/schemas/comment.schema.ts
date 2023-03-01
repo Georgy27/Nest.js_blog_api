@@ -1,5 +1,6 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { IBanInfo } from '../../users/schemas';
 
 @Schema({ _id: false, versionKey: false })
 export class CommentatorInfo {
@@ -7,20 +8,11 @@ export class CommentatorInfo {
   userId: string;
   @Prop({ required: true, type: String })
   userLogin: string;
+  @Prop({ required: true, type: Boolean, default: false })
+  isUserBanned: boolean;
 }
 export const CommentatorInfoSchema =
   SchemaFactory.createForClass(CommentatorInfo);
-
-// @Schema({ _id: false, versionKey: false })
-// export class LikesInfo {
-//   @Prop({ required: true, type: Number })
-//   likesCount: number;
-//   @Prop({ required: true, type: Number })
-//   dislikesCount: number;
-//   @Prop({ required: true, type: String })
-//   myStatus: string;
-// }
-// export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
 
 export type CommentDocument = HydratedDocument<Comment>;
 
@@ -36,8 +28,6 @@ export class Comment {
   commentatorInfo: CommentatorInfo;
   @Prop({ required: true, type: String })
   createdAt: string;
-  // @Prop({ required: true, type: LikesInfoSchema })
-  // likesInfo: LikesInfo;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);

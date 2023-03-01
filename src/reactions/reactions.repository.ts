@@ -21,4 +21,10 @@ export class ReactionsRepository {
   async dropReactions() {
     await this.reactionsModel.deleteMany({});
   }
+  async updateUserBanStatus(userId: string, isBanned: boolean) {
+    return this.reactionsModel.updateMany(
+      { userId },
+      { $set: { isUserBanned: isBanned } },
+    );
+  }
 }
