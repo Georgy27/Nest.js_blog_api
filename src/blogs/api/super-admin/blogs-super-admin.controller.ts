@@ -18,7 +18,7 @@ import { Blog } from '../../schemas/blog.schema';
 
 @SkipThrottle()
 @UseGuards(BasicAuthGuard)
-@Controller('api/sa/blogs')
+@Controller('sa/blogs')
 export class BlogsSuperAdminController {
   constructor(
     private commandBus: CommandBus,

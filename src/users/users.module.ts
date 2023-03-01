@@ -11,8 +11,13 @@ import { BanOrUnbanUserByAdminUseCase } from './use-cases/ban-unban-user-admin-u
 import { SecurityDevicesModule } from '../security-devices/security.devices.module';
 import { CommentsModule } from '../comments/comments.module';
 import { ReactionsModule } from '../reactions/reactions.module';
+import { DeleteUserByAdminUseCase } from './use-cases/delete-user-admin-use-case';
 
-const useCases = [CreateUserByAdminUseCase, BanOrUnbanUserByAdminUseCase];
+const useCases = [
+  CreateUserByAdminUseCase,
+  BanOrUnbanUserByAdminUseCase,
+  DeleteUserByAdminUseCase,
+];
 @Module({
   imports: [
     forwardRef(() => CommentsModule),

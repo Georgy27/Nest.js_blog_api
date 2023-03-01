@@ -22,7 +22,7 @@ import { ExtractUserPayloadFromAt } from '../../../common/guards/exctract-payloa
 import { GetUserIdFromAtDecorator } from '../../../common/decorators/getUserIdFromAt.decorator';
 
 @SkipThrottle()
-@Controller('api/blogs')
+@Controller('blogs')
 export class BlogsController {
   constructor(
     private readonly blogsService: BlogsService,

@@ -22,7 +22,7 @@ import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-f
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
 
 @SkipThrottle()
-@Controller('api/comments')
+@Controller('comments')
 export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService,

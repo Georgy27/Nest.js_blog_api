@@ -31,7 +31,7 @@ import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-f
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
 
 @SkipThrottle()
-@Controller('api/posts')
+@Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,

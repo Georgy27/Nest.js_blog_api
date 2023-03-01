@@ -18,11 +18,9 @@ import { UpdateBlogDto } from '../../dto/update.blog.dto';
 import { Blog } from '../../schemas/blog.schema';
 import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
-import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/posts.pagination.query.dto';
 import { PostsQueryRepository } from '../../../posts/posts.query.repository';
 import { CreatePostByBlogIdDto } from '../../dto/create.post.blogId.dto';
 import { PostsService } from '../../../posts/posts.service';
-import { PostViewModel } from '../../../posts';
 import { JwtService } from '@nestjs/jwt';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
@@ -31,16 +29,14 @@ import { CreatePostForSpecifiedBlogCommand } from '../../../posts/use-cases/crea
 import { UpdateBlogCommand } from '../../use-cases/update-blog-use-case';
 import { DeleteBlogCommand } from '../../use-cases/delete-blog-use-case';
 import { AuthGuard } from '@nestjs/passport';
-import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
 import { JwtAtPayload } from '../../../auth/strategies';
 import { UpdatePostForBloggerDto } from '../../dto/update.post.blogger.dto';
-import { ExtractUserPayloadFromAt } from '../../../common/guards/exctract-payload-from-AT.guard';
-import { GetUserIdFromAtDecorator } from '../../../common/decorators/getUserIdFromAt.decorator';
 import { UpdatePostCommand } from '../../../posts/use-cases/update-post-use-case';
 import { DeletePostCommand } from '../../../posts/use-cases/delete-post-use-case';
+import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
 
 @SkipThrottle()
-@Controller('api/blogger/blogs')
+@Controller('blogger/blogs')
 export class BlogsController {
   constructor(
     private readonly blogsService: BlogsService,

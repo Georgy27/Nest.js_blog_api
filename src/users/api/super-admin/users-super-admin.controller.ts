@@ -20,12 +20,12 @@ import { PaginationViewModel } from '../../../helpers/pagination/pagination.view
 import { UserViewModel } from '../../types/user.view.model';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserByAdminCommand } from '../../use-cases/create-user-admin-use-case';
-import { DeleteUserByAdminCommand } from './delete-user-admin-use-case';
+import { DeleteUserByAdminCommand } from '../../use-cases/delete-user-admin-use-case';
 import { BanUserDto } from '../../dto/ban.user.dto';
 import { BanOrUnbanUserByAdminCommand } from '../../use-cases/ban-unban-user-admin-user-case';
 
 @UseGuards(BasicAuthGuard)
-@Controller('api/sa/users')
+@Controller('sa/users')
 export class UsersSuperAdminController {
   constructor(
     private readonly usersService: UsersService,
