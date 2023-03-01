@@ -19,10 +19,10 @@ import { APP_GUARD } from '@nestjs/core';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    ThrottlerModule.forRoot({
-      ttl: 10,
-      limit: 5,
-    }),
+    // ThrottlerModule.forRoot({
+    //   ttl: 10,
+    //   limit: 5,
+    // }),
     MongooseModule.forRoot(process.env.DB_URI || ''),
     BlogsModule,
     PostsModule,
@@ -35,10 +35,10 @@ import { APP_GUARD } from '@nestjs/core';
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
   ],
 })
 export class AppModule {}
