@@ -12,6 +12,7 @@ export class UpdatePostCommand {
     public blogId: string,
     public postId: string,
     public updatePostForBloggerDto: UpdatePostForBloggerDto,
+    public userId: string,
   ) {}
 }
 @CommandHandler(UpdatePostCommand)
@@ -29,6 +30,9 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
     // find post
     const post = await this.postsRepository.findPostById(command.postId);
     if (!post) throw new NotFoundException();
+    // check user
+    if (isBlog.blogOwnerInfo.userId !== command.userId)
+      throw new ForbiddenException();
     // check for blogId
     if (command.blogId !== post.blogId) throw new ForbiddenException();
     post.updatePost(command.updatePostForBloggerDto);

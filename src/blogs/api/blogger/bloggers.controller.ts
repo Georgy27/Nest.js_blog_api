@@ -111,9 +111,15 @@ export class BloggersController {
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
     @Body() updatePostForBloggerDto: UpdatePostForBloggerDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
     return this.commandBus.execute(
-      new UpdatePostCommand(blogId, postId, updatePostForBloggerDto),
+      new UpdatePostCommand(
+        blogId,
+        postId,
+        updatePostForBloggerDto,
+        jwtAtPayload.userId,
+      ),
     );
   }
   @UseGuards(AuthGuard('jwt'))
@@ -133,7 +139,10 @@ export class BloggersController {
   async deletePostById(
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
-    return this.commandBus.execute(new DeletePostCommand(blogId, postId));
+    return this.commandBus.execute(
+      new DeletePostCommand(blogId, postId, jwtAtPayload.userId),
+    );
   }
 }

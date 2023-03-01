@@ -7,7 +7,11 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { BlogsRepository } from '../../blogs/blogs.repository';
 
 export class DeletePostCommand {
-  constructor(public blogId: string, public postId: string) {}
+  constructor(
+    public blogId: string,
+    public postId: string,
+    public userId: string,
+  ) {}
 }
 @CommandHandler(DeletePostCommand)
 export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
@@ -24,6 +28,9 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
     // find post
     const post = await this.postsRepository.findPostById(command.postId);
     if (!post) throw new NotFoundException();
+    // check user
+    if (isBlog.blogOwnerInfo.userId !== command.userId)
+      throw new ForbiddenException();
     // check for blogId
     if (command.blogId !== post.blogId) throw new ForbiddenException();
     await this.postsRepository.deletePostById(command.postId);
