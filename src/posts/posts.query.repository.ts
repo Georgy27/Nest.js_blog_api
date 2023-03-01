@@ -34,10 +34,11 @@ export class PostsQueryRepository {
         $regex: blogId ?? '',
         $options: 'i',
       },
+      isUserBanned: false,
     };
 
     const posts: Post[] = await this.postModel
-      .find(filter)
+      .find(filter, { isUserBanned: false })
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -63,13 +64,15 @@ export class PostsQueryRepository {
     userId: string | null,
   ): Promise<PostReactionViewModel | null> {
     const newPost: Post = await this.postModel
-      .findOne({ id }, { _id: false })
+      .findOne({ id, isUserBanned: false }, { _id: false, isUserBanned: false })
       .lean();
     if (!newPost) return null;
     return this.addReactionsInfoToPost(newPost, userId);
   }
   async getMappedPost(id: string): Promise<PostViewModel | null> {
-    const post = await this.postModel.findOne({ id }, { _id: false }).lean();
+    const post = await this.postModel
+      .findOne({ id, isUserBanned: false }, { _id: false, isUserBanned: false })
+      .lean();
     if (!post) return null;
     return new PostReactionViewModel(post);
   }

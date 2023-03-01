@@ -79,6 +79,7 @@ export class CommentsQueryRepository {
         { _id: false, postId: false },
       )
       .lean();
+    console.log(comment);
     if (!comment) return null;
     return this.addReactionsInfoToComment(comment, userId);
   }
@@ -89,12 +90,12 @@ export class CommentsQueryRepository {
     const likes = await this.reactionModel.countDocuments({
       parentId: comment.id,
       status: reactionStatusEnum.Like,
-      'commentatorInfo.isUserBanned': false,
+      isUserBanned: false,
     });
     const dislikes = await this.reactionModel.countDocuments({
       parentId: comment.id,
       status: reactionStatusEnum.Dislike,
-      'commentatorInfo.isUserBanned': false,
+      isUserBanned: false,
     });
     let myStatus: reactionStatusEnumKeys = 'None';
     if (userId) {
@@ -102,7 +103,7 @@ export class CommentsQueryRepository {
         {
           parentId: comment.id,
           userId: userId,
-          'commentatorInfo.isUserBanned': false,
+          isUserBanned: false,
         },
         { _id: false },
       );

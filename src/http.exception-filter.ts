@@ -33,13 +33,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return response.status(status).json(errorsResponse);
     }
     if (status === 401) {
-      return response.sendStatus(status);
+      return response.status(status).send(exception.message);
     }
     if (status === 429) {
-      return response.sendStatus(status);
+      return response.status(status).send(exception.message);
     }
     if (status === 404) {
-      return response.sendStatus(status);
+      return response.status(status).send(exception.message);
     } else {
       response.status(status).json({
         statusCode: status,

@@ -29,7 +29,7 @@ export class CommentsRepository {
   }
   async updateUserBanStatus(userId: string, isBanned: boolean) {
     return this.commentModel.updateMany(
-      { userId },
+      { 'commentatorInfo.userId': userId },
       { $set: { 'commentatorInfo.isUserBanned': isBanned } },
     );
   }

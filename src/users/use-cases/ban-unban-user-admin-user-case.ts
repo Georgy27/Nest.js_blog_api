@@ -22,7 +22,7 @@ export class BanOrUnbanUserByAdminUseCase
   async execute(command: BanOrUnbanUserByAdminCommand): Promise<void> {
     // find user
     const user = await this.usersRepository.findUserById(command.userId);
-    if (!user) throw new NotFoundException();
+    if (!user) throw new NotFoundException('user with this Id does not exist');
     // ban-unban user
     const updateBanInfo = command.banUserDto.isBanned
       ? {
