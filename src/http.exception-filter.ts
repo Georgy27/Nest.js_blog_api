@@ -19,6 +19,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       } = {
         errorsMessages: [],
       };
+
       const responseBody = exception.getResponse() as null | {
         message: { message: string; field: string }[];
       };
@@ -30,6 +31,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       responseBody.message.forEach((m) =>
         errorsResponse.errorsMessages.push(m),
       );
+      console.log(errorsResponse);
       return response.status(status).json(errorsResponse);
     }
     if (status === 401) {
