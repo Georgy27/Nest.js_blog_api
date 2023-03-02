@@ -12,6 +12,7 @@ import { MailModule } from './mail/mail.module';
 import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -23,7 +24,6 @@ import { APP_GUARD } from '@nestjs/core';
     //   ttl: 10,
     //   limit: 5,
     // }),
-    MongooseModule.forRoot(process.env.DB_URI || ''),
     BlogsModule,
     PostsModule,
     CommentsModule,
@@ -31,6 +31,7 @@ import { APP_GUARD } from '@nestjs/core';
     TestingModule,
     MailModule,
     AuthModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [
