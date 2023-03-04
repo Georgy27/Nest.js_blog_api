@@ -28,7 +28,6 @@ export class BlogsSuperAdminController {
   async getBlogsForSuperAdmin(
     @Query() blogsPaginationDto: BlogsPaginationQueryDto,
   ): Promise<PaginationViewModel<Blog[]>> {
-    console.log('inside blogs');
     return this.blogsQueryRepository.findBlogsForSuperAdmin(
       blogsPaginationDto.searchNameTerm,
       blogsPaginationDto.pageSize,

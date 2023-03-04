@@ -31,7 +31,6 @@ export class CreatePostForSpecifiedBlogUseCase
     const blog = await this.blogsRepository.findBlogById(
       command.createPostDto.blogId,
     );
-    console.log(blog);
     if (!blog) throw new NotFoundException();
     // validate
     if (command.jwtAtPayload.userId !== blog.blogOwnerInfo.userId)

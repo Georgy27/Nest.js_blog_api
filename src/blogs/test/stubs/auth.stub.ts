@@ -15,4 +15,5 @@ export const authStub = {
       password: 'George123',
     };
   },
+  getUser() {},
 };
