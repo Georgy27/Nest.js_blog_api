@@ -81,20 +81,50 @@ export class CommentsQueryRepository {
   ) {
     const { sortBy, sortDirection, pageNumber, pageSize } =
       commentsForPostsPaginationDto;
-    const comments = await this.commentModel.find(
-      {
-        postId: allPosts.map((post) => post.id),
-        'commentatorInfo.isUserBanned': false,
-      },
-      {
-        _id: false,
-        postId: false,
-        'commentatorInfo.isUserBanned': false,
-      },
-    );
+    const dictionary: Record<string, Post> = {};
+
+    allPosts.forEach((post) => {
+      const postId = post.id;
+      dictionary[postId] = post;
+    });
+    console.log(dictionary);
+
+    const comments = await this.commentModel
+      .find(
+        {
+          postId: allPosts.map((post) => post.id),
+          'commentatorInfo.isUserBanned': false,
+        },
+        {
+          _id: false,
+          'commentatorInfo.isUserBanned': false,
+        },
+      )
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .lean();
+
+    const mappedComments = comments.map((comment) => {
+      console.log(comment);
+      const postId = comment.postId;
+      return {
+        id: comment.id,
+        content: comment.content,
+        commentatorInfo: comment.commentatorInfo,
+        createdAt: comment.createdAt,
+        postInfo: {
+          id: postId,
+          title: dictionary[postId].title,
+          blogId: dictionary[postId].blogId,
+          blogName: dictionary[postId].blogName,
+          content: dictionary[postId].content,
+        },
+      };
+    });
 
     // const mappedComments = await Promise.all(
-    //   allPosts.flatMap(async (post) => {
+    //   allPosts.map(async (post) => {
     //     const postId = post.id;
     //     const comments = await this.commentModel
     //       .find(
@@ -109,14 +139,6 @@ export class CommentsQueryRepository {
     //       .skip((pageNumber - 1) * pageSize)
     //       .limit(pageSize)
     //       .lean();
-    //     // comments.map((comment) => {
-    //     //   return {
-    //     //     id: comment.id,
-    //     //     content: comment.content,
-    //     //     commentatorInfo: comment.commentatorInfo,
-    //     //     createdAt: comment.createdAt,
-    //     //   };
-    //     // });
     //     return comments;
     //   }),
     // );
@@ -127,7 +149,7 @@ export class CommentsQueryRepository {
       numberOfComments,
       pageNumber,
       pageSize,
-      comments,
+      mappedComments,
     );
   }
   async findComment(id: string, userId: null | string) {
