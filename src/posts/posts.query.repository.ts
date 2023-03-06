@@ -58,7 +58,9 @@ export class PostsQueryRepository {
       postsWithLikesInfo,
     );
   }
-
+  async findPostsForBlogger(userId: string) {
+    return this.postModel.find({ userId }, { isUserBanned: false }).lean();
+  }
   async findPost(
     id: string,
     userId: string | null,

@@ -12,6 +12,8 @@ import {
   reactionStatusEnumKeys,
 } from '../helpers/reaction';
 import { CommentViewModel } from './index';
+import { CommentsPaginationQueryDto } from '../helpers/pagination/dto/comments.pagination.dto';
+import { Post } from '../posts/schemas/post.schema';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -71,6 +73,62 @@ export class CommentsQueryRepository {
         myStatus: 'None',
       },
     };
+  }
+  async getAllCommentsForAllPostsByBlogger(
+    allPosts: Post[],
+    commentsForPostsPaginationDto: CommentsPaginationQueryDto,
+    userId: string,
+  ) {
+    const { sortBy, sortDirection, pageNumber, pageSize } =
+      commentsForPostsPaginationDto;
+    const comments = await this.commentModel.find(
+      {
+        postId: allPosts.map((post) => post.id),
+        'commentatorInfo.isUserBanned': false,
+      },
+      {
+        _id: false,
+        postId: false,
+        'commentatorInfo.isUserBanned': false,
+      },
+    );
+
+    // const mappedComments = await Promise.all(
+    //   allPosts.flatMap(async (post) => {
+    //     const postId = post.id;
+    //     const comments = await this.commentModel
+    //       .find(
+    //         { postId, 'commentatorInfo.isUserBanned': false },
+    //         {
+    //           _id: false,
+    //           postId: false,
+    //           'commentatorInfo.isUserBanned': false,
+    //         },
+    //       )
+    //       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+    //       .skip((pageNumber - 1) * pageSize)
+    //       .limit(pageSize)
+    //       .lean();
+    //     // comments.map((comment) => {
+    //     //   return {
+    //     //     id: comment.id,
+    //     //     content: comment.content,
+    //     //     commentatorInfo: comment.commentatorInfo,
+    //     //     createdAt: comment.createdAt,
+    //     //   };
+    //     // });
+    //     return comments;
+    //   }),
+    // );
+    // console.log(mappedComments);
+
+    const numberOfComments = await this.commentModel.countDocuments({ userId });
+    return new PaginationViewModel(
+      numberOfComments,
+      pageNumber,
+      pageSize,
+      comments,
+    );
   }
   async findComment(id: string, userId: null | string) {
     const comment = await this.commentModel

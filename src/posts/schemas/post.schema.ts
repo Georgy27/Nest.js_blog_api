@@ -23,10 +23,12 @@ export class Post {
   blogName: string;
   @Prop({ required: true, type: String })
   createdAt: string;
+  @Prop({ required: true, type: String })
+  userId: string;
   @Prop({ required: true, type: Boolean, default: false })
   isUserBanned: boolean;
 
-  createPost(createPostDto: CreatePostDto, blogName: string) {
+  createPost(createPostDto: CreatePostDto, blogName: string, userId: string) {
     this.id = randomUUID();
     this.title = createPostDto.title;
     this.shortDescription = createPostDto.shortDescription;
@@ -34,6 +36,7 @@ export class Post {
     this.blogId = createPostDto.blogId;
     this.blogName = blogName;
     this.createdAt = new Date().toISOString();
+    this.userId = userId;
   }
   updatePost(updatePostDto: UpdatePostForBloggerDto) {
     this.title = updatePostDto.title;

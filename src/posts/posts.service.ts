@@ -30,16 +30,16 @@ export class PostsService {
     private readonly commentsRepository: CommentsRepository,
     private readonly reactionsService: ReactionsService,
   ) {}
-  async createPost(createPostDto: CreatePostDto): Promise<string | null> {
-    // find a blog
-    const blog = await this.blogsRepository.findBlogById(createPostDto.blogId);
-    if (!blog) throw new NotFoundException();
-    // create new post
-    const newPost = new this.postModel();
-    newPost.createPost(createPostDto, blog.name);
-
-    return this.postsRepository.save(newPost);
-  }
+  // async createPost(createPostDto: CreatePostDto): Promise<string | null> {
+  //   // find a blog
+  //   const blog = await this.blogsRepository.findBlogById(createPostDto.blogId);
+  //   if (!blog) throw new NotFoundException();
+  //   // create new post
+  //   const newPost = new this.postModel();
+  //   newPost.createPost(createPostDto, blog.name);
+  //
+  //   return this.postsRepository.save(newPost);
+  // }
   async createCommentForSpecifiedPost(
     postId: string,
     createCommentForPostDto: CreateCommentForPostDto,

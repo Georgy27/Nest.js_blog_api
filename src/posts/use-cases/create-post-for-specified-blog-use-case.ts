@@ -37,7 +37,11 @@ export class CreatePostForSpecifiedBlogUseCase
       throw new ForbiddenException();
     // create new post
     const newPost = new this.postModel();
-    newPost.createPost(command.createPostDto, blog.name);
+    newPost.createPost(
+      command.createPostDto,
+      blog.name,
+      command.jwtAtPayload.userId,
+    );
 
     return this.postsRepository.save(newPost);
   }

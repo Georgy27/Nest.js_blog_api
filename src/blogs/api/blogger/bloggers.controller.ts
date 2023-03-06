@@ -34,6 +34,8 @@ import { UpdatePostForBloggerDto } from '../../dto/update.post.blogger.dto';
 import { UpdatePostCommand } from '../../../posts/use-cases/update-post-use-case';
 import { DeletePostCommand } from '../../../posts/use-cases/delete-post-use-case';
 import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
+import { CommentsPaginationQueryDto } from '../../../helpers/pagination/dto/comments.pagination.dto';
+import { CommentsQueryRepository } from '../../../comments/comments.query.repository';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
@@ -43,6 +45,7 @@ export class BloggersController {
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly postsService: PostsService,
+    private readonly commentsQueryRepository: CommentsQueryRepository,
     private jwtService: JwtService,
     private commandBus: CommandBus,
   ) {}
@@ -59,6 +62,24 @@ export class BloggersController {
       blogsPaginationDto.pageNumber,
       blogsPaginationDto.sortDirection,
       jwtAtPayload,
+    );
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('comments')
+  async getAllCommentsForAllPostsByBlogger(
+    @Query() commentsForPostsPaginationDto: CommentsPaginationQueryDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
+  ) {
+    // find all posts made by blogger
+    const allPosts = await this.postsQueryRepository.findPostsForBlogger(
+      jwtAtPayload.userId,
+    );
+    console.log(allPosts);
+    // return all comments for posts
+    return this.commentsQueryRepository.getAllCommentsForAllPostsByBlogger(
+      allPosts,
+      commentsForPostsPaginationDto,
+      jwtAtPayload.userId,
     );
   }
   @UseGuards(AuthGuard('jwt'))

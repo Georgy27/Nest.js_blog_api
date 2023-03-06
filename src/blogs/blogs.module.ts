@@ -16,6 +16,7 @@ import { BindBlogWithUserUseCase } from './use-cases/bind-blog-with-user-use-cas
 import { UsersModule } from '../users/users.module';
 import { BlogsSuperAdminController } from './api/super-admin/blogs-super-admin.controller';
 import { BlogsController } from './api/public/blogs.controller';
+import { CommentsModule } from '../comments/comments.module';
 
 const useCases = [
   CreateBlogUseCase,
@@ -30,6 +31,7 @@ const useCases = [
     forwardRef(() => PostsModule),
     JwtModule.register({}),
     UsersModule,
+    CommentsModule,
   ],
   controllers: [BloggersController, BlogsController, BlogsSuperAdminController],
   providers: [
