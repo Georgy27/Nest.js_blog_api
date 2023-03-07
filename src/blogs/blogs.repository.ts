@@ -20,4 +20,7 @@ export class BlogsRepository {
   async clearBlogs() {
     await this.blogModel.deleteMany({});
   }
+  // async addBannedUser(){
+  //   await this.blogModel.
+  // }
 }

@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModelType } from '../schemas/blog.schema';
+import { Blog, BlogDocument } from '../schemas/blog.schema';
 import { BlogsRepository } from '../blogs.repository';
 import { BadRequestException } from '@nestjs/common';
 import { UsersRepository } from '../../users/users.repository';
+import { Model } from 'mongoose';
 
 export class BindBlogWithUserCommand {
   constructor(public blogId: string, public userId: string) {}
@@ -13,7 +14,7 @@ export class BindBlogWithUserUseCase
   implements ICommandHandler<BindBlogWithUserCommand>
 {
   constructor(
-    @InjectModel(Blog.name) private blogModel: BlogModelType,
+    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
     private readonly blogsRepository: BlogsRepository,
     private readonly usersRepository: UsersRepository,
   ) {}

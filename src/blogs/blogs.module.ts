@@ -30,8 +30,8 @@ const useCases = [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     forwardRef(() => PostsModule),
     JwtModule.register({}),
-    UsersModule,
-    CommentsModule,
+    forwardRef(() => UsersModule),
+    forwardRef(() => CommentsModule),
   ],
   controllers: [BloggersController, BlogsController, BlogsSuperAdminController],
   providers: [

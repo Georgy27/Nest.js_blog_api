@@ -1,7 +1,7 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { randomUUID } from 'crypto';
-import { IBlogOwnerInfo } from './index';
+import { IBannedUsersInfo, IBlogOwnerInfo } from './index';
 export type BlogDocument = HydratedDocument<Blog>;
 
 @Schema({ id: false, versionKey: false })
@@ -25,43 +25,41 @@ export class Blog {
     }),
   )
   blogOwnerInfo: IBlogOwnerInfo;
-  static createBlog(
+  @Prop(
+    raw([
+      {
+        id: { unique: true, type: String },
+        login: { unique: true, type: String },
+        banInfo: raw({
+          isBanned: { type: Boolean },
+          banDate: { type: String },
+          banReason: { type: String },
+        }),
+      },
+    ]),
+  )
+  bannedUsersInfo: IBannedUsersInfo[];
+
+  createBlog(
     name: string,
     description: string,
     websiteUrl: string,
     userId: string,
     userLogin: string,
-    Blog: BlogModelType,
   ) {
-    return new Blog({
-      id: randomUUID(),
-      name: name,
-      description: description,
-      websiteUrl: websiteUrl,
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-      blogOwnerInfo: {
-        userId: userId,
-        userLogin: userLogin,
-      },
-    });
+    this.id = randomUUID();
+    this.name = name;
+    this.description = description;
+    this.websiteUrl = websiteUrl;
+    this.createdAt = new Date().toISOString();
+    this.isMembership = false;
+    this.blogOwnerInfo.userId = userId;
+    this.blogOwnerInfo.userLogin = userLogin;
+    this.bannedUsersInfo = [];
   }
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
-const blogStaticMethods: BlogModelStaticType = {
-  createBlog: Blog.createBlog,
+BlogSchema.methods = {
+  createBlog: Blog.prototype.createBlog,
 };
-BlogSchema.statics = blogStaticMethods;
-
-export type BlogModelStaticType = {
-  createBlog: (
-    name: string,
-    description: string,
-    websiteUrl: string,
-    userId: string,
-    userLogin: string,
-    Blog: BlogModelType,
-  ) => BlogDocument;
-};
-export type BlogModelType = Model<BlogDocument> & BlogModelStaticType;

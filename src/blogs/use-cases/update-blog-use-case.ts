@@ -2,7 +2,7 @@ import { UpdateBlogDto } from '../dto/update.blog.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogsRepository } from '../blogs.repository';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogModelType } from '../schemas/blog.schema';
+import { Blog, BlogDocument } from '../schemas/blog.schema';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 export class UpdateBlogCommand {
@@ -17,7 +17,7 @@ export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
   constructor(
     private readonly blogsRepository: BlogsRepository,
     @InjectModel(Blog.name)
-    private blogModel: BlogModelType,
+    private blogModel: BlogDocument,
   ) {}
   async execute(command: UpdateBlogCommand): Promise<void> {
     const { name, description, websiteUrl } = command.updateBlogDto;

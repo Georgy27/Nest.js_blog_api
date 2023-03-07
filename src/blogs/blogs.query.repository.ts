@@ -22,7 +22,12 @@ export class BlogsQueryRepository {
       jwtAtPayload ? jwtAtPayload.userId : undefined,
     );
     const blogs = await this.blogModel
-      .find(filter, { _id: false, __v: false, blogOwnerInfo: false })
+      .find(filter, {
+        _id: false,
+        __v: false,
+        blogOwnerInfo: false,
+        bannedUsersInfo: false,
+      })
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -45,7 +50,7 @@ export class BlogsQueryRepository {
       },
     };
     const blogs = await this.blogModel
-      .find(filter, { _id: false, __v: false })
+      .find(filter, { _id: false, __v: false, bannedUsersInfo: false })
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -56,7 +61,15 @@ export class BlogsQueryRepository {
   }
   async findBlog(id: string): Promise<Blog | null> {
     return this.blogModel
-      .findOne({ id }, { _id: false, __v: false, blogOwnerInfo: false })
+      .findOne(
+        { id },
+        {
+          _id: false,
+          __v: false,
+          blogOwnerInfo: false,
+          bannedUsersInfo: false,
+        },
+      )
       .lean();
   }
 }

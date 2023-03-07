@@ -12,21 +12,27 @@ import { SecurityDevicesModule } from '../security-devices/security.devices.modu
 import { CommentsModule } from '../comments/comments.module';
 import { ReactionsModule } from '../reactions/reactions.module';
 import { DeleteUserByAdminUseCase } from './use-cases/delete-user-admin-use-case';
+import { UsersBloggerController } from './api/blogger/users-blogger.controller';
+import { BanOrUnbanUserByBloggerUseCase } from './use-cases/ban-unban-user-blogger-use-case';
+import { BlogsModule } from '../blogs/blogs.module';
 
 const useCases = [
   CreateUserByAdminUseCase,
   BanOrUnbanUserByAdminUseCase,
+  BanOrUnbanUserByBloggerUseCase,
   DeleteUserByAdminUseCase,
 ];
 @Module({
   imports: [
     forwardRef(() => CommentsModule),
+    forwardRef(() => BlogsModule),
     CqrsModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     SecurityDevicesModule,
     ReactionsModule,
+    // BlogsModule,
   ],
-  controllers: [UsersSuperAdminController],
+  controllers: [UsersSuperAdminController, UsersBloggerController],
   providers: [UsersService, UsersQueryRepository, UsersRepository, ...useCases],
   exports: [UsersRepository, UsersService, UsersQueryRepository],
 })
