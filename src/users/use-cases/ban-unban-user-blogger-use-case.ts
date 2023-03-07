@@ -45,15 +45,27 @@ export class BanOrUnbanUserByBloggerUseCase
     if (isBlog.blogOwnerInfo.userId !== command.bloggerId)
       throw new ForbiddenException('blog id does not match to userId');
     // ban user info to blogger db
-    const updateBanInfo = isBlog.bannedUsersInfo.push({
-      id: command.userId,
-      login: isUser.accountData.login,
-      banInfo: {
-        isBanned: command.banUserByBloggerDto.isBanned,
-        banDate: new Date().toISOString(),
-        banReason: command.banUserByBloggerDto.banReason,
-      },
-    });
+    if (
+      command.banUserByBloggerDto.isBanned &&
+      isBlog.bannedUsersInfo.some((user) => user.id === command.userId)
+    )
+      return;
+    else if (command.banUserByBloggerDto.isBanned) {
+      isBlog.bannedUsersInfo.push({
+        id: command.userId,
+        login: isUser.accountData.login,
+        banInfo: {
+          isBanned: command.banUserByBloggerDto.isBanned,
+          banDate: new Date().toISOString(),
+          banReason: command.banUserByBloggerDto.banReason,
+        },
+      });
+    } else {
+      isBlog.bannedUsersInfo = isBlog.bannedUsersInfo.filter((user) => {
+        return user.id !== command.userId;
+      });
+    }
+
     await this.blogsRepository.save(isBlog);
   }
 }
