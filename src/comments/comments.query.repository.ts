@@ -14,6 +14,7 @@ import {
 import { CommentViewModel } from './index';
 import { CommentsPaginationQueryDto } from '../helpers/pagination/dto/comments.pagination.dto';
 import { Post } from '../posts/schemas/post.schema';
+import { Blog } from '../blogs/schemas/blog.schema';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -76,30 +77,34 @@ export class CommentsQueryRepository {
   }
   async getAllCommentsForAllPostsByBlogger(
     allPosts: Post[],
+    allBlogs: Blog[],
     commentsForPostsPaginationDto: CommentsPaginationQueryDto,
     userId: string,
   ) {
     const { sortBy, sortDirection, pageNumber, pageSize } =
       commentsForPostsPaginationDto;
-    const dictionary: Record<string, Post> = {};
 
+    const dictionary: Record<string, Post> = {};
     allPosts.forEach((post) => {
       const postId = post.id;
       dictionary[postId] = post;
     });
-    console.log(dictionary);
 
+    const blogsBunnedUsersInfo = allBlogs.flatMap(
+      (blog) => blog.bannedUsersInfo,
+    );
+    const filter = {
+      postId: allPosts.map((post) => post.id),
+      'commentatorInfo.isUserBanned': false,
+      'commentatorInfo.userId': {
+        $nin: blogsBunnedUsersInfo.map((user) => user.id),
+      },
+    };
     const comments = await this.commentModel
-      .find(
-        {
-          postId: allPosts.map((post) => post.id),
-          'commentatorInfo.isUserBanned': false,
-        },
-        {
-          _id: false,
-          'commentatorInfo.isUserBanned': false,
-        },
-      )
+      .find(filter, {
+        _id: false,
+        'commentatorInfo.isUserBanned': false,
+      })
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -123,28 +128,7 @@ export class CommentsQueryRepository {
       };
     });
 
-    // const mappedComments = await Promise.all(
-    //   allPosts.flatMap(async (post) => {
-    //     const postId = post.id;
-    //     const comments = await this.commentModel
-    //       .find(
-    //         { postId, 'commentatorInfo.isUserBanned': false },
-    //         {
-    //           _id: false,
-    //           postId: false,
-    //           'commentatorInfo.isUserBanned': false,
-    //         },
-    //       )
-    //       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
-    //       .skip((pageNumber - 1) * pageSize)
-    //       .limit(pageSize)
-    //       .lean();
-    //     return comments;
-    //   }),
-    // );
-    // console.log(mappedComments);
-
-    const numberOfComments = await this.commentModel.countDocuments({ userId });
+    const numberOfComments = await this.commentModel.countDocuments(filter);
     return new PaginationViewModel(
       numberOfComments,
       pageNumber,

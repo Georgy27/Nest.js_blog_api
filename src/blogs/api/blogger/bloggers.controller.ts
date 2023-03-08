@@ -70,6 +70,10 @@ export class BloggersController {
     @Query() commentsForPostsPaginationDto: CommentsPaginationQueryDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ) {
+    // find all blogs made by blogger
+    const allBlogs = await this.blogsQueryRepository.findBlogsWithoutPagination(
+      jwtAtPayload.userId,
+    );
     // find all posts made by blogger
     const allPosts = await this.postsQueryRepository.findPostsForBlogger(
       jwtAtPayload.userId,
@@ -77,6 +81,7 @@ export class BloggersController {
     // return all comments for posts
     return this.commentsQueryRepository.getAllCommentsForAllPostsByBlogger(
       allPosts,
+      allBlogs,
       commentsForPostsPaginationDto,
       jwtAtPayload.userId,
     );

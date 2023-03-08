@@ -49,7 +49,7 @@ export class PostsService {
     // check if the post exists
     const isPost = await this.postsRepository.findPostById(postId);
     if (!isPost) throw new NotFoundException();
-    // check if the user is banned for blogger
+    // check if the user is banned by blogger
     const isBlog = await this.blogsRepository.findBlogById(isPost.blogId);
     if (!isBlog)
       throw new NotFoundException("blog for this post doesn't exist");

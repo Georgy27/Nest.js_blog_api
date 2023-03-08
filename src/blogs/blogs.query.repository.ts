@@ -38,7 +38,13 @@ export class BlogsQueryRepository {
     const numberOfBlogs = await this.blogModel.countDocuments(filter);
     return new PaginationViewModel(numberOfBlogs, pageNumber, pageSize, blogs);
   }
-
+  async findBlogsWithoutPagination(userId: string) {
+    return this.blogModel.find({
+      'blogOwnerInfo.userId': {
+        $regex: userId ?? '',
+      },
+    });
+  }
   async findBlogsForSuperAdmin(
     searchNameTerm: string | null,
     pageSize: number,
@@ -83,14 +89,14 @@ export class BlogsQueryRepository {
   ) {
     const { searchLoginTerm, pageNumber, pageSize, sortBy, sortDirection } =
       usersBannedByBloggerPaginationDto;
-    // aggregate
-    // const bannedUsers = blog.bannedUsersInfo;
+
     const bannedUsers = await this.blogModel.aggregate([
       {
         $match: {
-          id: '5305a9f0-868b-4f32-85d8-4d02faa03bb4',
+          id: blog.id,
         },
       },
+
       {
         $unwind: {
           path: '$bannedUsersInfo',
@@ -99,10 +105,21 @@ export class BlogsQueryRepository {
       {
         $match: {
           'bannedUsersInfo.login': {
-            $regex: '4',
+            $regex: searchLoginTerm ?? '',
             $options: 'i',
           },
         },
+      },
+      {
+        $sort: {
+          [sortBy]: sortDirection === 'asc' ? 1 : -1,
+        },
+      },
+      {
+        $skip: (pageNumber - 1) * pageSize,
+      },
+      {
+        $limit: pageSize,
       },
       {
         $project: {
@@ -116,20 +133,25 @@ export class BlogsQueryRepository {
           },
         },
       },
-      {
-        $sort: {
-          'banInfo.banDate': 1,
+    ]);
+
+    const countBannedUsers = await this.blogModel.countDocuments({
+      id: blog.id,
+      login: {
+        $in: {
+          bannedUsersInfo: {
+            $regex: searchLoginTerm ?? '',
+            $options: 'i',
+          },
         },
       },
-      {
-        $skip: 0,
-      },
-      {
-        $limit: 10,
-      },
-    ]);
-    console.log('bannedUsers', bannedUsers);
-    const countBannedUsers = await this.blogModel.countDocuments(bannedUsers);
-    console.log('countBannedUsers', countBannedUsers);
+    });
+
+    return new PaginationViewModel(
+      countBannedUsers,
+      pageNumber,
+      pageSize,
+      bannedUsers,
+    );
   }
 }
