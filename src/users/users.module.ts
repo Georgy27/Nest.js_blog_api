@@ -30,7 +30,6 @@ const useCases = [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     SecurityDevicesModule,
     ReactionsModule,
-    // BlogsModule,
   ],
   controllers: [UsersSuperAdminController, UsersBloggerController],
   providers: [UsersService, UsersQueryRepository, UsersRepository, ...useCases],

@@ -6,17 +6,17 @@ export type BlogDocument = HydratedDocument<Blog>;
 
 @Schema({ id: false, versionKey: false })
 export class Blog {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, type: String })
   id: string;
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   name: string;
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   description: string;
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   websiteUrl: string;
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   createdAt: string;
-  @Prop({ required: true })
+  @Prop({ required: true, type: Boolean })
   isMembership: boolean;
   @Prop(
     raw({
@@ -39,6 +39,8 @@ export class Blog {
     ]),
   )
   bannedUsersInfo: IBannedUsersInfo[];
+  @Prop({ required: true, default: false, type: Boolean })
+  isBanned: boolean;
 
   createBlog(
     name: string,
@@ -56,6 +58,7 @@ export class Blog {
     this.blogOwnerInfo.userId = userId;
     this.blogOwnerInfo.userLogin = userLogin;
     this.bannedUsersInfo = [];
+    this.isBanned = false;
   }
 }
 

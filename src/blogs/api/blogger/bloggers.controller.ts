@@ -74,7 +74,6 @@ export class BloggersController {
     const allPosts = await this.postsQueryRepository.findPostsForBlogger(
       jwtAtPayload.userId,
     );
-    console.log(allPosts);
     // return all comments for posts
     return this.commentsQueryRepository.getAllCommentsForAllPostsByBlogger(
       allPosts,

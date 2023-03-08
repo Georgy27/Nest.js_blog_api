@@ -41,6 +41,6 @@ const useCases = [
     BlogIsExistValidator,
     ...useCases,
   ],
-  exports: [BlogsRepository],
+  exports: [BlogsRepository, BlogsQueryRepository],
 })
 export class BlogsModule {}

@@ -124,7 +124,7 @@ export class CommentsQueryRepository {
     });
 
     // const mappedComments = await Promise.all(
-    //   allPosts.map(async (post) => {
+    //   allPosts.flatMap(async (post) => {
     //     const postId = post.id;
     //     const comments = await this.commentModel
     //       .find(

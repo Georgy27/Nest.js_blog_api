@@ -69,16 +69,3 @@ export class BanOrUnbanUserByBloggerUseCase
     await this.blogsRepository.save(isBlog);
   }
 }
-
-// const updateBanInfo = command.banUserDto.isBanned
-//   ? {
-//     isBanned: command.banUserDto.isBanned,
-//     banDate: new Date().toISOString(),
-//     banReason: command.banUserDto.banReason,
-//   }
-//   : {
-//     isBanned: command.banUserDto.isBanned,
-//     banDate: null,
-//     banReason: null,
-//   };
-// user.banInfo = updateBanInfo;

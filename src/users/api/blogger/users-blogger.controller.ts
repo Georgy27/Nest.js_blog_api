@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
+  NotFoundException,
   Param,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../../users.service';
@@ -14,6 +17,8 @@ import { BanOrUnbanUserByBloggerCommand } from '../../use-cases/ban-unban-user-b
 import { AuthGuard } from '@nestjs/passport';
 import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
 import { JwtAtPayload } from '../../../auth/strategies';
+import { UsersBannedByBloggerPaginationQueryDto } from '../../../helpers/pagination/dto/users-banned-by-blogger.pagination.query.dto';
+import { BlogsQueryRepository } from '../../../blogs/blogs.query.repository';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('blogger/users')
@@ -21,8 +26,22 @@ export class UsersBloggerController {
   constructor(
     private readonly usersService: UsersService,
     private readonly usersQueryRepository: UsersQueryRepository,
+    private readonly blogsQueryRepository: BlogsQueryRepository,
     private commandBus: CommandBus,
   ) {}
+  @Get('blog/:id')
+  async getBannedUsersForBlog(
+    @Param('id') id: string,
+    @Query()
+    usersBannedByBloggerPaginationDto: UsersBannedByBloggerPaginationQueryDto,
+  ) {
+    const blog = await this.blogsQueryRepository.findBlog(id);
+    if (!blog) throw new NotFoundException('blog is not found');
+    return this.blogsQueryRepository.getBannedUsersForBlog(
+      blog,
+      usersBannedByBloggerPaginationDto,
+    );
+  }
   @Put(':id/ban')
   @HttpCode(204)
   async banOrUnbanUser(

@@ -10,6 +10,7 @@ import { UserViewModel } from './types/user.view.model';
 @Injectable()
 export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
   async findUsers(
     usersPaginationDto: UsersPaginationQueryDto,
   ): Promise<PaginationViewModel<UserViewModel[]>> {
@@ -58,6 +59,7 @@ export class UsersQueryRepository {
       newUsers,
     );
   }
+
   async findUser(id: string): Promise<UserViewModel> {
     const user: User = await this.userModel
       .findOne({ id }, { _id: false, 'accountData.passwordHash': false })
