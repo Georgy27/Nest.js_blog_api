@@ -28,8 +28,8 @@ export class Blog {
   @Prop(
     raw([
       {
-        id: { unique: true, type: String },
-        login: { unique: true, type: String },
+        id: { type: String },
+        login: { type: String },
         banInfo: raw({
           isBanned: { type: Boolean },
           banDate: { type: String },
@@ -39,8 +39,13 @@ export class Blog {
     ]),
   )
   bannedUsersInfo: IBannedUsersInfo[];
-  @Prop({ required: true, default: false, type: Boolean })
-  isBanned: boolean;
+  @Prop(
+    raw({
+      isBanned: { type: String, default: false },
+      banDate: { type: String },
+    }),
+  )
+  banInfo: { isBanned: boolean; banDate: string | null };
 
   createBlog(
     name: string,
@@ -58,7 +63,6 @@ export class Blog {
     this.blogOwnerInfo.userId = userId;
     this.blogOwnerInfo.userLogin = userLogin;
     this.bannedUsersInfo = [];
-    this.isBanned = false;
   }
 }
 

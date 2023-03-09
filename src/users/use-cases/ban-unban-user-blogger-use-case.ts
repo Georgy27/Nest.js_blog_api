@@ -41,7 +41,7 @@ export class BanOrUnbanUserByBloggerUseCase
       command.banUserByBloggerDto.blogId,
     );
     if (!isBlog)
-      throw new NotFoundException('user with this Id does not exist');
+      throw new NotFoundException('blog with this Id does not exist');
     if (isBlog.blogOwnerInfo.userId !== command.bloggerId)
       throw new ForbiddenException('blog id does not match to userId');
     // ban user info to blogger db

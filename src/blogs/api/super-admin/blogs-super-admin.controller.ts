@@ -1,5 +1,6 @@
 import { SkipThrottle } from '@nestjs/throttler';
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -15,6 +16,8 @@ import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.p
 import { BlogsQueryRepository } from '../../blogs.query.repository';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { Blog } from '../../schemas/blog.schema';
+import { BanBlogAdminDto } from '../../dto/ban.blog.admin.dto';
+import { BanBlogByAdminCommand } from '../../use-cases/ban-blog-by-admin-use-case';
 
 @SkipThrottle()
 @UseGuards(BasicAuthGuard)
@@ -43,5 +46,15 @@ export class BlogsSuperAdminController {
     @Param('userId') userId: string,
   ) {
     return this.commandBus.execute(new BindBlogWithUserCommand(blogId, userId));
+  }
+  @Put(':id/ban')
+  @HttpCode(204)
+  async banBlogByAdmin(
+    @Param('id') blogId: string,
+    @Body() banBlogAdminDto: BanBlogAdminDto,
+  ) {
+    return this.commandBus.execute(
+      new BanBlogByAdminCommand(blogId, banBlogAdminDto),
+    );
   }
 }

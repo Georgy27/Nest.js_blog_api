@@ -17,12 +17,14 @@ import { UsersModule } from '../users/users.module';
 import { BlogsSuperAdminController } from './api/super-admin/blogs-super-admin.controller';
 import { BlogsController } from './api/public/blogs.controller';
 import { CommentsModule } from '../comments/comments.module';
+import { BanBlogByAdminUseCase } from './use-cases/ban-blog-by-admin-use-case';
 
 const useCases = [
   CreateBlogUseCase,
   UpdateBlogUseCase,
   DeleteBlogUseCase,
   BindBlogWithUserUseCase,
+  BanBlogByAdminUseCase,
 ];
 @Module({
   imports: [

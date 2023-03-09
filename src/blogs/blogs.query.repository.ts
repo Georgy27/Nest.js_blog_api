@@ -19,16 +19,19 @@ export class BlogsQueryRepository {
     sortDirection: string,
     jwtAtPayload?: JwtAtPayload,
   ): Promise<PaginationViewModel<Blog[]>> {
-    const filter: FilterQuery<Blog> = blogQueryFilter(
+    let filter: FilterQuery<Blog> = blogQueryFilter(
       searchNameTerm,
       jwtAtPayload ? jwtAtPayload.userId : undefined,
     );
+    filter = { ...filter, 'banInfo.isBanned': false };
+
     const blogs = await this.blogModel
       .find(filter, {
         _id: false,
         __v: false,
         blogOwnerInfo: false,
         bannedUsersInfo: false,
+        banInfo: false,
       })
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
@@ -59,7 +62,11 @@ export class BlogsQueryRepository {
       },
     };
     const blogs = await this.blogModel
-      .find(filter, { _id: false, __v: false, bannedUsersInfo: false })
+      .find(filter, {
+        _id: false,
+        __v: false,
+        bannedUsersInfo: false,
+      })
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -72,12 +79,13 @@ export class BlogsQueryRepository {
   async findBlog(id: string): Promise<Blog | null> {
     return this.blogModel
       .findOne(
-        { id },
+        { id, 'banInfo.isBanned': false },
         {
           _id: false,
           __v: false,
           blogOwnerInfo: false,
           bannedUsersInfo: false,
+          banInfo: false,
         },
       )
       .lean();
@@ -94,6 +102,7 @@ export class BlogsQueryRepository {
       {
         $match: {
           id: blog.id,
+          'banInfo.isBanned': false,
         },
       },
 
