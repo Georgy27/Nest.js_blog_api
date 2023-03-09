@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Comment, CommentSchema } from './schemas/comment.schema';
 import { CommentsController } from './api/comments.controller';
@@ -9,6 +9,7 @@ import { UsersModule } from '../users/users.module';
 import { ReactionsModule } from '../reactions/reactions.module';
 import { Reaction, ReactionSchema } from '../reactions/schemas/reaction.schema';
 import { JwtModule } from '@nestjs/jwt';
+import { PostsModule } from '../posts/posts.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { JwtModule } from '@nestjs/jwt';
     ]),
     UsersModule,
     ReactionsModule,
+    forwardRef(() => PostsModule),
     JwtModule.register({}),
   ],
   controllers: [CommentsController],

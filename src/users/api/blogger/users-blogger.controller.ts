@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -37,6 +38,8 @@ export class UsersBloggerController {
   ) {
     const blog = await this.blogsQueryRepository.findBlog(id);
     if (!blog) throw new NotFoundException('blog is not found');
+    if (blog.banInfo.isBanned)
+      throw new ForbiddenException('blog is banned by admin');
     return this.blogsQueryRepository.getBannedUsersForBlog(
       blog,
       usersBannedByBloggerPaginationDto,

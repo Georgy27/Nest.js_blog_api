@@ -1,6 +1,5 @@
-import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { IBanInfo } from '../../users/schemas';
 
 @Schema({ _id: false, versionKey: false })
 export class CommentatorInfo {

@@ -92,13 +92,13 @@ export class PostsController {
     @Body() createCommentForPostDto: CreateCommentForPostDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<CommentViewModel> {
-    const newComment = await this.postsService.createCommentForSpecifiedPost(
+    const newCommentId = await this.postsService.createCommentForSpecifiedPost(
       postId,
       createCommentForPostDto,
       jwtAtPayload.userId,
     );
     const commentToView = await this.commentsQueryRepository.getMappedComment(
-      newComment,
+      newCommentId,
     );
     if (!commentToView) throw new NotFoundException();
     return commentToView;

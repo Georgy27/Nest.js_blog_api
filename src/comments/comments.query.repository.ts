@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentDocument } from './schemas/comment.schema';
 import { Model } from 'mongoose';
@@ -15,12 +19,14 @@ import { CommentViewModel } from './index';
 import { CommentsPaginationQueryDto } from '../helpers/pagination/dto/comments.pagination.dto';
 import { Post } from '../posts/schemas/post.schema';
 import { Blog } from '../blogs/schemas/blog.schema';
+import { PostsRepository } from '../posts/posts.repository';
 
 @Injectable()
 export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     @InjectModel(Reaction.name) private reactionModel: Model<ReactionDocument>,
+    private readonly postsRepository: PostsRepository,
   ) {}
   async findCommentsByPostId(
     pageSize: number,
@@ -30,6 +36,11 @@ export class CommentsQueryRepository {
     postId: string,
     userId: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
+    // check that blog is not baned
+    const post = await this.postsRepository.findPostById(postId);
+    if (!post) throw new NotFoundException('post with this id does not exist');
+    if (post.isBlogBanned) throw new ForbiddenException('the post is banned');
+    // find comment
     const comments = await this.commentModel
       .find(
         { postId, 'commentatorInfo.isUserBanned': false },
@@ -79,7 +90,6 @@ export class CommentsQueryRepository {
     allPosts: Post[],
     allBlogs: Blog[],
     commentsForPostsPaginationDto: CommentsPaginationQueryDto,
-    userId: string,
   ) {
     const { sortBy, sortDirection, pageNumber, pageSize } =
       commentsForPostsPaginationDto;
@@ -90,14 +100,15 @@ export class CommentsQueryRepository {
       dictionary[postId] = post;
     });
 
-    const blogsBunnedUsersInfo = allBlogs.flatMap(
+    // return all banned users for all not banned blogs
+    const blogsBannedUsersInfo = allBlogs.flatMap(
       (blog) => blog.bannedUsersInfo,
     );
     const filter = {
       postId: allPosts.map((post) => post.id),
       'commentatorInfo.isUserBanned': false,
       'commentatorInfo.userId': {
-        $nin: blogsBunnedUsersInfo.map((user) => user.id),
+        $nin: blogsBannedUsersInfo.map((user) => user.id),
       },
     };
     const comments = await this.commentModel
@@ -143,8 +154,13 @@ export class CommentsQueryRepository {
         { _id: false, postId: false },
       )
       .lean();
-    console.log(comment);
+
     if (!comment) return null;
+    // check that blog is not baned
+    const post = await this.postsRepository.findPostById(comment.postId);
+    if (!post) throw new NotFoundException('post with this id does not exist');
+    if (post.isBlogBanned) throw new ForbiddenException('the post is banned');
+
     return this.addReactionsInfoToComment(comment, userId);
   }
   private async addReactionsInfoToComment(

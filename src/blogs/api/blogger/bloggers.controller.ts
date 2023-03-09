@@ -70,7 +70,7 @@ export class BloggersController {
     @Query() commentsForPostsPaginationDto: CommentsPaginationQueryDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ) {
-    // find all blogs made by blogger
+    // find all blogs that were not banned and made by blogger
     const allBlogs = await this.blogsQueryRepository.findBlogsWithoutPagination(
       jwtAtPayload.userId,
     );
@@ -83,7 +83,6 @@ export class BloggersController {
       allPosts,
       allBlogs,
       commentsForPostsPaginationDto,
-      jwtAtPayload.userId,
     );
   }
   @UseGuards(AuthGuard('jwt'))
