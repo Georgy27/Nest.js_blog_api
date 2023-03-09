@@ -46,6 +46,7 @@ export class BlogsQueryRepository {
       'blogOwnerInfo.userId': {
         $regex: userId ?? '',
       },
+      'banInfo.isBanned': false,
     });
   }
   async findBlogsForSuperAdmin(
@@ -90,6 +91,18 @@ export class BlogsQueryRepository {
       )
       .lean();
   }
+  // async findBlogByUserId(userId: string) {
+  //   return this.blogModel.findOne(
+  //     { 'blogOwnerInfo.userId': userId },
+  //     {
+  //       _id: false,
+  //       __v: false,
+  //       blogOwnerInfo: false,
+  //       bannedUsersInfo: false,
+  //       banInfo: false,
+  //     },
+  //   );
+  // }
 
   async getBannedUsersForBlog(
     blog: Blog,
@@ -146,6 +159,7 @@ export class BlogsQueryRepository {
 
     const countBannedUsers = await this.blogModel.countDocuments({
       id: blog.id,
+      'banInfo.isBanned': false,
       login: {
         $in: {
           bannedUsersInfo: {

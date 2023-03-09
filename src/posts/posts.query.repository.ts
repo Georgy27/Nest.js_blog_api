@@ -35,6 +35,7 @@ export class PostsQueryRepository {
         $options: 'i',
       },
       isUserBanned: false,
+      isBlogBanned: false,
     };
 
     const posts: Post[] = await this.postModel
@@ -59,21 +60,32 @@ export class PostsQueryRepository {
     );
   }
   async findPostsForBlogger(userId: string) {
-    return this.postModel.find({ userId }, { isUserBanned: false }).lean();
+    return this.postModel
+      .find(
+        { userId, isUserBanned: false, isBlogBanned: false },
+        { isUserBanned: false },
+      )
+      .lean();
   }
   async findPost(
     id: string,
     userId: string | null,
   ): Promise<PostReactionViewModel | null> {
     const newPost: Post = await this.postModel
-      .findOne({ id, isUserBanned: false }, { _id: false, isUserBanned: false })
+      .findOne(
+        { id, isUserBanned: false, isBlogBanned: false },
+        { _id: false, isUserBanned: false },
+      )
       .lean();
     if (!newPost) return null;
     return this.addReactionsInfoToPost(newPost, userId);
   }
   async getMappedPost(id: string): Promise<PostViewModel | null> {
     const post = await this.postModel
-      .findOne({ id, isUserBanned: false }, { _id: false, isUserBanned: false })
+      .findOne(
+        { id, isUserBanned: false, isBlogBanned: false },
+        { _id: false, isUserBanned: false },
+      )
       .lean();
     if (!post) return null;
     return new PostReactionViewModel(post);

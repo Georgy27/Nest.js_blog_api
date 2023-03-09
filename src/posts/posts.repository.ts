@@ -20,4 +20,14 @@ export class PostsRepository {
   async clearPosts() {
     await this.postModel.deleteMany({});
   }
+  async updateBlogBanStatus(blogId: string, isBanned: boolean) {
+    return this.postModel.updateMany(
+      {
+        blogId,
+      },
+      {
+        $set: { isBlogBanned: isBanned },
+      },
+    );
+  }
 }

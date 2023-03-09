@@ -32,6 +32,8 @@ export class CreatePostForSpecifiedBlogUseCase
       command.createPostDto.blogId,
     );
     if (!blog) throw new NotFoundException();
+    if (blog.banInfo.isBanned)
+      throw new ForbiddenException("Can't create post for banned blog");
     // validate
     if (command.jwtAtPayload.userId !== blog.blogOwnerInfo.userId)
       throw new ForbiddenException();

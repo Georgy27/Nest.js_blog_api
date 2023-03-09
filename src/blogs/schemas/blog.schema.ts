@@ -41,7 +41,7 @@ export class Blog {
   bannedUsersInfo: IBannedUsersInfo[];
   @Prop(
     raw({
-      isBanned: { type: String, default: false },
+      isBanned: { type: Boolean, default: false },
       banDate: { type: String },
     }),
   )

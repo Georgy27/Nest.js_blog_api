@@ -15,20 +15,18 @@ import { PaginationViewModel } from '../../helpers/pagination/pagination.view.mo
 import { PostsService } from '../posts.service';
 import { PostsQueryRepository } from '../posts.query.repository';
 import { CommentsQueryRepository } from '../../comments/comments.query.repository';
-import { CreatePostDto } from '../dto/create.post.dto';
 import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
-import { BasicAuthGuard } from '../../common/guards/basic.auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
 import { CommentViewModel } from '../../comments';
 import { UpdateReactionPostDto } from '../dto/update-reaction-post.dto';
 import { JwtService } from '@nestjs/jwt';
-import { PostViewModel } from '../index';
 import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAtPayload } from '../../auth/strategies';
 import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-from-AT.guard';
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
+import { BlogsQueryRepository } from '../../blogs/blogs.query.repository';
 
 @SkipThrottle()
 @Controller('posts')
@@ -37,6 +35,7 @@ export class PostsController {
     private readonly postsService: PostsService,
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly commentsQueryRepository: CommentsQueryRepository,
+    private readonly blogsQueryRepository: BlogsQueryRepository,
     private jwtService: JwtService,
   ) {}
   @UseGuards(ExtractUserPayloadFromAt)
@@ -45,6 +44,8 @@ export class PostsController {
     @Query() postsPaginationDto: PostPaginationQueryDto,
     @GetUserIdFromAtDecorator() userId: string | null,
   ): Promise<PaginationViewModel<PostReactionViewModel[]>> {
+    // // check if the blog is banned
+    // const isBlog = await this.blogsQueryRepository.findBlogByUserId(userId);
     return this.postsQueryRepository.findPosts(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,

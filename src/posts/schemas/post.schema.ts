@@ -27,6 +27,8 @@ export class Post {
   userId: string;
   @Prop({ required: true, type: Boolean, default: false })
   isUserBanned: boolean;
+  @Prop({ required: true, type: Boolean, default: false })
+  isBlogBanned: boolean;
 
   createPost(createPostDto: CreatePostDto, blogName: string, userId: string) {
     this.id = randomUUID();
