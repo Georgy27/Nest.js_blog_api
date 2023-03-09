@@ -110,7 +110,7 @@ export class BlogsQueryRepository {
   ) {
     const { searchLoginTerm, pageNumber, pageSize, sortBy, sortDirection } =
       usersBannedByBloggerPaginationDto;
-
+    const sortArg = 'bannedUsersInfo.'.concat(sortBy);
     const bannedUsers = await this.blogModel.aggregate([
       {
         $match: {
@@ -134,7 +134,7 @@ export class BlogsQueryRepository {
       },
       {
         $sort: {
-          [sortBy]: sortDirection === 'asc' ? 1 : -1,
+          [sortArg]: sortDirection === 'asc' ? 1 : -1,
         },
       },
       {
@@ -194,28 +194,13 @@ export class BlogsQueryRepository {
         },
         { $count: 'totalCount' },
       ]);
+    const totalCount = countBannedUsers[0] ? countBannedUsers[0].totalCount : 0;
 
     return new PaginationViewModel(
-      countBannedUsers[0].totalCount,
+      totalCount,
       pageNumber,
       pageSize,
       bannedUsers,
     );
   }
 }
-// db.fruit.aggregate(
-//   // Limit matching documents (can take advantage of index)
-//   { $match: {
-//       "_id" : ObjectId("52c1d909fc7fc68ddd999a73")
-//     }},
-//
-//   // Unpack the question & answer arrays
-//   { $unwind: "$questions" },
-//   { $unwind: "$questions.answers" },
-//
-//   // Group by the answer values
-//   { $group: {
-//       _id: "$questions.answers.answer",
-//       count: { $sum: 1 }
-//     }}
-// )
