@@ -37,10 +37,15 @@ export class UsersBloggerController {
     @Param('id') id: string,
     @Query()
     usersBannedByBloggerPaginationDto: UsersBannedByBloggerPaginationQueryDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ) {
     const blog = await this.blogsRepository.findBlogById(id);
     if (!blog) throw new NotFoundException('blog is not found');
     console.log(blog);
+    if (blog.blogOwnerInfo.userId !== jwtAtPayload.userId)
+      throw new ForbiddenException(
+        'can not view the blogs that belong to another blogger',
+      );
     if (blog.banInfo.isBanned)
       throw new ForbiddenException('blog is banned by admin');
     return this.blogsQueryRepository.getBannedUsersForBlog(
