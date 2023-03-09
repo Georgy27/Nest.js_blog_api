@@ -90,6 +90,7 @@ export class CommentsQueryRepository {
     allPosts: Post[],
     allBlogs: Blog[],
     commentsForPostsPaginationDto: CommentsPaginationQueryDto,
+    userId: string,
   ) {
     const { sortBy, sortDirection, pageNumber, pageSize } =
       commentsForPostsPaginationDto;
@@ -121,29 +122,51 @@ export class CommentsQueryRepository {
       .limit(pageSize)
       .lean();
 
-    const mappedComments = comments.map((comment) => {
-      console.log(comment);
-      const postId = comment.postId;
-      return {
-        id: comment.id,
-        content: comment.content,
-        commentatorInfo: comment.commentatorInfo,
-        createdAt: comment.createdAt,
-        postInfo: {
-          id: postId,
-          title: dictionary[postId].title,
-          blogId: dictionary[postId].blogId,
-          blogName: dictionary[postId].blogName,
-        },
-      };
-    });
+    const commentsWithLikesInfo = await Promise.all(
+      comments.map(async (comment) => {
+        const result = await this.addReactionsInfoToComment(comment, userId);
+        return {
+          id: comment.id,
+          content: comment.content,
+          commentatorInfo: comment.commentatorInfo,
+          createdAt: comment.createdAt,
+          postInfo: {
+            id: comment.postId,
+            title: dictionary[comment.postId].title,
+            blogId: dictionary[comment.postId].blogId,
+            blogName: dictionary[comment.postId].blogName,
+          },
+          likesInfo: {
+            likesCount: result.likesInfo.likesCount,
+            dislikesCount: result.likesInfo.dislikesCount,
+            myStatus: result.likesInfo.myStatus,
+          },
+        };
+      }),
+    );
+    // const mappedComments = comments.map((comment) => {
+    //   console.log(comment);
+    //   const postId = comment.postId;
+    //   return {
+    //     id: comment.id,
+    //     content: comment.content,
+    //     commentatorInfo: comment.commentatorInfo,
+    //     createdAt: comment.createdAt,
+    //     postInfo: {
+    //       id: postId,
+    //       title: dictionary[postId].title,
+    //       blogId: dictionary[postId].blogId,
+    //       blogName: dictionary[postId].blogName,
+    //     },
+    //   };
+    // });
 
     const numberOfComments = await this.commentModel.countDocuments(filter);
     return new PaginationViewModel(
       numberOfComments,
       pageNumber,
       pageSize,
-      mappedComments,
+      commentsWithLikesInfo,
     );
   }
   async findComment(id: string, userId: null | string) {

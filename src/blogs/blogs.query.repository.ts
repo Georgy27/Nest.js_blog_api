@@ -132,6 +132,9 @@ export class BlogsQueryRepository {
           },
         },
       },
+      // {
+      //   $count: 'totalCount',
+      // },
       {
         $sort: {
           [sortBy]: sortDirection === 'asc' ? 1 : -1,
@@ -153,6 +156,7 @@ export class BlogsQueryRepository {
             banDate: '$bannedUsersInfo.banInfo.banDate',
             banReason: '$bannedUsersInfo.banInfo.banReason',
           },
+          // totalCount: { $count: { $sum: 1 } },
         },
       },
     ]);

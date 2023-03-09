@@ -83,6 +83,7 @@ export class BloggersController {
       allPosts,
       allBlogs,
       commentsForPostsPaginationDto,
+      jwtAtPayload.userId,
     );
   }
   @UseGuards(AuthGuard('jwt'))
