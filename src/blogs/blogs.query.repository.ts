@@ -132,9 +132,6 @@ export class BlogsQueryRepository {
           },
         },
       },
-      // {
-      //   $count: 'totalCount',
-      // },
       {
         $sort: {
           [sortBy]: sortDirection === 'asc' ? 1 : -1,
@@ -156,29 +153,69 @@ export class BlogsQueryRepository {
             banDate: '$bannedUsersInfo.banInfo.banDate',
             banReason: '$bannedUsersInfo.banInfo.banReason',
           },
-          // totalCount: { $count: { $sum: 1 } },
+          // totalCount: { $sum: 2 },
         },
       },
     ]);
 
-    const countBannedUsers = await this.blogModel.countDocuments({
-      id: blog.id,
-      'banInfo.isBanned': false,
-      login: {
-        $in: {
-          bannedUsersInfo: {
-            $regex: searchLoginTerm ?? '',
-            $options: 'i',
+    // const countBannedUsers = await this.blogModel.countDocuments({
+    //   id: blog.id,
+    //   'banInfo.isBanned': false,
+    //   login: {
+    //     $in: {
+    //       bannedUsersInfo: {
+    //         $regex: searchLoginTerm ?? '',
+    //         $options: 'i',
+    //       },
+    //     },
+    //   },
+    // });
+    const countBannedUsers: { totalCount: number }[] =
+      await this.blogModel.aggregate([
+        {
+          $match: {
+            id: blog.id,
+            'banInfo.isBanned': false,
           },
         },
-      },
-    });
+
+        {
+          $unwind: {
+            path: '$bannedUsersInfo',
+          },
+        },
+        {
+          $match: {
+            'bannedUsersInfo.login': {
+              $regex: searchLoginTerm ?? '',
+              $options: 'i',
+            },
+          },
+        },
+        { $count: 'totalCount' },
+      ]);
 
     return new PaginationViewModel(
-      countBannedUsers,
+      countBannedUsers[0].totalCount,
       pageNumber,
       pageSize,
       bannedUsers,
     );
   }
 }
+// db.fruit.aggregate(
+//   // Limit matching documents (can take advantage of index)
+//   { $match: {
+//       "_id" : ObjectId("52c1d909fc7fc68ddd999a73")
+//     }},
+//
+//   // Unpack the question & answer arrays
+//   { $unwind: "$questions" },
+//   { $unwind: "$questions.answers" },
+//
+//   // Group by the answer values
+//   { $group: {
+//       _id: "$questions.answers.answer",
+//       count: { $sum: 1 }
+//     }}
+// )
