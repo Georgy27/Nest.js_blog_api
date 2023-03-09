@@ -134,7 +134,6 @@ export class CommentsQueryRepository {
           title: dictionary[postId].title,
           blogId: dictionary[postId].blogId,
           blogName: dictionary[postId].blogName,
-          content: dictionary[postId].content,
         },
       };
     });

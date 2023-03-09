@@ -40,6 +40,7 @@ export class BanOrUnbanUserByBloggerUseCase
     const isBlog = await this.blogsRepository.findBlogById(
       command.banUserByBloggerDto.blogId,
     );
+    console.log(isBlog);
     if (!isBlog)
       throw new NotFoundException('blog with this Id does not exist');
     if (isBlog.blogOwnerInfo.userId !== command.bloggerId)

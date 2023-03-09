@@ -42,7 +42,7 @@ export class Blog {
   @Prop(
     raw({
       isBanned: { type: Boolean, default: false },
-      banDate: { type: String },
+      banDate: { type: String, default: null },
     }),
   )
   banInfo: { isBanned: boolean; banDate: string | null };

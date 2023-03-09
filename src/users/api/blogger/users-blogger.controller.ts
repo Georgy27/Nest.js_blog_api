@@ -20,6 +20,7 @@ import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPay
 import { JwtAtPayload } from '../../../auth/strategies';
 import { UsersBannedByBloggerPaginationQueryDto } from '../../../helpers/pagination/dto/users-banned-by-blogger.pagination.query.dto';
 import { BlogsQueryRepository } from '../../../blogs/blogs.query.repository';
+import { BlogsRepository } from '../../../blogs/blogs.repository';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('blogger/users')
@@ -28,6 +29,7 @@ export class UsersBloggerController {
     private readonly usersService: UsersService,
     private readonly usersQueryRepository: UsersQueryRepository,
     private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly blogsRepository: BlogsRepository,
     private commandBus: CommandBus,
   ) {}
   @Get('blog/:id')
@@ -36,8 +38,9 @@ export class UsersBloggerController {
     @Query()
     usersBannedByBloggerPaginationDto: UsersBannedByBloggerPaginationQueryDto,
   ) {
-    const blog = await this.blogsQueryRepository.findBlog(id);
+    const blog = await this.blogsRepository.findBlogById(id);
     if (!blog) throw new NotFoundException('blog is not found');
+    console.log(blog);
     if (blog.banInfo.isBanned)
       throw new ForbiddenException('blog is banned by admin');
     return this.blogsQueryRepository.getBannedUsersForBlog(
