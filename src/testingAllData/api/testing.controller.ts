@@ -1,7 +1,7 @@
 import { Controller, Delete, HttpCode } from '@nestjs/common';
 import { BlogsRepository } from '../../blogs/blogs.repository';
 import { PostsRepository } from '../../posts/posts.repository';
-import { UsersRepository } from '../../users/users.repository';
+import { UsersRepository } from '../../users/repositories/mongo/users.repository';
 import { CommentsRepository } from '../../comments/comments.repository';
 import { SkipThrottle } from '@nestjs/throttler';
 import { SecurityDevicesRepository } from '../../security-devices/security.devices.repository';

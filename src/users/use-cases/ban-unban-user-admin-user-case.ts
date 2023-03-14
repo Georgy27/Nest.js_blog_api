@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../users.repository';
+import { UsersRepository } from '../repositories/mongo/users.repository';
 import { BanUserDto } from '../dto/ban.user.dto';
 import { NotFoundException } from '@nestjs/common';
 import { SecurityDevicesRepository } from '../../security-devices/security.devices.repository';

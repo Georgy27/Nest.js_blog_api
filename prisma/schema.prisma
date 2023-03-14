@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User
+model User {
+  id                String             @id @default(uuid())
+  login             String             @unique
+  email             String             @unique
+  hash              String
+  createdAt         String
+  passwordRecovery  PasswordRecovery?
+  emailConfirmation EmailConfirmation?
+  // banInfo           BanInfo?
+  isDeleted         Boolean            @default(false)
+  banInfo           BanInfo            @relation(fields: [banInfoId], references: [id])
+  banInfoId         Int                @unique
+}
+
+model PasswordRecovery {
+  id             Int     @id @default(autoincrement())
+  recoveryCode   String?
+  expirationDate String?
+  user           User    @relation(fields: [userId], references: [id])
+  userId         String  @unique
+}
+
+model EmailConfirmation {
+  id               Int     @id @default(autoincrement())
+  confirmationCode String
+  expirationDate   String
+  isConfirmed      Boolean
+  user             User    @relation(fields: [userEmail], references: [email])
+  userEmail        String  @unique
+}
+
+model BanInfo {
+  id        Int     @id @default(autoincrement())
+  isBanned  Boolean @default(false)
+  banDate   String?
+  banReason String?
+  user      User?
+}

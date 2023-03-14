@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CommentsRepository } from './comments.repository';
-import { UsersRepository } from '../users/users.repository';
+import { UsersRepository } from '../users/repositories/mongo/users.repository';
 import { ReactionsRepository } from '../reactions/reactions.repository';
 import { ReactionsService } from '../reactions/reactions.service';
 import { UpdateCommentDto } from './dto/update-comment.dto';

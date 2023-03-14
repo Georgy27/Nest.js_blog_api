@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../../users.service';
-import { UsersQueryRepository } from '../../users.query.repository';
+import { UsersQueryRepository } from '../../repositories/mongo/users.query.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { BanUserByBloggerDto } from '../../dto/ban.user.blogger.dto';
 import { BanOrUnbanUserByBloggerCommand } from '../../use-cases/ban-unban-user-blogger-use-case';

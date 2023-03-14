@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../../users.service';
-import { UsersQueryRepository } from '../../users.query.repository';
+import { UsersQueryRepository } from '../../repositories/mongo/users.query.repository';
 import { UsersPaginationQueryDto } from '../../../helpers/pagination/dto/users.pagination.query.dto';
 import { CreateUserDto } from '../../dto/create.user.dto';
 import { BasicAuthGuard } from '../../../common/guards/basic.auth.guard';
@@ -23,6 +23,7 @@ import { CreateUserByAdminCommand } from '../../use-cases/create-user-admin-use-
 import { DeleteUserByAdminCommand } from '../../use-cases/delete-user-admin-use-case';
 import { BanUserDto } from '../../dto/ban.user.dto';
 import { BanOrUnbanUserByAdminCommand } from '../../use-cases/ban-unban-user-admin-user-case';
+import { UsersSQLQueryRepository } from '../../repositories/PostgreSQL/users.sql.query.repository';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa/users')
@@ -30,23 +31,19 @@ export class UsersSuperAdminController {
   constructor(
     private readonly usersService: UsersService,
     private readonly usersQueryRepository: UsersQueryRepository,
+    private readonly usersSQLQueryRepository: UsersSQLQueryRepository,
     private commandBus: CommandBus,
   ) {}
   @Get()
-  async getAllUsers(
-    @Query() usersPaginationDto: UsersPaginationQueryDto,
-  ): Promise<PaginationViewModel<UserViewModel[]>> {
-    return this.usersQueryRepository.findUsers(usersPaginationDto);
+  async getAllUsers(@Query() usersPaginationDto: UsersPaginationQueryDto) {
+    return this.usersSQLQueryRepository.findUsers(usersPaginationDto);
   }
   @Post()
   @HttpCode(201)
   async createUserByAdmin(
     @Body() createUserDto: CreateUserDto,
   ): Promise<UserViewModel> {
-    const userId: string = await this.commandBus.execute(
-      new CreateUserByAdminCommand(createUserDto),
-    );
-    return this.usersQueryRepository.findUser(userId);
+    return this.commandBus.execute(new CreateUserByAdminCommand(createUserDto));
   }
   @Put(':id/ban')
   @HttpCode(204)

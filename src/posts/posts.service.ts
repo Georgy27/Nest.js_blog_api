@@ -12,7 +12,7 @@ import { BlogsRepository } from '../blogs/blogs.repository';
 import { CreatePostDto } from './dto/create.post.dto';
 import { UpdatePostDto } from './dto/update.post.dto';
 import { CreateCommentForPostDto } from './dto/createCommentForPost.dto';
-import { UsersRepository } from '../users/users.repository';
+import { UsersRepository } from '../users/repositories/mongo/users.repository';
 import { randomUUID } from 'crypto';
 import { Comment } from '../comments/schemas/comment.schema';
 import { User } from '../users/schemas/user.schema';

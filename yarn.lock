@@ -5,6 +5,13 @@ __metadata:
   version: 6
   cacheKey: 8
 
+"-@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "-@npm:0.0.1"
+  checksum: 33786d96a8c404f3ce4db242b50d9a8f6013b3a0673bba52186b92f016429135ec2d9b9f77abf85c2a2b757c85e9b33a1f44d5dbf9740fd6294de87198681fd6
+  languageName: node
+  linkType: hard
+
 "@ampproject/remapping@npm:^2.1.0":
   version: 2.2.0
   resolution: "@ampproject/remapping@npm:2.2.0"
@@ -2074,6 +2081,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@prisma/client@npm:^4.11.0":
+  version: 4.11.0
+  resolution: "@prisma/client@npm:4.11.0"
+  dependencies:
+    "@prisma/engines-version": 4.11.0-57.8fde8fef4033376662cad983758335009d522acb
+  peerDependencies:
+    prisma: "*"
+  peerDependenciesMeta:
+    prisma:
+      optional: true
+  checksum: ca8d8f820caaf4a76b94674f88207d5bb14f57a9682d37d2f79c56378f259cd3b14b30a110ab59a97647fcf3c46f896e7a2d20ded2777e09b835d7accd70cf1d
+  languageName: node
+  linkType: hard
+
+"@prisma/engines-version@npm:4.11.0-57.8fde8fef4033376662cad983758335009d522acb":
+  version: 4.11.0-57.8fde8fef4033376662cad983758335009d522acb
+  resolution: "@prisma/engines-version@npm:4.11.0-57.8fde8fef4033376662cad983758335009d522acb"
+  checksum: f040b93d09b21feaef193080eed22142fa26b3cf86d089ebb4286f5f45ed17a98e030a8bb55c0bec2892e15880a697f6754c6966b7795cf7ba4553f59fb387e7
+  languageName: node
+  linkType: hard
+
+"@prisma/engines@npm:4.11.0":
+  version: 4.11.0
+  resolution: "@prisma/engines@npm:4.11.0"
+  checksum: 98030cead39e5009b7a91fd2463433ccdb16cbeb6c7345ed7950c25dbe0731a425fc888458a1423b594d659972e081ca3d63d301ef647f05a634209c75769db2
+  languageName: node
+  linkType: hard
+
 "@selderee/plugin-htmlparser2@npm:^0.10.0":
   version: 0.10.0
   resolution: "@selderee/plugin-htmlparser2@npm:0.10.0"
@@ -3300,6 +3335,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "blog_api@workspace:."
   dependencies:
+    "-": ^0.0.1
     "@nestjs-modules/mailer": ^1.8.1
     "@nestjs/cli": ^9.0.0
     "@nestjs/common": ^9.0.0
@@ -3313,6 +3349,7 @@ __metadata:
     "@nestjs/schematics": ^9.0.0
     "@nestjs/testing": ^9.0.0
     "@nestjs/throttler": ^4.0.0
+    "@prisma/client": ^4.11.0
     "@types/bcrypt": ^5.0.0
     "@types/cookie-parser": ^1.4.3
     "@types/express": ^4.17.13
@@ -3341,6 +3378,7 @@ __metadata:
     passport-jwt: ^4.0.1
     passport-local: ^1.0.0
     prettier: ^2.3.2
+    prisma: ^4.11.0
     reflect-metadata: ^0.1.13
     rxjs: ^7.2.0
     source-map-support: ^0.5.20
@@ -8589,6 +8627,18 @@ __metadata:
     pug: ^3.0.2
     uuid: ^8.3.2
   checksum: 84b1b14d5988ce65859b4ab18502288594e7854b0c050750ecd9c2778a28c2855721cb82f19d401bd076b37f2920881f75033e35474ca472767efc640557cc0d
+  languageName: node
+  linkType: hard
+
+"prisma@npm:^4.11.0":
+  version: 4.11.0
+  resolution: "prisma@npm:4.11.0"
+  dependencies:
+    "@prisma/engines": 4.11.0
+  bin:
+    prisma: build/index.js
+    prisma2: build/index.js
+  checksum: 760d80766ae16ad2d25cfc20d75433b020dff0937eab864b94b95beadd89e481508e4d3c6370a5df90749d5ac5c7af77c9c2f293b74bfdee0e548b04a905c2e7
   languageName: node
   linkType: hard
 

@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../schemas/blog.schema';
 import { Model } from 'mongoose';
 import { BlogsRepository } from '../blogs.repository';
-import { UsersRepository } from '../../users/users.repository';
+import { UsersRepository } from '../../users/repositories/mongo/users.repository';
 import { BanBlogAdminDto } from '../dto/ban.blog.admin.dto';
 import { NotFoundException } from '@nestjs/common';
 import { PostsRepository } from '../../posts/posts.repository';

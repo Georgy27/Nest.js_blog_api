@@ -30,5 +30,5 @@ export class UsersPaginationQueryDto {
   sortBy = 'createdAt';
   @IsOptional()
   @Transform(({ value }) => checkSortBy(value))
-  sortDirection = 'desc';
+  sortDirection: 'asc' | 'desc' = 'desc';
 }

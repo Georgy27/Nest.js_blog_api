@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { DatabaseModule } from './database/database.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { DatabaseModule } from './database/database.module';
     MailModule,
     AuthModule,
     DatabaseModule,
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [

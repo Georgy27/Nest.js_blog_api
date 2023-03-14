@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../users.repository';
+import { UsersRepository } from '../repositories/mongo/users.repository';
 import { SecurityDevicesRepository } from '../../security-devices/security.devices.repository';
 import { CommentsRepository } from '../../comments/comments.repository';
 import { ReactionsRepository } from '../../reactions/reactions.repository';

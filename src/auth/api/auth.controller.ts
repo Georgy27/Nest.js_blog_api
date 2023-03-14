@@ -20,7 +20,7 @@ import { GetJwtRtPayloadDecorator } from '../../common/decorators/getJwtRtPayloa
 import { EmailDto } from '../dto/email.dto';
 import { NewPasswordDto } from '../dto/new-password.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
-import { UsersQueryRepository } from '../../users/users.query.repository';
+import { UsersQueryRepository } from '../../users/repositories/mongo/users.query.repository';
 import { ConfirmationCodeDto } from '../dto/confirmationCode.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 

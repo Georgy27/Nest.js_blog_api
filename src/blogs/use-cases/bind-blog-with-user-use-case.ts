@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../schemas/blog.schema';
 import { BlogsRepository } from '../blogs.repository';
 import { BadRequestException } from '@nestjs/common';
-import { UsersRepository } from '../../users/users.repository';
+import { UsersRepository } from '../../users/repositories/mongo/users.repository';
 import { Model } from 'mongoose';
 
 export class BindBlogWithUserCommand {

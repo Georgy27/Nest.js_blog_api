@@ -6,7 +6,7 @@ import {
 import { AuthDto } from './dto/auth.dto';
 import { UsersService } from '../users/users.service';
 import { User, UserDocument } from '../users/schemas/user.schema';
-import { UsersRepository } from '../users/users.repository';
+import { UsersRepository } from '../users/repositories/mongo/users.repository';
 import { MailService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
