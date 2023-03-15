@@ -14,7 +14,9 @@ export class UsersSQLQueryRepository {
     private prisma: PrismaService,
   ) {}
 
-  async findUsers(usersPaginationDto: UsersPaginationQueryDto) {
+  async findUsers(
+    usersPaginationDto: UsersPaginationQueryDto,
+  ): Promise<PaginationViewModel<UserViewModel[]>> {
     const {
       searchLoginTerm,
       searchEmailTerm,

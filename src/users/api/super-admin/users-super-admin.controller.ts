@@ -35,7 +35,9 @@ export class UsersSuperAdminController {
     private commandBus: CommandBus,
   ) {}
   @Get()
-  async getAllUsers(@Query() usersPaginationDto: UsersPaginationQueryDto) {
+  async getAllUsers(
+    @Query() usersPaginationDto: UsersPaginationQueryDto,
+  ): Promise<PaginationViewModel<UserViewModel[]>> {
     return this.usersSQLQueryRepository.findUsers(usersPaginationDto);
   }
   @Post()
@@ -58,10 +60,10 @@ export class UsersSuperAdminController {
   @Delete(':id')
   @HttpCode(204)
   async deleteUserByAdmin(@Param('id') id: string): Promise<void> {
-    const deletedUser: boolean = await this.commandBus.execute(
-      new DeleteUserByAdminCommand(id),
-    );
-    if (!deletedUser) throw new NotFoundException();
-    return;
+    try {
+      await this.commandBus.execute(new DeleteUserByAdminCommand(id));
+    } catch (e) {
+      throw new NotFoundException();
+    }
   }
 }

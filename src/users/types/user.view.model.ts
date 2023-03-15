@@ -7,5 +7,5 @@ export interface UserViewModel {
     isBanned: boolean;
     banDate: string | null;
     banReason: string | null;
-  };
+  } | null;
 }

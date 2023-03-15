@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../schemas/user.schema';
 import { Model } from 'mongoose';
@@ -29,7 +29,11 @@ export class UsersSQLRepository {
         hash: hash,
         createdAt: new Date().toISOString(),
         banInfo: {
-          create: {},
+          create: {
+            isBanned: false,
+            banDate: null,
+            banReason: null,
+          },
         },
         emailConfirmation: {
           create: {
@@ -58,10 +62,10 @@ export class UsersSQLRepository {
     });
   }
 
-  async deleteUserById(id: string): Promise<boolean> {
-    const result = await this.userModel.deleteOne({ id });
-    return result.deletedCount === 1;
+  async deleteUserById(id: string) {
+    return this.prisma.user.delete({ where: { id: id } });
   }
+
   async clearUsers() {
     return this.userModel.deleteMany({});
   }

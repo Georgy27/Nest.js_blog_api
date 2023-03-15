@@ -19,17 +19,14 @@ model User {
   createdAt         String
   passwordRecovery  PasswordRecovery?
   emailConfirmation EmailConfirmation?
-  // banInfo           BanInfo?
-  isDeleted         Boolean            @default(false)
-  banInfo           BanInfo            @relation(fields: [banInfoId], references: [id])
-  banInfoId         Int                @unique
+  banInfo           BanInfo?
 }
 
 model PasswordRecovery {
   id             Int     @id @default(autoincrement())
   recoveryCode   String?
   expirationDate String?
-  user           User    @relation(fields: [userId], references: [id])
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String  @unique
 }
 
@@ -38,7 +35,7 @@ model EmailConfirmation {
   confirmationCode String
   expirationDate   String
   isConfirmed      Boolean
-  user             User    @relation(fields: [userEmail], references: [email])
+  user             User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
   userEmail        String  @unique
 }
 
@@ -47,5 +44,6 @@ model BanInfo {
   isBanned  Boolean @default(false)
   banDate   String?
   banReason String?
-  user      User?
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String  @unique
 }

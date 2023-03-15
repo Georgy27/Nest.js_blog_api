@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../repositories/mongo/users.repository';
+import { UsersSQLRepository } from '../repositories/PostgreSQL/users.sql.repository';
 
 export class DeleteUserByAdminCommand {
   constructor(public userId: string) {}
@@ -8,8 +8,8 @@ export class DeleteUserByAdminCommand {
 export class DeleteUserByAdminUseCase
   implements ICommandHandler<DeleteUserByAdminCommand>
 {
-  constructor(private readonly usersRepository: UsersRepository) {}
-  async execute(command: DeleteUserByAdminCommand): Promise<boolean> {
-    return this.usersRepository.deleteUserById(command.userId);
+  constructor(private readonly usersSQLRepository: UsersSQLRepository) {}
+  async execute(command: DeleteUserByAdminCommand) {
+    return this.usersSQLRepository.deleteUserById(command.userId);
   }
 }
