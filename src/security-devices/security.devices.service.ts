@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { SecurityDevices } from './schemas/security.devices.schema';
-import { SecurityDevicesRepository } from './security.devices.repository';
+import { SecurityDevicesRepository } from './repositories/security.devices.repository';
 
 @Injectable()
 export class SecurityDevicesService {

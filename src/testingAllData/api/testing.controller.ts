@@ -4,7 +4,7 @@ import { PostsRepository } from '../../posts/posts.repository';
 import { UsersRepository } from '../../users/repositories/mongo/users.repository';
 import { CommentsRepository } from '../../comments/comments.repository';
 import { SkipThrottle } from '@nestjs/throttler';
-import { SecurityDevicesRepository } from '../../security-devices/security.devices.repository';
+import { SecurityDevicesRepository } from '../../security-devices/repositories/security.devices.repository';
 import { ReactionsRepository } from '../../reactions/reactions.repository';
 
 @SkipThrottle()

@@ -23,17 +23,20 @@ import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayloa
 import { UsersQueryRepository } from '../../users/repositories/mongo/users.query.repository';
 import { ConfirmationCodeDto } from '../dto/confirmationCode.dto';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CommandBus } from '@nestjs/cqrs';
+import { RegisterUserCommand } from '../use-cases/register-user-use-case';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private readonly userQueryRepository: UsersQueryRepository,
+    private commandBus: CommandBus,
   ) {}
   @Post('registration')
   @HttpCode(204)
   async registration(@Body() authDto: AuthDto): Promise<void> {
-    return this.authService.registration(authDto);
+    return this.commandBus.execute(new RegisterUserCommand(authDto));
   }
   @Post('registration-confirmation')
   @HttpCode(204)

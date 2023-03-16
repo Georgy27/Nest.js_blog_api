@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { GetJwtRtPayloadDecorator } from '../../common/decorators/getJwtRtPayload.decorator';
 import { JwtRtPayload } from '../../auth/strategies';
-import { SecurityDevicesQueryRepository } from '../security.devices.query.repository';
+import { SecurityDevicesQueryRepository } from '../repositories/security.devices.query.repository';
 import { SessionViewModel } from '../index';
 import { AuthGuard } from '@nestjs/passport';
 import { SecurityDevicesService } from '../security.devices.service';

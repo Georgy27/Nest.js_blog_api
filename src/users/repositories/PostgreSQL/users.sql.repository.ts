@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../schemas/user.schema';
 import { Model } from 'mongoose';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { BanInfo, User as UserModel } from '@prisma/client';
+import { BanInfo, EmailConfirmation, User as UserModel } from '@prisma/client';
 import { UserViewModel } from '../../types/user.view.model';
 import { CreateUserDto } from '../../dto/create.user.dto';
 import { randomUUID } from 'crypto';
@@ -14,10 +14,7 @@ export class UsersSQLRepository {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private prisma: PrismaService,
   ) {}
-  // async save(user: UserDocument): Promise<string> {
-  //   await user.save();
-  //   return user.id;
-  // }
+
   async createUser(
     createUserDto: CreateUserDto,
     hash: string,
@@ -72,6 +69,13 @@ export class UsersSQLRepository {
         banDate: updateBanInfo.banDate,
         banReason: updateBanInfo.banReason,
       },
+    });
+  }
+  async getEmailConfirmationCode(
+    userEmail: string,
+  ): Promise<EmailConfirmation | null> {
+    return this.prisma.emailConfirmation.findUnique({
+      where: { userEmail: userEmail },
     });
   }
   async deleteUserById(id: string) {

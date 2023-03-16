@@ -8,9 +8,13 @@ import { JwtRtStrategy } from './strategies/jwt.rt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { SecurityDevicesModule } from '../security-devices/security.devices.module';
+import { CqrsModule } from '@nestjs/cqrs';
+import { RegisterUserUseCase } from './use-cases/register-user-use-case';
 
+const useCases = [RegisterUserUseCase];
 @Module({
   imports: [
+    CqrsModule,
     UsersModule,
     SecurityDevicesModule,
     MailModule,
@@ -18,7 +22,7 @@ import { SecurityDevicesModule } from '../security-devices/security.devices.modu
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAtStrategy, JwtRtStrategy],
+  providers: [AuthService, JwtAtStrategy, JwtRtStrategy, ...useCases],
   exports: [],
 })
 export class AuthModule {}

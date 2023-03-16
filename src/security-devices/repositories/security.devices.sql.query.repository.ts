@@ -3,12 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   SecurityDevices,
   SecurityDevicesDocument,
-} from './schemas/security.devices.schema';
+} from '../schemas/security.devices.schema';
 import { Model } from 'mongoose';
-import { SessionViewModel } from './index';
+import { SessionViewModel } from '../index';
 
 @Injectable()
-export class SecurityDevicesQueryRepository {
+export class SecurityDevicesSQLQueryRepository {
   constructor(
     @InjectModel(SecurityDevices.name)
     private securityDevicesModel: Model<SecurityDevicesDocument>,

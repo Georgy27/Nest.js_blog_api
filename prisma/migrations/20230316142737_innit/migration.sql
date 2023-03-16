@@ -41,6 +41,17 @@ CREATE TABLE "BanInfo" (
     CONSTRAINT "BanInfo_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "DeviceSessions" (
+    "id" SERIAL NOT NULL,
+    "deviceName" TEXT NOT NULL,
+    "lastActiveDate" TEXT NOT NULL,
+    "deviceId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "DeviceSessions_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_login_key" ON "User"("login");
 
@@ -56,11 +67,17 @@ CREATE UNIQUE INDEX "EmailConfirmation_userEmail_key" ON "EmailConfirmation"("us
 -- CreateIndex
 CREATE UNIQUE INDEX "BanInfo_userId_key" ON "BanInfo"("userId");
 
--- AddForeignKey
-ALTER TABLE "PasswordRecovery" ADD CONSTRAINT "PasswordRecovery_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "DeviceSessions_userId_key" ON "DeviceSessions"("userId");
 
 -- AddForeignKey
-ALTER TABLE "EmailConfirmation" ADD CONSTRAINT "EmailConfirmation_userEmail_fkey" FOREIGN KEY ("userEmail") REFERENCES "User"("email") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PasswordRecovery" ADD CONSTRAINT "PasswordRecovery_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "BanInfo" ADD CONSTRAINT "BanInfo_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "EmailConfirmation" ADD CONSTRAINT "EmailConfirmation_userEmail_fkey" FOREIGN KEY ("userEmail") REFERENCES "User"("email") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BanInfo" ADD CONSTRAINT "BanInfo_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DeviceSessions" ADD CONSTRAINT "DeviceSessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

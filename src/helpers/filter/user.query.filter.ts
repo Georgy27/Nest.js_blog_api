@@ -1,6 +1,8 @@
 import { banStatusEnumKeys } from '../pagination/dto/users.pagination.query.dto';
 import { Prisma } from '@prisma/client';
+
 export type UserFilter = Prisma.UserWhereInput;
+
 export const userQueryFilter = (
   searchLoginTerm: string | null,
   searchEmailTerm: string | null,
@@ -28,14 +30,17 @@ export const userQueryFilter = (
             },
           ],
         },
-        {
-          banInfo: {
-            isBanned: banStatusFilterValue,
-          },
-        },
+        banStatus === 'all'
+          ? {}
+          : {
+              banInfo: {
+                isBanned: banStatusFilterValue,
+              },
+            },
       ],
     };
   }
+
   if (searchLoginTerm) {
     return {
       AND: [
@@ -45,11 +50,13 @@ export const userQueryFilter = (
             mode: 'insensitive',
           },
         },
-        {
-          banInfo: {
-            isBanned: banStatusFilterValue,
-          },
-        },
+        banStatus === 'all'
+          ? {}
+          : {
+              banInfo: {
+                isBanned: banStatusFilterValue,
+              },
+            },
       ],
     };
   }
@@ -62,11 +69,13 @@ export const userQueryFilter = (
             mode: 'insensitive',
           },
         },
-        {
-          banInfo: {
-            isBanned: banStatusFilterValue,
-          },
-        },
+        banStatus === 'all'
+          ? {}
+          : {
+              banInfo: {
+                isBanned: banStatusFilterValue,
+              },
+            },
       ],
     };
   }
@@ -101,6 +110,7 @@ export const userQueryFilter = (
 //     {
 //       banInfo: {
 //         isBanned: banStatusFilterValue,
+//         mode: 'insensitive',
 //       },
 //     },
 //   ],

@@ -2,15 +2,17 @@ import { Injectable } from '@nestjs/common';
 import {
   SecurityDevices,
   SecurityDevicesDocument,
-} from './schemas/security.devices.schema';
+} from '../schemas/security.devices.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
-export class SecurityDevicesRepository {
+export class SecurityDevicesSQLRepository {
   constructor(
     @InjectModel(SecurityDevices.name)
     private securityDevicesModel: Model<SecurityDevicesDocument>,
+    private prisma: PrismaService,
   ) {}
 
   async save(session: SecurityDevicesDocument): Promise<string> {
@@ -66,6 +68,6 @@ export class SecurityDevicesRepository {
     await this.securityDevicesModel.deleteMany({});
   }
   async deleteAllUserSessions(userId: string) {
-    return this.securityDevicesModel.deleteMany({ userId });
+    return this.prisma.deviceSessions.deleteMany({ where: { userId: userId } });
   }
 }

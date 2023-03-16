@@ -6,7 +6,7 @@ import {
 import { AuthDto } from './dto/auth.dto';
 import { UsersService } from '../users/users.service';
 import { User, UserDocument } from '../users/schemas/user.schema';
-import { UsersRepository } from '../users/repositories/mongo/users.repository';
+
 import { MailService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
@@ -14,13 +14,16 @@ import { randomUUID } from 'crypto';
 import { SecurityDevices } from '../security-devices/schemas/security.devices.schema';
 import { SecurityDevicesService } from '../security-devices/security.devices.service';
 import { ConfigService } from '@nestjs/config';
-import { SecurityDevicesRepository } from '../security-devices/security.devices.repository';
+import { SecurityDevicesRepository } from '../security-devices/repositories/security.devices.repository';
 import * as bcrypt from 'bcrypt';
+import { UsersSQLRepository } from '../users/repositories/PostgreSQL/users.sql.repository';
+import { UsersRepository } from '../users/repositories/mongo/users.repository';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
+    private readonly usersSQLRepository: UsersSQLRepository,
     private readonly usersRepository: UsersRepository,
     private readonly securityDevicesService: SecurityDevicesService,
     private readonly securityDevicesRepository: SecurityDevicesRepository,
@@ -28,33 +31,33 @@ export class AuthService {
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
-  async registration(user: AuthDto) {
-    const { login, email } = user;
-    // check that user with the given login or email does not exist
-    const checkUserLogin = await this.usersRepository.findUserByLogin(login);
-    if (checkUserLogin)
-      throw new BadRequestException([
-        { message: 'This login already exists', field: 'login' },
-      ]);
-    const checkUserEmail = await this.usersRepository.findUserByEmail(email);
-    if (checkUserEmail)
-      throw new BadRequestException([
-        { message: 'This email already exists', field: 'email' },
-      ]);
-    // create tokens
-
-    // create user
-    const newUser: User = await this.usersService.createUser(user);
-    // send email
-    try {
-      return this.mailService.sendUserConfirmation(
-        newUser,
-        newUser.emailConfirmation.confirmationCode,
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // async registration(user: AuthDto) {
+  //   const { login, email } = user;
+  //   // check that user with the given login or email does not exist
+  //   const checkUserLogin = await this.usersSQLRepository.findUserByLogin(login);
+  //   if (checkUserLogin)
+  //     throw new BadRequestException([
+  //       { message: 'This login already exists', field: 'login' },
+  //     ]);
+  //   const checkUserEmail = await this.usersSQLRepository.findUserByEmail(email);
+  //   if (checkUserEmail)
+  //     throw new BadRequestException([
+  //       { message: 'This email already exists', field: 'email' },
+  //     ]);
+  //   // create tokens
+  //
+  //   // create user
+  //   const newUser: User = await this.usersService.createUser(user);
+  //   // send email
+  //   try {
+  //     return this.mailService.sendUserConfirmation(
+  //       newUser,
+  //       newUser.emailConfirmation.confirmationCode,
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
   async login(
     loginDto: LoginDto,
     ip: string,
@@ -162,14 +165,14 @@ export class AuthService {
 
     await this.usersService.updateConfirmationCode(user);
 
-    try {
-      await this.mailService.sendUserConfirmation(
-        user,
-        user.emailConfirmation.confirmationCode,
-      );
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   await this.mailService.sendUserConfirmation(
+    //     user,
+    //     user.emailConfirmation.confirmationCode,
+    //   );
+    // } catch (error) {
+    //   console.log(error);
+    // }
   }
 
   async passwordRecovery(email: string) {
@@ -179,14 +182,14 @@ export class AuthService {
     const updatedUser = await this.usersService.setPasswordRecoveryCode(user);
     if (!updatedUser.passwordRecovery.recoveryCode) return;
 
-    try {
-      await this.mailService.sendUserConfirmation(
-        updatedUser,
-        updatedUser.passwordRecovery.recoveryCode,
-      );
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   await this.mailService.sendUserConfirmation(
+    //     updatedUser,
+    //     updatedUser.passwordRecovery.recoveryCode,
+    //   );
+    // } catch (error) {
+    //   console.log(error);
+    // }
   }
   async confirmNewPassword(
     recoveryCode: string,

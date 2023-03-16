@@ -1,11 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../repositories/mongo/users.repository';
 import { BanUserDto } from '../dto/ban.user.dto';
 import { NotFoundException } from '@nestjs/common';
-import { SecurityDevicesRepository } from '../../security-devices/security.devices.repository';
 import { CommentsRepository } from '../../comments/comments.repository';
 import { ReactionsRepository } from '../../reactions/reactions.repository';
 import { UsersSQLRepository } from '../repositories/PostgreSQL/users.sql.repository';
+import { SecurityDevicesSQLRepository } from '../../security-devices/repositories/security.devices.sql.repository';
 
 export class BanOrUnbanUserByAdminCommand {
   constructor(public userId: string, public banUserDto: BanUserDto) {}
@@ -16,7 +15,7 @@ export class BanOrUnbanUserByAdminUseCase
 {
   constructor(
     private readonly usersSQLRepository: UsersSQLRepository,
-    private readonly securityDevicesRepository: SecurityDevicesRepository,
+    private readonly securityDevicesSQLRepository: SecurityDevicesSQLRepository,
     private readonly commentsRepository: CommentsRepository,
     private readonly reactionsRepository: ReactionsRepository,
   ) {}
@@ -51,10 +50,10 @@ export class BanOrUnbanUserByAdminUseCase
     //   command.banUserDto.isBanned,
     // );
     // // delete refresh tokens
-    // if (command.banUserDto.isBanned) {
-    //   await this.securityDevicesRepository.deleteAllUserSessions(
-    //     command.userId,
-    //   );
-    // }
+    if (command.banUserDto.isBanned) {
+      await this.securityDevicesSQLRepository.deleteAllUserSessions(
+        command.userId,
+      );
+    }
   }
 }

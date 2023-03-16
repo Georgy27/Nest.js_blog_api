@@ -17,9 +17,6 @@ export class CreateUserByAdminUseCase
   constructor(private readonly usersSQLRepository: UsersSQLRepository) {}
   async execute(command: CreateUserByAdminCommand): Promise<UserViewModel> {
     const { password, login, email } = command.createUserDto;
-    // generate salt and hash
-    const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, passwordSalt);
     // check that user with the given login or email does not exist
     const checkUserLogin = await this.usersSQLRepository.findUserByLogin(login);
     if (checkUserLogin)
@@ -31,6 +28,9 @@ export class CreateUserByAdminUseCase
       throw new BadRequestException([
         { message: 'This email already exists', field: 'email' },
       ]);
+    // generate salt and hash
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, passwordSalt);
     return this.usersSQLRepository.createUser(
       command.createUserDto,
       passwordHash,

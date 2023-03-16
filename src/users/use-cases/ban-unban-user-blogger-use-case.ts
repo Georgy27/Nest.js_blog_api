@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../repositories/mongo/users.repository';
-import { SecurityDevicesRepository } from '../../security-devices/security.devices.repository';
+import { SecurityDevicesRepository } from '../../security-devices/repositories/security.devices.repository';
 import { CommentsRepository } from '../../comments/comments.repository';
 import { ReactionsRepository } from '../../reactions/reactions.repository';
 import { BanUserByBloggerDto } from '../dto/ban.user.blogger.dto';

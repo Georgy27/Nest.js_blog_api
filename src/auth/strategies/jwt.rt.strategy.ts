@@ -4,7 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtRtPayload } from './index';
 import { Request as RequestType } from 'express';
-import { SecurityDevicesRepository } from '../../security-devices/security.devices.repository';
+import { SecurityDevicesRepository } from '../../security-devices/repositories/security.devices.repository';
 
 @Injectable()
 export class JwtRtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
