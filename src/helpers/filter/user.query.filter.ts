@@ -1,76 +1,107 @@
 import { banStatusEnumKeys } from '../pagination/dto/users.pagination.query.dto';
-
+import { Prisma } from '@prisma/client';
+export type UserFilter = Prisma.UserWhereInput;
 export const userQueryFilter = (
   searchLoginTerm: string | null,
   searchEmailTerm: string | null,
   banStatus: banStatusEnumKeys,
-) => {
+): UserFilter => {
   const banStatusFilterValue =
     banStatus === 'all' ? {} : banStatus === 'banned' ? true : false;
 
   if (searchLoginTerm && searchEmailTerm) {
     return {
-      $and: [
+      AND: [
         {
-          $or: [
+          OR: [
             {
-              'accountData.login': {
-                $regex: searchLoginTerm ?? '',
-                $options: 'i',
+              login: {
+                contains: searchLoginTerm ?? '',
+                mode: 'insensitive',
               },
             },
             {
-              'accountData.email': {
-                $regex: searchEmailTerm ?? '',
-                $options: 'i',
+              email: {
+                contains: searchEmailTerm ?? '',
+                mode: 'insensitive',
               },
             },
           ],
         },
-        banStatus === 'all'
-          ? {}
-          : {
-              'banInfo.isBanned': banStatusFilterValue,
-            },
+        {
+          banInfo: {
+            isBanned: banStatusFilterValue,
+          },
+        },
       ],
     };
   }
   if (searchLoginTerm) {
     return {
-      $and: [
+      AND: [
         {
-          'accountData.login': {
-            $regex: searchLoginTerm ?? '',
-            $options: 'i',
+          login: {
+            contains: searchLoginTerm ?? '',
+            mode: 'insensitive',
           },
         },
-        banStatus === 'all'
-          ? {}
-          : {
-              'banInfo.isBanned': banStatusFilterValue,
-            },
+        {
+          banInfo: {
+            isBanned: banStatusFilterValue,
+          },
+        },
       ],
     };
   }
   if (searchEmailTerm) {
     return {
-      $and: [
+      AND: [
         {
-          'accountData.email': {
-            $regex: searchEmailTerm ?? '',
-            $options: 'i',
+          email: {
+            contains: searchEmailTerm ?? '',
+            mode: 'insensitive',
           },
         },
-        banStatus === 'all'
-          ? {}
-          : {
-              'banInfo.isBanned': banStatusFilterValue,
-            },
+        {
+          banInfo: {
+            isBanned: banStatusFilterValue,
+          },
+        },
       ],
     };
   }
   if (banStatus === 'banned' || banStatus === 'notBanned')
-    return { 'banInfo.isBanned': banStatusFilterValue };
+    return {
+      banInfo: {
+        isBanned: banStatusFilterValue,
+      },
+    };
 
   return {};
 };
+
+// const filter: UserFilter = {
+//   AND: [
+//     {
+//       AND: [
+//         {
+//           login: {
+//             contains: searchLoginTerm ?? '',
+//             mode: 'insensitive',
+//           },
+//         },
+//         {
+//           email: {
+//             contains: searchEmailTerm ?? '',
+//             mode: 'insensitive',
+//           },
+//         },
+//       ],
+//     },
+//     {
+//       banInfo: {
+//         isBanned: banStatusFilterValue,
+//       },
+//     },
+//   ],
+// };

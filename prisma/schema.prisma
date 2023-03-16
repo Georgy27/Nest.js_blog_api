@@ -20,6 +20,7 @@ model User {
   passwordRecovery  PasswordRecovery?
   emailConfirmation EmailConfirmation?
   banInfo           BanInfo?
+  deviceSessions    DeviceSessions?
 }
 
 model PasswordRecovery {
@@ -46,4 +47,14 @@ model BanInfo {
   banReason String?
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String  @unique
+}
+
+// Device Sessions
+model DeviceSessions {
+  id             Int    @id @default(autoincrement())
+  deviceName     String
+  lastActiveDate String
+  deviceId       String
+  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String @unique
 }

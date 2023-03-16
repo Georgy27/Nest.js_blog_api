@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../schemas/user.schema';
 import { Model } from 'mongoose';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { User as UserModel } from '@prisma/client';
+import { BanInfo, User as UserModel } from '@prisma/client';
 import { UserViewModel } from '../../types/user.view.model';
 import { CreateUserDto } from '../../dto/create.user.dto';
 import { randomUUID } from 'crypto';
@@ -61,7 +61,19 @@ export class UsersSQLRepository {
       },
     });
   }
-
+  async updateUserBanInfoByAdmin(
+    userId: string,
+    updateBanInfo: any,
+  ): Promise<BanInfo> {
+    return this.prisma.banInfo.update({
+      where: { userId: userId },
+      data: {
+        isBanned: updateBanInfo.isBanned,
+        banDate: updateBanInfo.banDate,
+        banReason: updateBanInfo.banReason,
+      },
+    });
+  }
   async deleteUserById(id: string) {
     return this.prisma.user.delete({ where: { id: id } });
   }
@@ -69,8 +81,8 @@ export class UsersSQLRepository {
   async clearUsers() {
     return this.userModel.deleteMany({});
   }
-  async findUserById(id: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ id });
+  async findUserById(id: string) {
+    return this.prisma.user.findUnique({ where: { id: id } });
   }
   async findUserByLogin(login: string): Promise<UserModel | null> {
     return this.prisma.user.findUnique({ where: { login: login } });
