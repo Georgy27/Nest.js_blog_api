@@ -28,6 +28,7 @@ import { RegisterUserCommand } from '../use-cases/register-user-use-case';
 import { ConfirmEmailCommand } from '../use-cases/confirm-emal-use-case';
 import { RegistrationEmailResendingCommand } from '../use-cases/registration-email-resending-use-case';
 import { LoginUserCommand } from '../use-cases/login-user-use-case';
+import { LogoutUserCommand } from '../use-cases/logout-user-use-case';
 
 @Controller('auth')
 export class AuthController {
@@ -82,7 +83,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     const { userId, deviceId } = user;
-    const logoutUser = await this.authService.logout(userId, deviceId);
+    await this.commandBus.execute(new LogoutUserCommand(userId, deviceId));
     res.clearCookie('refreshToken');
   }
   @SkipThrottle()

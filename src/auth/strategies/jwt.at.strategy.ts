@@ -3,13 +3,13 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtAtPayload } from './index';
-import { SecurityDevicesRepository } from '../../security-devices/repositories/security.devices.repository';
+import { SecurityDevicesSQLRepository } from '../../security-devices/repositories/security.devices.sql.repository';
 
 @Injectable()
 export class JwtAtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     config: ConfigService,
-    private securityDevicesRepository: SecurityDevicesRepository,
+    private securityDevicesSQLRepository: SecurityDevicesSQLRepository,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -18,13 +18,13 @@ export class JwtAtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
   async validate(payload: JwtAtPayload) {
-    const lastActiveDate = new Date(payload.iat * 1000).toISOString();
-    const verifyToken = await this.securityDevicesRepository.findLastActiveDate(
-      payload.userId,
-      lastActiveDate,
-    );
-    if (!verifyToken) throw new UnauthorizedException();
+    // const issuedAt = new Date(payload.iat * 1000).toISOString();
+    const deviceId = payload.deviceId;
+    const lastActiveDate =
+      await this.securityDevicesSQLRepository.findLastActiveDate(deviceId);
+    if (!lastActiveDate) throw new UnauthorizedException();
+    // if (lastActiveDate !== issuedAt) throw new UnauthorizedException();
     return payload;
-    // return { userId: payload.sub, username: payload.username };
+    // return { userId: payload.userId, deviceId: payload.deviceId };
   }
 }

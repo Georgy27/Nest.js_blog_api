@@ -3,15 +3,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthDto } from './dto/auth.dto';
+
 import { UsersService } from '../users/users.service';
-import { User, UserDocument } from '../users/schemas/user.schema';
+import { User } from '../users/schemas/user.schema';
 
 import { MailService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from './dto/login.dto';
-import { randomUUID } from 'crypto';
-import { SecurityDevices } from '../security-devices/schemas/security.devices.schema';
 import { SecurityDevicesService } from '../security-devices/security.devices.service';
 import { ConfigService } from '@nestjs/config';
 import { SecurityDevicesRepository } from '../security-devices/repositories/security.devices.repository';
@@ -263,7 +260,7 @@ export class AuthService {
   async getTokens(userId: string, userLogin: string, deviceId: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
-        { userId, userLogin },
+        { userId, userLogin, deviceId },
         {
           secret: this.config.get<string>('JWT_AT_SECRET'),
           expiresIn: 60 * 15,

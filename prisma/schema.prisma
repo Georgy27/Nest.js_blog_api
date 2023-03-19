@@ -55,7 +55,7 @@ model DeviceSessions {
   ip             String
   deviceName     String
   lastActiveDate String
-  deviceId       String
+  deviceId       String @unique
   user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
 }

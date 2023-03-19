@@ -21,27 +21,27 @@ export class SecurityDevicesSQLRepository {
     return session.deviceId;
   }
 
-  async createNewSession(deviceInfo: SecurityDevices): Promise<DeviceSessions> {
+  async createNewSession(deviceInfo: SecurityDevices) {
+    // return this.prisma.deviceSessions.upsert({
+    //   create: deviceInfo,
+    //   update: {
+    //     ip: deviceInfo.ip,
+    //     lastActiveDate: deviceInfo.lastActiveDate,
+    //   },
+    //   where: {
+    //     deviceName:deviceName
+    //   },
+    // });
     return this.prisma.deviceSessions.create({ data: deviceInfo });
   }
-
-  async deleteSessionByDeviceId(
-    userId: string,
-    deviceId: string,
-  ): Promise<boolean> {
-    const deletedToken = await this.securityDevicesModel.deleteOne({
-      userId,
-      deviceId,
-    });
-    console.log(deletedToken);
-    return deletedToken.deletedCount === 1;
+  async deleteSessionByDeviceId(deviceId: string) {
+    return this.prisma.deviceSessions.delete({ where: { deviceId } });
   }
 
-  async findLastActiveDate(
-    userId: string,
-    lastActiveDate: string,
-  ): Promise<SecurityDevices | null> {
-    return this.securityDevicesModel.findOne({ userId, lastActiveDate }).lean();
+  async findLastActiveDate(deviceId: string): Promise<DeviceSessions | null> {
+    return this.prisma.deviceSessions.findUnique({
+      where: { deviceId },
+    });
   }
 
   async findSessionByDeviceAndUserId(
@@ -53,8 +53,8 @@ export class SecurityDevicesSQLRepository {
 
   async findSessionByDeviceId(
     deviceId: string,
-  ): Promise<SecurityDevicesDocument | null> {
-    return this.securityDevicesModel.findOne({ deviceId });
+  ): Promise<DeviceSessions | null> {
+    return this.prisma.deviceSessions.findUnique({ where: { deviceId } });
   }
 
   async deleteAllSessionsExceptCurrent(userId: string, deviceId: string) {

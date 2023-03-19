@@ -13,12 +13,14 @@ import { RegisterUserUseCase } from './use-cases/register-user-use-case';
 import { ConfirmEmailUseCase } from './use-cases/confirm-emal-use-case';
 import { RegistrationEmailResendingUseCase } from './use-cases/registration-email-resending-use-case';
 import { LoginUserUseCase } from './use-cases/login-user-use-case';
+import { LogoutUserUseCase } from './use-cases/logout-user-use-case';
 
 const useCases = [
   RegisterUserUseCase,
   ConfirmEmailUseCase,
   RegistrationEmailResendingUseCase,
   LoginUserUseCase,
+  LogoutUserUseCase,
 ];
 @Module({
   imports: [

@@ -56,6 +56,3 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
     return tokens;
   }
 }
-
-// await this.securityDevicesService.createNewDevice(deviceInfo);
-// return tokens;
