@@ -55,10 +55,10 @@ export class UsersService {
   //   // create user
   //   return this.usersRepository.createUser(preparedUser);
   // }
-  async updateConfirmation(user: UserDocument): Promise<string> {
-    user.emailConfirmation.isConfirmed = true;
-    return this.usersRepository.save(user);
-  }
+  // async updateConfirmation(user: UserDocument): Promise<string> {
+  //   user.emailConfirmation.isConfirmed = true;
+  //   return this.usersRepository.save(user);
+  // }
   async updateConfirmationCode(user: UserDocument): Promise<string> {
     user.emailConfirmation.confirmationCode = randomUUID();
     user.emailConfirmation.expirationDate = add(new Date(), {

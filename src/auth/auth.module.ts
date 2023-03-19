@@ -10,8 +10,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { SecurityDevicesModule } from '../security-devices/security.devices.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegisterUserUseCase } from './use-cases/register-user-use-case';
+import { ConfirmEmailUseCase } from './use-cases/confirm-emal-use-case';
 
-const useCases = [RegisterUserUseCase];
+const useCases = [RegisterUserUseCase, ConfirmEmailUseCase];
 @Module({
   imports: [
     CqrsModule,

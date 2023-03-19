@@ -1,19 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../../schemas/user.schema';
-import { Model } from 'mongoose';
+import { Injectable } from '@nestjs/common';
+
 import { PrismaService } from '../../../prisma/prisma.service';
 import { BanInfo, EmailConfirmation, User as UserModel } from '@prisma/client';
 import { UserViewModel } from '../../types/user.view.model';
 import { CreateUserDto } from '../../dto/create.user.dto';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
+import { UserWithEmailConfirmation } from '../../../auth/types';
 @Injectable()
 export class UsersSQLRepository {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async createUser(
     createUserDto: CreateUserDto,
@@ -78,13 +74,19 @@ export class UsersSQLRepository {
       where: { userEmail: userEmail },
     });
   }
+  async updateEmailConfirmationCode(userEmail: string) {
+    return this.prisma.emailConfirmation.update({
+      where: { userEmail },
+      data: { isConfirmed: true },
+    });
+  }
   async deleteUserById(id: string) {
     return this.prisma.user.delete({ where: { id: id } });
   }
 
-  async clearUsers() {
-    return this.userModel.deleteMany({});
-  }
+  // async clearUsers() {
+  //   return this.userModel.deleteMany({});
+  // }
   async findUserById(id: string) {
     return this.prisma.user.findUnique({ where: { id: id } });
   }
@@ -94,28 +96,41 @@ export class UsersSQLRepository {
   async findUserByEmail(email: string): Promise<UserModel | null> {
     return this.prisma.user.findUnique({ where: { email: email } });
   }
-  async findUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<UserDocument | null> {
-    return this.userModel.findOne({
-      $or: [
-        { 'accountData.email': loginOrEmail },
-        { 'accountData.login': loginOrEmail },
-      ],
-    });
-  }
+  // async findUserByLoginOrEmail(
+  //   loginOrEmail: string,
+  // ): Promise<UserDocument | null> {
+  //   return this.userModel.findOne({
+  //     $or: [
+  //       { 'accountData.email': loginOrEmail },
+  //       { 'accountData.login': loginOrEmail },
+  //     ],
+  //   });
+  // }
   async findUserByEmailConfirmationCode(
     code: string,
-  ): Promise<UserDocument | null> {
-    return this.userModel.findOne({
-      'emailConfirmation.confirmationCode': code,
+  ): Promise<UserWithEmailConfirmation | null> {
+    return this.prisma.user.findFirst({
+      where: {
+        emailConfirmation: {
+          confirmationCode: code,
+        },
+      },
+      include: {
+        emailConfirmation: {
+          select: {
+            confirmationCode: true,
+            expirationDate: true,
+            isConfirmed: true,
+          },
+        },
+      },
     });
   }
-  async findUserByPasswordRecoveryCode(
-    code: string,
-  ): Promise<UserDocument | null> {
-    return this.userModel.findOne({
-      'passwordRecovery.recoveryCode': code,
-    });
-  }
+  // async findUserByPasswordRecoveryCode(
+  //   code: string,
+  // ): Promise<UserDocument | null> {
+  //   return this.userModel.findOne({
+  //     'passwordRecovery.recoveryCode': code,
+  //   });
+  // }
 }

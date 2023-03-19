@@ -130,21 +130,21 @@ export class AuthService {
     );
     return tokens;
   }
-  async confirmEmail(code: string): Promise<void> {
-    // check that user exists
-    const user = await this.usersRepository.findUserByEmailConfirmationCode(
-      code,
-    );
-    if (!user)
-      throw new BadRequestException([
-        {
-          message: 'No user exists with the given confirmation code',
-          field: 'code',
-        },
-      ]);
-    const checkCode = this.checkUserConfirmationCode(user, code);
-    if (checkCode) await this.usersService.updateConfirmation(user);
-  }
+  // async confirmEmail(code: string): Promise<void> {
+  //   // check that user exists
+  //   const user = await this.usersRepository.findUserByEmailConfirmationCode(
+  //     code,
+  //   );
+  //   if (!user)
+  //     throw new BadRequestException([
+  //       {
+  //         message: 'No user exists with the given confirmation code',
+  //         field: 'code',
+  //       },
+  //     ]);
+  //   const checkCode = this.checkUserConfirmationCode(user, code);
+  //   if (checkCode) await this.usersService.updateConfirmation(user);
+  // }
   async resendEmail(email: string) {
     // find user
     const user = await this.usersRepository.findUserByEmail(email);
@@ -216,33 +216,33 @@ export class AuthService {
     // set recoveryCode and expirationCode to null
     await this.usersService.clearRecoveryCode(user);
   }
-  checkUserConfirmationCode(user: User, code: string) {
-    if (user.emailConfirmation.isConfirmed) {
-      throw new BadRequestException([
-        {
-          message: 'User email already confirmed',
-          field: 'code',
-        },
-      ]);
-    }
-    if (user.emailConfirmation.confirmationCode !== code) {
-      throw new BadRequestException([
-        {
-          message: 'User code does not match',
-          field: 'code',
-        },
-      ]);
-    }
-    if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
-      throw new BadRequestException([
-        {
-          message: 'User code has expired',
-          field: 'code',
-        },
-      ]);
-    }
-    return true;
-  }
+  // checkUserConfirmationCode(user: User, code: string) {
+  //   if (user.emailConfirmation.isConfirmed) {
+  //     throw new BadRequestException([
+  //       {
+  //         message: 'User email already confirmed',
+  //         field: 'code',
+  //       },
+  //     ]);
+  //   }
+  //   if (user.emailConfirmation.confirmationCode !== code) {
+  //     throw new BadRequestException([
+  //       {
+  //         message: 'User code does not match',
+  //         field: 'code',
+  //       },
+  //     ]);
+  //   }
+  //   if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
+  //     throw new BadRequestException([
+  //       {
+  //         message: 'User code has expired',
+  //         field: 'code',
+  //       },
+  //     ]);
+  //   }
+  //   return true;
+  // }
   checkPasswordRecoveryCode(user: User) {
     if (!user.passwordRecovery.expirationDate)
       throw new BadRequestException([

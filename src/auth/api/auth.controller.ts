@@ -25,6 +25,7 @@ import { ConfirmationCodeDto } from '../dto/confirmationCode.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../use-cases/register-user-use-case';
+import { ConfirmEmailCommand } from '../use-cases/confirm-emal-use-case';
 
 @Controller('auth')
 export class AuthController {
@@ -43,7 +44,7 @@ export class AuthController {
   async registrationConfirmation(
     @Body() codeDto: ConfirmationCodeDto,
   ): Promise<void> {
-    return this.authService.confirmEmail(codeDto.code);
+    return this.commandBus.execute(new ConfirmEmailCommand(codeDto));
   }
   @Post('registration-email-resending')
   @HttpCode(204)
