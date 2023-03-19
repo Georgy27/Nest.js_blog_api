@@ -80,6 +80,19 @@ export class UsersSQLRepository {
       data: { isConfirmed: true },
     });
   }
+  async updateEmailConfirmationInfo(
+    userEmail: string,
+  ): Promise<EmailConfirmation> {
+    return this.prisma.emailConfirmation.update({
+      where: { userEmail },
+      data: {
+        confirmationCode: randomUUID(),
+        expirationDate: add(new Date(), {
+          minutes: 1,
+        }).toISOString(),
+      },
+    });
+  }
   async deleteUserById(id: string) {
     return this.prisma.user.delete({ where: { id: id } });
   }

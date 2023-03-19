@@ -145,35 +145,35 @@ export class AuthService {
   //   const checkCode = this.checkUserConfirmationCode(user, code);
   //   if (checkCode) await this.usersService.updateConfirmation(user);
   // }
-  async resendEmail(email: string) {
-    // find user
-    const user = await this.usersRepository.findUserByEmail(email);
-    if (!user)
-      throw new BadRequestException([
-        {
-          message: 'No user exists with the given email',
-          field: 'email',
-        },
-      ]);
-    if (user.emailConfirmation.isConfirmed)
-      throw new BadRequestException([
-        {
-          message: 'User already confirmed',
-          field: 'email',
-        },
-      ]);
-
-    await this.usersService.updateConfirmationCode(user);
-
-    // try {
-    //   await this.mailService.sendUserConfirmation(
-    //     user,
-    //     user.emailConfirmation.confirmationCode,
-    //   );
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
+  // async resendEmail(email: string) {
+  //   // find user
+  //   const user = await this.usersRepository.findUserByEmail(email);
+  //   if (!user)
+  //     throw new BadRequestException([
+  //       {
+  //         message: 'No user exists with the given email',
+  //         field: 'email',
+  //       },
+  //     ]);
+  //   if (user.emailConfirmation.isConfirmed)
+  //     throw new BadRequestException([
+  //       {
+  //         message: 'User already confirmed',
+  //         field: 'email',
+  //       },
+  //     ]);
+  //
+  //   await this.usersService.updateConfirmationCode(user);
+  //
+  //   // try {
+  //   //   await this.mailService.sendUserConfirmation(
+  //   //     user,
+  //   //     user.emailConfirmation.confirmationCode,
+  //   //   );
+  //   // } catch (error) {
+  //   //   console.log(error);
+  //   // }
+  // }
 
   async passwordRecovery(email: string) {
     const user = await this.usersRepository.findUserByLoginOrEmail(email);

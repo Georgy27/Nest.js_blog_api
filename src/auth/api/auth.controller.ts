@@ -26,6 +26,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../use-cases/register-user-use-case';
 import { ConfirmEmailCommand } from '../use-cases/confirm-emal-use-case';
+import { RegistrationEmailResendingCommand } from '../use-cases/registration-email-resending-use-case';
 
 @Controller('auth')
 export class AuthController {
@@ -49,7 +50,9 @@ export class AuthController {
   @Post('registration-email-resending')
   @HttpCode(204)
   async registrationEmailResending(@Body() emailDto: EmailDto): Promise<void> {
-    return this.authService.resendEmail(emailDto.email);
+    return this.commandBus.execute(
+      new RegistrationEmailResendingCommand(emailDto),
+    );
   }
   @Post('login')
   @HttpCode(200)
