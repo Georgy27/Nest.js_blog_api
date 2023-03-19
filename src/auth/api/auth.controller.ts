@@ -27,6 +27,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../use-cases/register-user-use-case';
 import { ConfirmEmailCommand } from '../use-cases/confirm-emal-use-case';
 import { RegistrationEmailResendingCommand } from '../use-cases/registration-email-resending-use-case';
+import { LoginUserCommand } from '../use-cases/login-user-use-case';
 
 @Controller('auth')
 export class AuthController {
@@ -63,10 +64,8 @@ export class AuthController {
     @Headers('user-agent') userAgent: string,
   ): Promise<{ accessToken: string }> {
     if (!userAgent) throw new UnauthorizedException();
-    const { accessToken, refreshToken } = await this.authService.login(
-      loginDto,
-      ip,
-      userAgent,
+    const { accessToken, refreshToken } = await this.commandBus.execute(
+      new LoginUserCommand(loginDto, ip, userAgent),
     );
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,

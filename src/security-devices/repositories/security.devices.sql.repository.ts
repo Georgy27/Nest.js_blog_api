@@ -6,6 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PrismaService } from '../../prisma/prisma.service';
+import { DeviceSessions } from '@prisma/client';
 
 @Injectable()
 export class SecurityDevicesSQLRepository {
@@ -20,10 +21,8 @@ export class SecurityDevicesSQLRepository {
     return session.deviceId;
   }
 
-  async createNewSession(
-    deviceInfo: SecurityDevices,
-  ): Promise<SecurityDevices> {
-    return this.securityDevicesModel.create({ ...deviceInfo });
+  async createNewSession(deviceInfo: SecurityDevices): Promise<DeviceSessions> {
+    return this.prisma.deviceSessions.create({ data: deviceInfo });
   }
 
   async deleteSessionByDeviceId(

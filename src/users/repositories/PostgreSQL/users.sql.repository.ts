@@ -109,16 +109,27 @@ export class UsersSQLRepository {
   async findUserByEmail(email: string): Promise<UserModel | null> {
     return this.prisma.user.findUnique({ where: { email: email } });
   }
-  // async findUserByLoginOrEmail(
-  //   loginOrEmail: string,
-  // ): Promise<UserDocument | null> {
-  //   return this.userModel.findOne({
-  //     $or: [
-  //       { 'accountData.email': loginOrEmail },
-  //       { 'accountData.login': loginOrEmail },
-  //     ],
-  //   });
-  // }
+  async findUserByLoginOrEmail(loginOrEmail: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        OR: [
+          {
+            login: loginOrEmail,
+          },
+          {
+            email: loginOrEmail,
+          },
+        ],
+      },
+      include: {
+        banInfo: {
+          select: {
+            isBanned: true,
+          },
+        },
+      },
+    });
+  }
   async findUserByEmailConfirmationCode(
     code: string,
   ): Promise<UserWithEmailConfirmation | null> {

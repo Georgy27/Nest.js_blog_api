@@ -58,38 +58,38 @@ export class AuthService {
   //     console.log(error);
   //   }
   // }
-  async login(
-    loginDto: LoginDto,
-    ip: string,
-    userAgent: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    // find user and check if its banned
-    const user = await this.usersService.validateUserByLoginOrEmail(
-      loginDto.loginOrEmail,
-      loginDto.password,
-    );
-    if (user.banInfo.isBanned) throw new UnauthorizedException();
-    // tokens
-    const deviceId = randomUUID();
-    const tokens = await this.getTokens(
-      user.id,
-      user.accountData.login,
-      deviceId,
-    );
-    const issuedAt = await this.getIssuedAtFromRefreshToken(
-      tokens.refreshToken,
-    );
-    // generate device session
-    const deviceInfo: SecurityDevices = {
-      ip,
-      deviceName: userAgent,
-      lastActiveDate: issuedAt,
-      deviceId,
-      userId: user.id,
-    };
-    await this.securityDevicesService.createNewDevice(deviceInfo);
-    return tokens;
-  }
+  // async login(
+  //   loginDto: LoginDto,
+  //   ip: string,
+  //   userAgent: string,
+  // ): Promise<{ accessToken: string; refreshToken: string }> {
+  //   // find user and check if its banned
+  //   const user = await this.usersService.validateUserByLoginOrEmail(
+  //     loginDto.loginOrEmail,
+  //     loginDto.password,
+  //   );
+  //   if (user.banInfo.isBanned) throw new UnauthorizedException();
+  //   // tokens
+  //   const deviceId = randomUUID();
+  //   const tokens = await this.getTokens(
+  //     user.id,
+  //     user.accountData.login,
+  //     deviceId,
+  //   );
+  //   const issuedAt = await this.getIssuedAtFromRefreshToken(
+  //     tokens.refreshToken,
+  //   );
+  //   // generate device session
+  //   const deviceInfo: SecurityDevices = {
+  //     ip,
+  //     deviceName: userAgent,
+  //     lastActiveDate: issuedAt,
+  //     deviceId,
+  //     userId: user.id,
+  //   };
+  //   await this.securityDevicesService.createNewDevice(deviceInfo);
+  //   return tokens;
+  // }
   async logout(userId: string, deviceId: string) {
     const logOutUser =
       await this.securityDevicesService.deleteSessionByDeviceId(
