@@ -15,6 +15,7 @@ import { SecurityDevicesRepository } from '../security-devices/repositories/secu
 import * as bcrypt from 'bcrypt';
 import { UsersSQLRepository } from '../users/repositories/PostgreSQL/users.sql.repository';
 import { UsersRepository } from '../users/repositories/mongo/users.repository';
+import { SecurityDevicesSQLRepository } from '../security-devices/repositories/security.devices.sql.repository';
 
 @Injectable()
 export class AuthService {
@@ -24,79 +25,12 @@ export class AuthService {
     private readonly usersRepository: UsersRepository,
     private readonly securityDevicesService: SecurityDevicesService,
     private readonly securityDevicesRepository: SecurityDevicesRepository,
+    private readonly securityDevicesSQLRepository: SecurityDevicesSQLRepository,
     private mailService: MailService,
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
-  // async registration(user: AuthDto) {
-  //   const { login, email } = user;
-  //   // check that user with the given login or email does not exist
-  //   const checkUserLogin = await this.usersSQLRepository.findUserByLogin(login);
-  //   if (checkUserLogin)
-  //     throw new BadRequestException([
-  //       { message: 'This login already exists', field: 'login' },
-  //     ]);
-  //   const checkUserEmail = await this.usersSQLRepository.findUserByEmail(email);
-  //   if (checkUserEmail)
-  //     throw new BadRequestException([
-  //       { message: 'This email already exists', field: 'email' },
-  //     ]);
-  //   // create tokens
-  //
-  //   // create user
-  //   const newUser: User = await this.usersService.createUser(user);
-  //   // send email
-  //   try {
-  //     return this.mailService.sendUserConfirmation(
-  //       newUser,
-  //       newUser.emailConfirmation.confirmationCode,
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-  // async login(
-  //   loginDto: LoginDto,
-  //   ip: string,
-  //   userAgent: string,
-  // ): Promise<{ accessToken: string; refreshToken: string }> {
-  //   // find user and check if its banned
-  //   const user = await this.usersService.validateUserByLoginOrEmail(
-  //     loginDto.loginOrEmail,
-  //     loginDto.password,
-  //   );
-  //   if (user.banInfo.isBanned) throw new UnauthorizedException();
-  //   // tokens
-  //   const deviceId = randomUUID();
-  //   const tokens = await this.getTokens(
-  //     user.id,
-  //     user.accountData.login,
-  //     deviceId,
-  //   );
-  //   const issuedAt = await this.getIssuedAtFromRefreshToken(
-  //     tokens.refreshToken,
-  //   );
-  //   // generate device session
-  //   const deviceInfo: SecurityDevices = {
-  //     ip,
-  //     deviceName: userAgent,
-  //     lastActiveDate: issuedAt,
-  //     deviceId,
-  //     userId: user.id,
-  //   };
-  //   await this.securityDevicesService.createNewDevice(deviceInfo);
-  //   return tokens;
-  // }
-  async logout(userId: string, deviceId: string) {
-    const logOutUser =
-      await this.securityDevicesService.deleteSessionByDeviceId(
-        userId,
-        deviceId,
-      );
-    if (!logOutUser) throw new UnauthorizedException();
 
-    return logOutUser;
-  }
   async refreshTokin(
     userId: string,
     userLogin: string,
@@ -105,72 +39,22 @@ export class AuthService {
   ) {
     // check if the token is valid
     const lastActiveDate = new Date(iat * 1000).toISOString();
-    const isValidRt = await this.securityDevicesRepository.findLastActiveDate(
-      userId,
-      lastActiveDate,
-    );
-    if (!isValidRt) throw new UnauthorizedException();
-
+    const isSession =
+      await this.securityDevicesSQLRepository.findSessionByDeviceId(deviceId);
+    if (!isSession) throw new UnauthorizedException();
+    if (isSession.lastActiveDate !== lastActiveDate)
+      throw new UnauthorizedException();
     // if valid, create new pair of tokens
     const tokens = await this.getTokens(userId, userLogin, deviceId);
     const issuedAt = await this.getIssuedAtFromRefreshToken(
       tokens.refreshToken,
     );
-    const issuedAt2 = await this.getIssuedAtFromRefreshToken(
-      tokens.accessToken,
-    );
-
-    await this.securityDevicesService.updateLastActiveDate(
-      userId,
+    await this.securityDevicesSQLRepository.updateLastActiveDate(
       deviceId,
       issuedAt,
     );
     return tokens;
   }
-  // async confirmEmail(code: string): Promise<void> {
-  //   // check that user exists
-  //   const user = await this.usersRepository.findUserByEmailConfirmationCode(
-  //     code,
-  //   );
-  //   if (!user)
-  //     throw new BadRequestException([
-  //       {
-  //         message: 'No user exists with the given confirmation code',
-  //         field: 'code',
-  //       },
-  //     ]);
-  //   const checkCode = this.checkUserConfirmationCode(user, code);
-  //   if (checkCode) await this.usersService.updateConfirmation(user);
-  // }
-  // async resendEmail(email: string) {
-  //   // find user
-  //   const user = await this.usersRepository.findUserByEmail(email);
-  //   if (!user)
-  //     throw new BadRequestException([
-  //       {
-  //         message: 'No user exists with the given email',
-  //         field: 'email',
-  //       },
-  //     ]);
-  //   if (user.emailConfirmation.isConfirmed)
-  //     throw new BadRequestException([
-  //       {
-  //         message: 'User already confirmed',
-  //         field: 'email',
-  //       },
-  //     ]);
-  //
-  //   await this.usersService.updateConfirmationCode(user);
-  //
-  //   // try {
-  //   //   await this.mailService.sendUserConfirmation(
-  //   //     user,
-  //   //     user.emailConfirmation.confirmationCode,
-  //   //   );
-  //   // } catch (error) {
-  //   //   console.log(error);
-  //   // }
-  // }
 
   async passwordRecovery(email: string) {
     const user = await this.usersRepository.findUserByLoginOrEmail(email);

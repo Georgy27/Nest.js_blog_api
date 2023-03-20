@@ -24,20 +24,20 @@ export class SecurityDevicesService {
       deviceId,
     );
   }
-  async updateLastActiveDate(
-    userId: string,
-    deviceId: string,
-    lastActiveDate: string,
-  ): Promise<string> {
-    const session =
-      await this.securityDevicesRepository.findSessionByDeviceAndUserId(
-        userId,
-        deviceId,
-      );
-    if (!session) throw new UnauthorizedException();
-    session.lastActiveDate = lastActiveDate;
-    return this.securityDevicesRepository.save(session);
-  }
+  // async updateLastActiveDate(
+  //   userId: string,
+  //   deviceId: string,
+  //   lastActiveDate: string,
+  // ): Promise<string> {
+  //   const session =
+  //     await this.securityDevicesRepository.findSessionByDeviceAndUserId(
+  //       userId,
+  //       deviceId,
+  //     );
+  //   if (!session) throw new UnauthorizedException();
+  //   session.lastActiveDate = lastActiveDate;
+  //   return this.securityDevicesRepository.save(session);
+  // }
   async logoutDevices(userId: string, deviceId: string) {
     return this.securityDevicesRepository.deleteAllSessionsExceptCurrent(
       userId,

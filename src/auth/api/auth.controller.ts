@@ -5,6 +5,7 @@ import {
   Headers,
   HttpCode,
   Ip,
+  NotFoundException,
   Post,
   Res,
   UnauthorizedException,
@@ -20,7 +21,6 @@ import { GetJwtRtPayloadDecorator } from '../../common/decorators/getJwtRtPayloa
 import { EmailDto } from '../dto/email.dto';
 import { NewPasswordDto } from '../dto/new-password.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
-import { UsersQueryRepository } from '../../users/repositories/mongo/users.query.repository';
 import { ConfirmationCodeDto } from '../dto/confirmationCode.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
@@ -29,12 +29,13 @@ import { ConfirmEmailCommand } from '../use-cases/confirm-emal-use-case';
 import { RegistrationEmailResendingCommand } from '../use-cases/registration-email-resending-use-case';
 import { LoginUserCommand } from '../use-cases/login-user-use-case';
 import { LogoutUserCommand } from '../use-cases/logout-user-use-case';
+import { UsersSQLQueryRepository } from '../../users/repositories/PostgreSQL/users.sql.query.repository';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private readonly userQueryRepository: UsersQueryRepository,
+    private readonly usersSQLQueryRepository: UsersSQLQueryRepository,
     private commandBus: CommandBus,
   ) {}
   @Post('registration')
@@ -124,7 +125,10 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
   async me(@GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload) {
-    const user = await this.userQueryRepository.findUser(jwtAtPayload.userId);
+    const user = await this.usersSQLQueryRepository.findUser(
+      jwtAtPayload.userId,
+    );
+    if (!user) throw new NotFoundException('user is not found');
     return {
       email: user.email,
       login: user.login,

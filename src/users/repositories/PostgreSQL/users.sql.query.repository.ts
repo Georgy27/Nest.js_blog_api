@@ -68,21 +68,7 @@ export class UsersSQLQueryRepository {
     );
   }
 
-  async findUser(id: string): Promise<UserViewModel> {
-    const user: User = await this.userModel
-      .findOne({ id }, { _id: false, 'accountData.passwordHash': false })
-      .lean();
-
-    return {
-      id: user.id,
-      login: user.accountData.login,
-      email: user.accountData.email,
-      createdAt: user.accountData.createdAt,
-      banInfo: {
-        isBanned: user.banInfo.isBanned,
-        banDate: user.banInfo.banDate,
-        banReason: user.banInfo.banReason,
-      },
-    };
+  async findUser(id: string) {
+    return this.prisma.user.findUnique({ where: { id } });
   }
 }

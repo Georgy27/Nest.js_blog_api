@@ -74,7 +74,9 @@ export class UsersSQLRepository {
       where: { userEmail: userEmail },
     });
   }
-  async updateEmailConfirmationCode(userEmail: string) {
+  async updateEmailConfirmationCode(
+    userEmail: string,
+  ): Promise<EmailConfirmation> {
     return this.prisma.emailConfirmation.update({
       where: { userEmail },
       data: { isConfirmed: true },

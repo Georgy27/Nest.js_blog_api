@@ -53,7 +53,7 @@ model BanInfo {
 model DeviceSessions {
   id             Int    @id @default(autoincrement())
   ip             String
-  deviceName     String
+  deviceName     String @unique
   lastActiveDate String
   deviceId       String @unique
   user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
