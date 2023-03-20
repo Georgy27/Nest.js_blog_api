@@ -30,6 +30,7 @@ import { RegistrationEmailResendingCommand } from '../use-cases/registration-ema
 import { LoginUserCommand } from '../use-cases/login-user-use-case';
 import { LogoutUserCommand } from '../use-cases/logout-user-use-case';
 import { UsersSQLQueryRepository } from '../../users/repositories/PostgreSQL/users.sql.query.repository';
+import { PasswordRecoveryCommand } from '../use-cases/user-password-recovery-use-case';
 
 @Controller('auth')
 export class AuthController {
@@ -111,7 +112,7 @@ export class AuthController {
   @Post('password-recovery')
   @HttpCode(204)
   async passwordRecovery(@Body() emailDto: EmailDto): Promise<void> {
-    await this.authService.passwordRecovery(emailDto.email);
+    return this.commandBus.execute(new PasswordRecoveryCommand(emailDto));
   }
   @Post('new-password')
   @HttpCode(204)

@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../prisma/prisma.service';
-import { BanInfo, EmailConfirmation, User as UserModel } from '@prisma/client';
+import {
+  BanInfo,
+  EmailConfirmation,
+  PasswordRecovery,
+  User as UserModel,
+} from '@prisma/client';
 import { UserViewModel } from '../../types/user.view.model';
 import { CreateUserDto } from '../../dto/create.user.dto';
 import { randomUUID } from 'crypto';
@@ -92,6 +97,15 @@ export class UsersSQLRepository {
         expirationDate: add(new Date(), {
           minutes: 1,
         }).toISOString(),
+      },
+    });
+  }
+  async updatePasswordRecoveryInfo(userId: string): Promise<PasswordRecovery> {
+    return this.prisma.passwordRecovery.update({
+      where: { userId },
+      data: {
+        recoveryCode: randomUUID(),
+        expirationDate: add(new Date(), { minutes: 1 }).toISOString(),
       },
     });
   }
