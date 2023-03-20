@@ -11,7 +11,10 @@ import { UserViewModel } from '../../types/user.view.model';
 import { CreateUserDto } from '../../dto/create.user.dto';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
-import { UserWithEmailConfirmation } from '../../../auth/types';
+import {
+  UserWithEmailConfirmation,
+  UserWithPasswordRecoveryInfo,
+} from '../../../auth/types';
 @Injectable()
 export class UsersSQLRepository {
   constructor(private prisma: PrismaService) {}
@@ -109,6 +112,18 @@ export class UsersSQLRepository {
       },
     });
   }
+  async clearRecoveryAndExpirationDate(userId: string) {
+    return this.prisma.passwordRecovery.update({
+      where: { userId },
+      data: {
+        recoveryCode: null,
+        expirationDate: null,
+      },
+    });
+  }
+  async updateUserHash(id: string, hash: string): Promise<UserModel> {
+    return this.prisma.user.update({ where: { id }, data: { hash } });
+  }
   async deleteUserById(id: string) {
     return this.prisma.user.delete({ where: { id: id } });
   }
@@ -166,11 +181,23 @@ export class UsersSQLRepository {
       },
     });
   }
-  // async findUserByPasswordRecoveryCode(
-  //   code: string,
-  // ): Promise<UserDocument | null> {
-  //   return this.userModel.findOne({
-  //     'passwordRecovery.recoveryCode': code,
-  //   });
-  // }
+  async findUserByPasswordRecoveryCode(
+    code: string,
+  ): Promise<UserWithPasswordRecoveryInfo | null> {
+    return this.prisma.user.findFirst({
+      where: {
+        passwordRecovery: {
+          recoveryCode: code,
+        },
+      },
+      include: {
+        passwordRecovery: {
+          select: {
+            recoveryCode: true,
+            expirationDate: true,
+          },
+        },
+      },
+    });
+  }
 }

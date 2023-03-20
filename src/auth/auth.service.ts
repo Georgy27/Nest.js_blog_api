@@ -1,12 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/schemas/user.schema';
-
 import { MailService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { SecurityDevicesService } from '../security-devices/security.devices.service';
@@ -56,91 +49,6 @@ export class AuthService {
     return tokens;
   }
 
-  async passwordRecovery(email: string) {
-    const user = await this.usersRepository.findUserByLoginOrEmail(email);
-    if (!user) return;
-
-    const updatedUser = await this.usersService.setPasswordRecoveryCode(user);
-    if (!updatedUser.passwordRecovery.recoveryCode) return;
-
-    // try {
-    //   await this.mailService.sendUserConfirmation(
-    //     updatedUser,
-    //     updatedUser.passwordRecovery.recoveryCode,
-    //   );
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
-  async confirmNewPassword(
-    recoveryCode: string,
-    newPassword: string,
-  ): Promise<void> {
-    // check if user exists
-    const user = await this.usersRepository.findUserByPasswordRecoveryCode(
-      recoveryCode,
-    );
-    if (!user)
-      throw new BadRequestException([
-        {
-          message: 'User with the given recovery code does not exist',
-          field: 'recoveryCode',
-        },
-      ]);
-    // check if recoveryCode is valid
-    const checkRecoveryCode = this.checkPasswordRecoveryCode(user);
-    // prepare password
-    const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(newPassword, passwordSalt);
-    // update user password hash in db
-    await this.usersService.updatePasswordHash(user, passwordHash);
-    // set recoveryCode and expirationCode to null
-    await this.usersService.clearRecoveryCode(user);
-  }
-  // checkUserConfirmationCode(user: User, code: string) {
-  //   if (user.emailConfirmation.isConfirmed) {
-  //     throw new BadRequestException([
-  //       {
-  //         message: 'User email already confirmed',
-  //         field: 'code',
-  //       },
-  //     ]);
-  //   }
-  //   if (user.emailConfirmation.confirmationCode !== code) {
-  //     throw new BadRequestException([
-  //       {
-  //         message: 'User code does not match',
-  //         field: 'code',
-  //       },
-  //     ]);
-  //   }
-  //   if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
-  //     throw new BadRequestException([
-  //       {
-  //         message: 'User code has expired',
-  //         field: 'code',
-  //       },
-  //     ]);
-  //   }
-  //   return true;
-  // }
-  checkPasswordRecoveryCode(user: User) {
-    if (!user.passwordRecovery.expirationDate)
-      throw new BadRequestException([
-        {
-          message: 'User does not has an expiration date',
-          field: 'recoveryCode',
-        },
-      ]);
-    if (new Date().toISOString() > user.passwordRecovery.expirationDate)
-      throw new BadRequestException([
-        {
-          message: 'User with the given recovery code does not exist',
-          field: 'recoveryCode',
-        },
-      ]);
-    return true;
-  }
   async getTokens(userId: string, userLogin: string, deviceId: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(

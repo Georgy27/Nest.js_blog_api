@@ -7,3 +7,9 @@ export interface UserWithEmailConfirmation extends User {
     isConfirmed: boolean;
   } | null;
 }
+export interface UserWithPasswordRecoveryInfo extends User {
+  passwordRecovery: {
+    recoveryCode: string | null;
+    expirationDate: string | null;
+  } | null;
+}

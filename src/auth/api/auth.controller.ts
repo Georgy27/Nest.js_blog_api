@@ -31,6 +31,7 @@ import { LoginUserCommand } from '../use-cases/login-user-use-case';
 import { LogoutUserCommand } from '../use-cases/logout-user-use-case';
 import { UsersSQLQueryRepository } from '../../users/repositories/PostgreSQL/users.sql.query.repository';
 import { PasswordRecoveryCommand } from '../use-cases/user-password-recovery-use-case';
+import { NewPasswordCommand } from '../use-cases/new-password-use-case';
 
 @Controller('auth')
 export class AuthController {
@@ -117,10 +118,7 @@ export class AuthController {
   @Post('new-password')
   @HttpCode(204)
   async newPassword(@Body() newPasswordDto: NewPasswordDto): Promise<void> {
-    await this.authService.confirmNewPassword(
-      newPasswordDto.recoveryCode,
-      newPasswordDto.newPassword,
-    );
+    return this.commandBus.execute(new NewPasswordCommand(newPasswordDto));
   }
   @SkipThrottle()
   @UseGuards(AuthGuard('jwt'))
