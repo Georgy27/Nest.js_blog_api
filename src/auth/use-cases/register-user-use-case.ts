@@ -45,7 +45,7 @@ export class RegisterUserUseCase
       throw new NotFoundException('confirmation code does not exist');
     // send email
     try {
-      this.mailService.sendUserConfirmation(
+      return this.mailService.sendUserConfirmation(
         newUser,
         emailConfirmation.confirmationCode,
       );
