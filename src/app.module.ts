@@ -21,10 +21,10 @@ import { PrismaModule } from './prisma/prisma.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    // ThrottlerModule.forRoot({
-    //   ttl: 10,
-    //   limit: 5,
-    // }),
+    ThrottlerModule.forRoot({
+      ttl: 10,
+      limit: 5,
+    }),
     BlogsModule,
     PostsModule,
     CommentsModule,
@@ -38,10 +38,10 @@ import { PrismaModule } from './prisma/prisma.module';
   controllers: [AppController],
   providers: [
     AppService,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: ThrottlerGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
