@@ -22,16 +22,7 @@ export class SecurityDevicesSQLRepository {
   }
 
   async createNewSession(deviceInfo: SecurityDevices) {
-    return this.prisma.deviceSessions.upsert({
-      create: deviceInfo,
-      update: {
-        ip: deviceInfo.ip,
-        lastActiveDate: deviceInfo.lastActiveDate,
-        deviceId: deviceInfo.deviceId,
-      },
-      where: { deviceName: deviceInfo.deviceName },
-    });
-    // return this.prisma.deviceSessions.create({ data: deviceInfo });
+    return this.prisma.deviceSessions.create({ data: deviceInfo });
   }
   async deleteSessionByDeviceId(deviceId: string) {
     return this.prisma.deviceSessions.delete({ where: { deviceId } });

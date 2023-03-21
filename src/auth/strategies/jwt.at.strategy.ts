@@ -18,13 +18,13 @@ export class JwtAtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
   async validate(payload: JwtAtPayload) {
-    // const issuedAt = new Date(payload.iat * 1000).toISOString();
+    const issuedAt = new Date(payload.iat * 1000).toISOString();
     const deviceId = payload.deviceId;
     const deviceSession =
       await this.securityDevicesSQLRepository.findSessionByDeviceId(deviceId);
     if (!deviceSession) throw new UnauthorizedException();
-    // if (lastActiveDate.lastActiveDate !== issuedAt)
-    //   throw new UnauthorizedException();
+    if (deviceSession.lastActiveDate !== issuedAt)
+      throw new UnauthorizedException();
     return payload;
     // return { userId: payload.userId, deviceId: payload.deviceId };
   }

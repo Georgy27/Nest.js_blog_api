@@ -30,14 +30,14 @@ export class AuthService {
     deviceId: string,
     iat: number,
   ) {
-    // check if the token is valid
-    const lastActiveDate = new Date(iat * 1000).toISOString();
-    const isSession =
-      await this.securityDevicesSQLRepository.findSessionByDeviceId(deviceId);
-    if (!isSession) throw new UnauthorizedException();
-    if (isSession.lastActiveDate !== lastActiveDate)
-      throw new UnauthorizedException();
-    // if valid, create new pair of tokens
+    // // check if the token is valid
+    // const lastActiveDate = new Date(iat * 1000).toISOString();
+    // const isSession =
+    //   await this.securityDevicesSQLRepository.findSessionByDeviceId(deviceId);
+    // if (!isSession) throw new UnauthorizedException();
+    // if (isSession.lastActiveDate !== lastActiveDate)
+    //   throw new UnauthorizedException();
+    //  create new pair of tokens
     const tokens = await this.getTokens(userId, userLogin, deviceId);
     const issuedAt = await this.getIssuedAtFromRefreshToken(
       tokens.refreshToken,
