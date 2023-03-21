@@ -26,14 +26,15 @@ export class JwtRtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     });
   }
   async validate(payload: JwtRtPayload) {
-    // const issuedAt = new Date(payload.iat * 1000).toISOString();
+    const issuedAt = new Date(payload.iat * 1000).toISOString();
     const deviceId = payload.deviceId;
     const deviceSession =
       await this.securityDevicesSQLRepository.findSessionByDeviceId(deviceId);
     if (!deviceSession) throw new UnauthorizedException();
     if (deviceSession.userId !== payload.userId)
       throw new ForbiddenException('you are not authorized for this operation');
-    // if (lastActiveDate !== issuedAt) throw new UnauthorizedException();
+    if (deviceSession.lastActiveDate !== issuedAt)
+      throw new UnauthorizedException();
     return payload;
     // return { userId: payload.userId, deviceId: payload.deviceId };
   }
