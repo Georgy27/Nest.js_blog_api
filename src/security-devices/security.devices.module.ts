@@ -10,9 +10,19 @@ import {
 } from './schemas/security.devices.schema';
 import { SecurityDevicesSQLRepository } from './repositories/security.devices.sql.repository';
 import { SecurityDevicesSQLQueryRepository } from './repositories/security.devices.sql.query.repository';
+import { ActiveUserDevicesUseCase } from './use-cases/user-devices-with-active-sessions-use-case';
+import { CqrsModule } from '@nestjs/cqrs';
+import { DeleteAllSessionsButActiveUseCase } from './use-cases/delete-all-sessions-but-active-use-case';
+import { DeleteSessionUseCase } from './use-cases/delete-session-use-case';
 
+const useCases = [
+  ActiveUserDevicesUseCase,
+  DeleteAllSessionsButActiveUseCase,
+  DeleteSessionUseCase,
+];
 @Module({
   imports: [
+    CqrsModule,
     MongooseModule.forFeature([
       { name: SecurityDevices.name, schema: SecurityDevicesSchema },
     ]),
@@ -24,6 +34,7 @@ import { SecurityDevicesSQLQueryRepository } from './repositories/security.devic
     SecurityDevicesQueryRepository,
     SecurityDevicesSQLRepository,
     SecurityDevicesSQLQueryRepository,
+    ...useCases,
   ],
   exports: [
     SecurityDevicesService,

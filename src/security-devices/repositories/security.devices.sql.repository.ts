@@ -52,12 +52,12 @@ export class SecurityDevicesSQLRepository {
       throw new NotFoundException('user is not found');
     }
   }
-  async findSessionByDeviceAndUserId(
-    userId: string,
-    deviceId: string,
-  ): Promise<SecurityDevicesDocument | null> {
-    return this.securityDevicesModel.findOne({ userId, deviceId });
-  }
+  // async findSessionByDeviceAndUserId(
+  //   userId: string,
+  //   deviceId: string,
+  // ): Promise<SecurityDevicesDocument | null> {
+  //   return this.securityDevicesModel.findOne({ userId, deviceId });
+  // }
 
   async findSessionByDeviceId(
     deviceId: string,
@@ -66,9 +66,8 @@ export class SecurityDevicesSQLRepository {
   }
 
   async deleteAllSessionsExceptCurrent(userId: string, deviceId: string) {
-    return this.securityDevicesModel.deleteMany({
-      userId,
-      deviceId: { $ne: deviceId },
+    return this.prisma.deviceSessions.deleteMany({
+      where: { userId, NOT: [{ deviceId }] },
     });
   }
   async clearSessions() {

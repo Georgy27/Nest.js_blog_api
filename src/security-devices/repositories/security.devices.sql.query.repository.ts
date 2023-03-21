@@ -1,30 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import {
-  SecurityDevices,
-  SecurityDevicesDocument,
-} from '../schemas/security.devices.schema';
-import { Model } from 'mongoose';
-import { SessionViewModel } from '../index';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class SecurityDevicesSQLQueryRepository {
-  constructor(
-    @InjectModel(SecurityDevices.name)
-    private securityDevicesModel: Model<SecurityDevicesDocument>,
-  ) {}
-  async findAllActiveSessions(userId: string): Promise<SessionViewModel[]> {
-    const devices = await this.securityDevicesModel
-      .find({ userId }, { _id: false })
-      .lean();
-    const newDevices = devices.map((device) => {
-      return {
-        ip: device.ip,
-        title: device.deviceName,
-        lastActiveDate: device.lastActiveDate,
-        deviceId: device.deviceId,
-      };
+  constructor(private readonly prisma: PrismaService) {}
+  async findAllActiveSessions(userId: string) {
+    return this.prisma.deviceSessions.findMany({
+      where: { userId },
+      select: {
+        ip: true,
+        deviceName: true,
+        lastActiveDate: true,
+        deviceId: true,
+      },
     });
-    return newDevices;
   }
 }
