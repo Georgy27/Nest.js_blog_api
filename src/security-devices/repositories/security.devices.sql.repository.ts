@@ -71,7 +71,7 @@ export class SecurityDevicesSQLRepository {
     });
   }
   async clearSessions() {
-    await this.securityDevicesModel.deleteMany({});
+    await this.prisma.deviceSessions.deleteMany({});
   }
   async deleteAllUserSessions(userId: string) {
     return this.prisma.deviceSessions.deleteMany({ where: { userId: userId } });

@@ -128,9 +128,6 @@ export class UsersSQLRepository {
     return this.prisma.user.delete({ where: { id: id } });
   }
 
-  // async clearUsers() {
-  //   return this.userModel.deleteMany({});
-  // }
   async findUserById(id: string) {
     return this.prisma.user.findUnique({ where: { id: id } });
   }
@@ -199,5 +196,8 @@ export class UsersSQLRepository {
         },
       },
     });
+  }
+  async clearUsers() {
+    return this.prisma.user.deleteMany({});
   }
 }
