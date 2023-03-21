@@ -1,6 +1,10 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtRtPayload } from './index';
 import { Request as RequestType } from 'express';
@@ -27,6 +31,8 @@ export class JwtRtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     const deviceSession =
       await this.securityDevicesSQLRepository.findSessionByDeviceId(deviceId);
     if (!deviceSession) throw new UnauthorizedException();
+    if (deviceSession.userId !== payload.userId)
+      throw new ForbiddenException('you are not authorized for this operation');
     // if (lastActiveDate !== issuedAt) throw new UnauthorizedException();
     return payload;
     // return { userId: payload.userId, deviceId: payload.deviceId };

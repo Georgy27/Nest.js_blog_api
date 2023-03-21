@@ -15,15 +15,15 @@ export class LogoutUserUseCase implements ICommandHandler<LogoutUserCommand> {
     private readonly authService: AuthService,
   ) {}
   async execute(command: LogoutUserCommand) {
-    const isDeviceSession =
-      await this.securityDevicesSQLRepository.findSessionByDeviceId(
-        command.deviceId,
-      );
-
-    if (!isDeviceSession)
-      throw new NotFoundException('this device session does not exist');
-    if (isDeviceSession.userId !== command.userId)
-      throw new ForbiddenException('you are not authorized for this operation');
+    // const isDeviceSession =
+    //   await this.securityDevicesSQLRepository.findSessionByDeviceId(
+    //     command.deviceId,
+    //   );
+    //
+    // if (!isDeviceSession)
+    //   throw new NotFoundException('this device session does not exist');
+    // if (isDeviceSession.userId !== command.userId)
+    //   throw new ForbiddenException('you are not authorized for this operation');
 
     return this.securityDevicesSQLRepository.deleteSessionByDeviceId(
       command.deviceId,
