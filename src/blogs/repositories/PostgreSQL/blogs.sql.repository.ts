@@ -15,6 +15,11 @@ export class BlogsSqlRepository {
         createdAt: new Date().toISOString(),
         isMembership: false,
         bloggerId: jwtAtPayload.userId,
+        bannedBlogs: {
+          create: {
+            isBanned: false,
+          },
+        },
       },
       select: {
         name: true,

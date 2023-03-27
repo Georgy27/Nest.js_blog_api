@@ -1,31 +1,62 @@
+import { Prisma } from '@prisma/client';
+export type BlogFilter = Prisma.BlogWhereInput;
 export const blogQueryFilter = (
   searchNameTerm: string | null,
   userId: string | undefined,
-) => {
+): BlogFilter => {
   if (searchNameTerm && userId) {
     return {
-      name: {
-        $regex: searchNameTerm ?? '',
-        $options: 'i',
-      },
-      'blogOwnerInfo.userId': {
-        $regex: userId ?? '',
-      },
+      AND: [
+        {
+          name: {
+            contains: searchNameTerm ?? '',
+            mode: 'insensitive',
+          },
+        },
+        {
+          bloggerId: {
+            contains: userId ?? '',
+          },
+        },
+        {
+          bannedBlogs: {
+            isBanned: false,
+          },
+        },
+      ],
     };
   }
   if (searchNameTerm) {
     return {
-      name: {
-        $regex: searchNameTerm ?? '',
-        $options: 'i',
-      },
+      AND: [
+        {
+          name: {
+            contains: searchNameTerm ?? '',
+            mode: 'insensitive',
+          },
+        },
+        {
+          bannedBlogs: {
+            isBanned: false,
+          },
+        },
+      ],
     };
   }
   if (userId) {
     return {
-      'blogOwnerInfo.userId': {
-        $regex: userId ?? '',
-      },
+      AND: [
+        {
+          bloggerId: {
+            contains: userId ?? '',
+          },
+        },
+        {
+          bannedBlogs: {
+            isBanned: false,
+          },
+        },
+      ],
     };
   }
   return {};

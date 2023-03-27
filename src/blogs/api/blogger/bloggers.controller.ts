@@ -34,6 +34,8 @@ import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPay
 import { CommentsPaginationQueryDto } from '../../../helpers/pagination/dto/comments.pagination.dto';
 import { CommentsQueryRepository } from '../../../comments/comments.query.repository';
 import { BlogsSQLQueryRepository } from '../../repositories/PostgreSQL/blogs.query.sql.repository';
+import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
+import { BlogViewModel } from '../../types';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
@@ -52,7 +54,7 @@ export class BloggersController {
   async getAllBlogsForBlogger(
     @Query() blogsPaginationDto: BlogsPaginationQueryDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  ) {
+  ): Promise<PaginationViewModel<BlogViewModel[]>> {
     return this.blogsSQLQueryRepository.findBlogsForBlogger(
       blogsPaginationDto.searchNameTerm,
       blogsPaginationDto.pageSize,
