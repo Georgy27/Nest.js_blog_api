@@ -1,6 +1,6 @@
 import { UpdateBlogDto } from '../dto/update.blog.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BlogsRepository } from '../blogs.repository';
+import { BlogsRepository } from '../repositories/mongo/blogs.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../schemas/blog.schema';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';

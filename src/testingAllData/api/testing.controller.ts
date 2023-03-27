@@ -1,5 +1,5 @@
 import { Controller, Delete, HttpCode } from '@nestjs/common';
-import { BlogsRepository } from '../../blogs/blogs.repository';
+import { BlogsRepository } from '../../blogs/repositories/mongo/blogs.repository';
 import { PostsRepository } from '../../posts/posts.repository';
 import { UsersRepository } from '../../users/repositories/mongo/users.repository';
 import { CommentsRepository } from '../../comments/comments.repository';
@@ -8,12 +8,13 @@ import { SecurityDevicesRepository } from '../../security-devices/repositories/s
 import { ReactionsRepository } from '../../reactions/reactions.repository';
 import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
 import { SecurityDevicesSQLRepository } from '../../security-devices/repositories/security.devices.sql.repository';
+import { BlogsSqlRepository } from '../../blogs/repositories/PostgreSQL/blogs.sql.repository';
 
 @SkipThrottle()
 @Controller('testing/all-data')
 export class TestingController {
   constructor(
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsSQLRepository: BlogsSqlRepository,
     private readonly postsRepository: PostsRepository,
     private readonly usersSQLRepository: UsersSQLRepository,
     private readonly commentsRepository: CommentsRepository,
@@ -24,7 +25,7 @@ export class TestingController {
   @HttpCode(204)
   async deleteAllData(): Promise<string | void> {
     await Promise.all([
-      this.blogsRepository.clearBlogs(),
+      this.blogsSQLRepository.clearBlogs(),
       this.postsRepository.clearPosts(),
       this.usersSQLRepository.clearUsers(),
       this.commentsRepository.clearComments(),

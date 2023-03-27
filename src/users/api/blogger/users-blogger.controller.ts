@@ -19,8 +19,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
 import { JwtAtPayload } from '../../../auth/strategies';
 import { UsersBannedByBloggerPaginationQueryDto } from '../../../helpers/pagination/dto/users-banned-by-blogger.pagination.query.dto';
-import { BlogsQueryRepository } from '../../../blogs/blogs.query.repository';
-import { BlogsRepository } from '../../../blogs/blogs.repository';
+import { BlogsQueryRepository } from '../../../blogs/repositories/mongo/blogs.query.repository';
+import { BlogsRepository } from '../../../blogs/repositories/mongo/blogs.repository';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('blogger/users')

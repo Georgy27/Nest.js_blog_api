@@ -10,7 +10,7 @@ import {
   Inject,
   NotFoundException,
 } from '@nestjs/common';
-import { BlogsRepository } from '../../blogs/blogs.repository';
+import { BlogsRepository } from '../../blogs/repositories/mongo/blogs.repository';
 import { raw } from '@nestjs/mongoose';
 
 export class BanOrUnbanUserByBloggerCommand {

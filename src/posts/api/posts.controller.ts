@@ -26,7 +26,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAtPayload } from '../../auth/strategies';
 import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-from-AT.guard';
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
-import { BlogsQueryRepository } from '../../blogs/blogs.query.repository';
+import { BlogsQueryRepository } from '../../blogs/repositories/mongo/blogs.query.repository';
 
 @SkipThrottle()
 @Controller('posts')

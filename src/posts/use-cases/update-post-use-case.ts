@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { UpdatePostForBloggerDto } from '../../blogs/dto/update.post.blogger.dto';
 import { PostsRepository } from '../posts.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { BlogsRepository } from '../../blogs/blogs.repository';
+import { BlogsRepository } from '../../blogs/repositories/mongo/blogs.repository';
 
 export class UpdatePostCommand {
   constructor(

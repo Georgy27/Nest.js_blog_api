@@ -6,7 +6,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { BlogsQueryRepository } from '../../../blogs/blogs.query.repository';
+import { BlogsQueryRepository } from '../../../blogs/repositories/mongo/blogs.query.repository';
 
 export function BlogIsExist(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {

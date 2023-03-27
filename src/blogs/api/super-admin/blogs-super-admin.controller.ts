@@ -13,7 +13,7 @@ import { BasicAuthGuard } from '../../../common/guards/basic.auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { BindBlogWithUserCommand } from '../../use-cases/bind-blog-with-user-use-case';
 import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
-import { BlogsQueryRepository } from '../../blogs.query.repository';
+import { BlogsQueryRepository } from '../../repositories/mongo/blogs.query.repository';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { Blog } from '../../schemas/blog.schema';
 import { BanBlogAdminDto } from '../../dto/ban.blog.admin.dto';

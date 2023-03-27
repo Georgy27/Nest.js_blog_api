@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from '../../blogs.service';
-import { BlogsQueryRepository } from '../../blogs.query.repository';
+import { BlogsQueryRepository } from '../../repositories/mongo/blogs.query.repository';
 import { Blog } from '../../schemas/blog.schema';
 import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';

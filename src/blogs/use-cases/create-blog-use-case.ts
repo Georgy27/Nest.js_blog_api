@@ -1,10 +1,7 @@
 import { CreateBlogDto } from '../dto/create.blog.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from '../schemas/blog.schema';
-import { BlogsRepository } from '../blogs.repository';
 import { JwtAtPayload } from '../../auth/strategies';
-import { Model } from 'mongoose';
+import { BlogsSqlRepository } from '../repositories/PostgreSQL/blogs.sql.repository';
 
 export class CreateBlogCommand {
   constructor(
@@ -14,15 +11,11 @@ export class CreateBlogCommand {
 }
 @CommandHandler(CreateBlogCommand)
 export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
-  constructor(
-    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
-    private readonly blogsRepository: BlogsRepository,
-  ) {}
-  async execute(command: CreateBlogCommand): Promise<string> {
-    const { name, description, websiteUrl } = command.createBlogDto;
-    const { userId, userLogin } = command.jwtAtPayload;
-    const newBlog = new this.blogModel();
-    newBlog.createBlog(name, description, websiteUrl, userId, userLogin);
-    return this.blogsRepository.save(newBlog);
+  constructor(private readonly blogsSqlRepository: BlogsSqlRepository) {}
+  async execute(command: CreateBlogCommand) {
+    return this.blogsSqlRepository.createBlog(
+      command.createBlogDto,
+      command.jwtAtPayload,
+    );
   }
 }

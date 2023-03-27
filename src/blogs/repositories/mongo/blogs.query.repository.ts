@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from './schemas/blog.schema';
+import { Blog, BlogDocument } from '../../schemas/blog.schema';
 import { FilterQuery, Model } from 'mongoose';
-import { PaginationViewModel } from '../helpers/pagination/pagination.view.model.wrapper';
-import { JwtAtPayload } from '../auth/strategies';
-import { blogQueryFilter } from '../helpers/filter/blog.query.filter';
-import { UsersBannedByBloggerPaginationQueryDto } from '../helpers/pagination/dto/users-banned-by-blogger.pagination.query.dto';
+import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
+import { JwtAtPayload } from '../../../auth/strategies';
+import { blogQueryFilter } from '../../../helpers/filter/blog.query.filter';
+import { UsersBannedByBloggerPaginationQueryDto } from '../../../helpers/pagination/dto/users-banned-by-blogger.pagination.query.dto';
 
 @Injectable()
 export class BlogsQueryRepository {

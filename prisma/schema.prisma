@@ -11,7 +11,6 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-// User
 model User {
   id                String             @id @default(uuid())
   login             String             @unique
@@ -22,6 +21,15 @@ model User {
   emailConfirmation EmailConfirmation?
   banInfo           BanInfo?
   deviceSessions    DeviceSessions[]
+  blogger           Blogger?
+  bannedUsers       BannedUsers[]
+}
+
+model Blogger {
+  user        User          @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
+  bloggerId   String        @unique
+  blog        Blog[]
+  bannedUsers BannedUsers[]
 }
 
 model PasswordRecovery {
@@ -50,7 +58,20 @@ model BanInfo {
   userId    String  @unique
 }
 
-// Device Sessions
+model BannedUsers {
+  id        String   @id @default(uuid())
+  login     String
+  isBanned  Boolean
+  banDate   String
+  banReason String
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  blogId    String
+  bloggerId String?
+  Blogger   Blogger? @relation(fields: [bloggerId], references: [bloggerId])
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
 model DeviceSessions {
   id             Int    @id @default(autoincrement())
   ip             String
@@ -59,4 +80,25 @@ model DeviceSessions {
   deviceId       String @unique
   user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
+}
+
+model Blog {
+  id           String        @id @default(uuid())
+  name         String
+  description  String
+  websiteUrl   String
+  createdAt    String
+  isMembership Boolean
+  bannedBlogs  BannedBlogs?
+  bannedUsers  BannedUsers[]
+  Blogger      Blogger       @relation(fields: [bloggerId], references: [bloggerId])
+  bloggerId    String
+}
+
+model BannedBlogs {
+  id       Int     @id @default(autoincrement())
+  isBanned Boolean
+  banDate  String?
+  blog     Blog    @relation(fields: [blogId], references: [id])
+  blogId   String  @unique
 }

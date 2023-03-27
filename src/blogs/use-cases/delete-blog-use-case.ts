@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BlogsRepository } from '../blogs.repository';
+import { BlogsRepository } from '../repositories/mongo/blogs.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 export class DeleteBlogCommand {

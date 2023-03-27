@@ -3,8 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './schemas/blog.schema';
 import { BloggersController } from './api/blogger/bloggers.controller';
 import { BlogsService } from './blogs.service';
-import { BlogsRepository } from './blogs.repository';
-import { BlogsQueryRepository } from './blogs.query.repository';
+import { BlogsRepository } from './repositories/mongo/blogs.repository';
+import { BlogsQueryRepository } from './repositories/mongo/blogs.query.repository';
 import { PostsModule } from '../posts/posts.module';
 import { JwtModule } from '@nestjs/jwt';
 import { BlogIsExistValidator } from '../common/decorators/validation/blogId-validation.decorator';
@@ -18,6 +18,8 @@ import { BlogsSuperAdminController } from './api/super-admin/blogs-super-admin.c
 import { BlogsController } from './api/public/blogs.controller';
 import { CommentsModule } from '../comments/comments.module';
 import { BanBlogByAdminUseCase } from './use-cases/ban-blog-by-admin-use-case';
+import { BlogsSqlRepository } from './repositories/PostgreSQL/blogs.sql.repository';
+import { BlogsSQLQueryRepository } from './repositories/PostgreSQL/blogs.query.sql.repository';
 
 const useCases = [
   CreateBlogUseCase,
@@ -40,9 +42,11 @@ const useCases = [
     BlogsService,
     BlogsRepository,
     BlogsQueryRepository,
+    BlogsSqlRepository,
+    BlogsSQLQueryRepository,
     BlogIsExistValidator,
     ...useCases,
   ],
-  exports: [BlogsRepository, BlogsQueryRepository],
+  exports: [BlogsRepository, BlogsSqlRepository, BlogsQueryRepository],
 })
 export class BlogsModule {}

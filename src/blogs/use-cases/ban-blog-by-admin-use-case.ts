@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../schemas/blog.schema';
 import { Model } from 'mongoose';
-import { BlogsRepository } from '../blogs.repository';
+import { BlogsRepository } from '../repositories/mongo/blogs.repository';
 import { UsersRepository } from '../../users/repositories/mongo/users.repository';
 import { BanBlogAdminDto } from '../dto/ban.blog.admin.dto';
 import { NotFoundException } from '@nestjs/common';

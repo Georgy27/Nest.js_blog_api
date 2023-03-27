@@ -45,6 +45,7 @@ export class UsersSQLRepository {
             isConfirmed: false,
           },
         },
+        blogger: { create: {} },
         passwordRecovery: { create: {} },
       },
       select: {

@@ -12,12 +12,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from '../../blogs.service';
-import { BlogsQueryRepository } from '../../blogs.query.repository';
 import { CreateBlogDto } from '../../dto/create.blog.dto';
 import { UpdateBlogDto } from '../../dto/update.blog.dto';
-import { Blog } from '../../schemas/blog.schema';
 import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
-import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { PostsQueryRepository } from '../../../posts/posts.query.repository';
 import { CreatePostByBlogIdDto } from '../../dto/create.post.blogId.dto';
 import { PostsService } from '../../../posts/posts.service';
@@ -36,13 +33,14 @@ import { DeletePostCommand } from '../../../posts/use-cases/delete-post-use-case
 import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
 import { CommentsPaginationQueryDto } from '../../../helpers/pagination/dto/comments.pagination.dto';
 import { CommentsQueryRepository } from '../../../comments/comments.query.repository';
+import { BlogsSQLQueryRepository } from '../../repositories/PostgreSQL/blogs.query.sql.repository';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
 export class BloggersController {
   constructor(
     private readonly blogsService: BlogsService,
-    private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly blogsSQLQueryRepository: BlogsSQLQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly postsService: PostsService,
     private readonly commentsQueryRepository: CommentsQueryRepository,
@@ -54,8 +52,8 @@ export class BloggersController {
   async getAllBlogsForBlogger(
     @Query() blogsPaginationDto: BlogsPaginationQueryDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  ): Promise<PaginationViewModel<Blog[]>> {
-    return this.blogsQueryRepository.findBlogs(
+  ) {
+    return this.blogsSQLQueryRepository.findBlogsForBlogger(
       blogsPaginationDto.searchNameTerm,
       blogsPaginationDto.pageSize,
       blogsPaginationDto.sortBy,
@@ -64,41 +62,38 @@ export class BloggersController {
       jwtAtPayload,
     );
   }
-  @UseGuards(AuthGuard('jwt'))
-  @Get('comments')
-  async getAllCommentsForAllPostsByBlogger(
-    @Query() commentsForPostsPaginationDto: CommentsPaginationQueryDto,
-    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  ) {
-    // find all blogs that were not banned and made by blogger
-    const allBlogs = await this.blogsQueryRepository.findBlogsWithoutPagination(
-      jwtAtPayload.userId,
-    );
-    // find all posts made by blogger
-    const allPosts = await this.postsQueryRepository.findPostsForBlogger(
-      jwtAtPayload.userId,
-    );
-    // return all comments for posts
-    return this.commentsQueryRepository.getAllCommentsForAllPostsByBlogger(
-      allPosts,
-      allBlogs,
-      commentsForPostsPaginationDto,
-      jwtAtPayload.userId,
-    );
-  }
+  // @UseGuards(AuthGuard('jwt'))
+  // @Get('comments')
+  // async getAllCommentsForAllPostsByBlogger(
+  //   @Query() commentsForPostsPaginationDto: CommentsPaginationQueryDto,
+  //   @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
+  // ) {
+  //   // find all blogs that were not banned and made by blogger
+  //   const allBlogs = await this.blogsQueryRepository.findBlogsWithoutPagination(
+  //     jwtAtPayload.userId,
+  //   );
+  //   // find all posts made by blogger
+  //   const allPosts = await this.postsQueryRepository.findPostsForBlogger(
+  //     jwtAtPayload.userId,
+  //   );
+  //   // return all comments for posts
+  //   return this.commentsQueryRepository.getAllCommentsForAllPostsByBlogger(
+  //     allPosts,
+  //     allBlogs,
+  //     commentsForPostsPaginationDto,
+  //     jwtAtPayload.userId,
+  //   );
+  // }
   @UseGuards(AuthGuard('jwt'))
   @Post()
   @HttpCode(201)
   async createBlog(
     @Body() createBlogDto: CreateBlogDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  ): Promise<Blog> {
-    const blogId: string = await this.commandBus.execute(
+  ) {
+    return this.commandBus.execute(
       new CreateBlogCommand(createBlogDto, jwtAtPayload),
     );
-    const blog = await this.blogsQueryRepository.findBlog(blogId);
-    if (!blog) throw new NotFoundException();
-    return blog;
   }
   @UseGuards(AuthGuard('jwt'))
   @Post(':blogId/posts')

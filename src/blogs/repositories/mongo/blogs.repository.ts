@@ -1,5 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from './schemas/blog.schema';
+import { Blog, BlogDocument } from '../../schemas/blog.schema';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 

@@ -4,7 +4,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Post, PostDocument } from '../schemas/post.schema';
 import { PostsRepository } from '../posts.repository';
-import { BlogsRepository } from '../../blogs/blogs.repository';
+import { BlogsRepository } from '../../blogs/repositories/mongo/blogs.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtAtPayload } from '../../auth/strategies';
 
