@@ -4,6 +4,7 @@ import { BlogsRepository } from '../repositories/mongo/blogs.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../schemas/blog.schema';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BlogsSqlRepository } from '../repositories/PostgreSQL/blogs.sql.repository';
 
 export class UpdateBlogCommand {
   constructor(
@@ -15,19 +16,19 @@ export class UpdateBlogCommand {
 @CommandHandler(UpdateBlogCommand)
 export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
   constructor(
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsSQLRepository: BlogsSqlRepository,
     @InjectModel(Blog.name)
     private blogModel: BlogDocument,
   ) {}
   async execute(command: UpdateBlogCommand): Promise<void> {
     const { name, description, websiteUrl } = command.updateBlogDto;
-    const blog = await this.blogsRepository.findBlogById(command.blogId);
+    const blog = await this.blogsSQLRepository.findBlogById(command.blogId);
     if (!blog) throw new NotFoundException();
-    if (command.userId !== blog.blogOwnerInfo.userId)
-      throw new ForbiddenException();
-    blog.name = name;
-    blog.description = description;
-    blog.websiteUrl = websiteUrl;
-    await this.blogsRepository.save(blog);
+    if (command.userId !== blog.bloggerId) throw new ForbiddenException();
+
+    await this.blogsSQLRepository.updateBlog(
+      command.blogId,
+      command.updateBlogDto,
+    );
   }
 }

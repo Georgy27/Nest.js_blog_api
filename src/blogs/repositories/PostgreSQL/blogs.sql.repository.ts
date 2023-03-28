@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateBlogDto } from '../../dto/create.blog.dto';
 import { JwtAtPayload } from '../../../auth/strategies';
+import { BlogDocument } from '../../schemas/blog.schema';
+import { Blog } from '@prisma/client';
+import { UpdateBlogDto } from '../../dto/update.blog.dto';
 
 @Injectable()
 export class BlogsSqlRepository {
@@ -29,6 +32,32 @@ export class BlogsSqlRepository {
         isMembership: true,
       },
     });
+  }
+  async updateBlog(id: string, updateBlogDto: UpdateBlogDto): Promise<void> {
+    try {
+      await this.prisma.blog.update({
+        where: { id },
+        data: {
+          name: updateBlogDto.name,
+          description: updateBlogDto.description,
+          websiteUrl: updateBlogDto.websiteUrl,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+  async deleteBlog(id: string) {
+    try {
+      await this.prisma.blog.delete({ where: { id } });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+  async findBlogById(id: string): Promise<Blog | null> {
+    return this.prisma.blog.findUnique({ where: { id } });
   }
   async clearBlogs() {
     return this.prisma.blog.deleteMany({});
