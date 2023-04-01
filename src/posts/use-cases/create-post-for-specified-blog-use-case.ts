@@ -3,10 +3,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Post, PostDocument } from '../schemas/post.schema';
-import { PostsRepository } from '../posts.repository';
+import { PostsRepository } from '../repositories/mongo/posts.repository';
 import { BlogsRepository } from '../../blogs/repositories/mongo/blogs.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtAtPayload } from '../../auth/strategies';
+import { BlogsSqlRepository } from '../../blogs/repositories/PostgreSQL/blogs.sql.repository';
+import { PostsSqlRepository } from '../repositories/PostgreSQL/posts.sql.repository';
 
 export class CreatePostForSpecifiedBlogCommand {
   constructor(
@@ -21,30 +23,33 @@ export class CreatePostForSpecifiedBlogUseCase
   constructor(
     @InjectModel(Post.name)
     private postModel: Model<PostDocument>,
-    private readonly postsRepository: PostsRepository,
-    private readonly blogsRepository: BlogsRepository,
+    private readonly postsSqlRepository: PostsSqlRepository,
+    private readonly blogsSqlRepository: BlogsSqlRepository,
   ) {}
-  async execute(
-    command: CreatePostForSpecifiedBlogCommand,
-  ): Promise<string | null> {
+  async execute(command: CreatePostForSpecifiedBlogCommand) {
     // find a blog
-    const blog = await this.blogsRepository.findBlogById(
+    const blog = await this.blogsSqlRepository.findBlogById(
       command.createPostDto.blogId,
     );
     if (!blog) throw new NotFoundException();
-    if (blog.banInfo.isBanned)
-      throw new ForbiddenException("Can't create post for banned blog");
-    // validate
-    if (command.jwtAtPayload.userId !== blog.blogOwnerInfo.userId)
-      throw new ForbiddenException();
-    // create new post
-    const newPost = new this.postModel();
-    newPost.createPost(
-      command.createPostDto,
-      blog.name,
-      command.jwtAtPayload.userId,
-    );
 
-    return this.postsRepository.save(newPost);
+    if (blog.bannedBlogs?.isBanned)
+      throw new ForbiddenException("Can't create post for banned blog");
+
+    // validate
+    if (command.jwtAtPayload.userId !== blog.bloggerId)
+      throw new ForbiddenException(
+        "Can't create post for blog that doesn't belong to the current user",
+      );
+
+    // create new post
+    // const newPost = new this.postModel();
+    // newPost.createPost(
+    //   command.createPostDto,
+    //   blog.name,
+    //   command.jwtAtPayload.userId,
+    // );
+    //
+    // return this.postsRepository.save(newPost);
   }
 }

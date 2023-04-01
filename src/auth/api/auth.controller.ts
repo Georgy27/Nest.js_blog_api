@@ -32,7 +32,15 @@ import { LogoutUserCommand } from '../use-cases/logout-user-use-case';
 import { UsersSQLQueryRepository } from '../../users/repositories/PostgreSQL/users.sql.query.repository';
 import { PasswordRecoveryCommand } from '../use-cases/user-password-recovery-use-case';
 import { NewPasswordCommand } from '../use-cases/new-password-use-case';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { APIErrorResult } from '../../types';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -40,12 +48,25 @@ export class AuthController {
     private readonly usersSQLQueryRepository: UsersSQLQueryRepository,
     private commandBus: CommandBus,
   ) {}
+
   @Post('registration')
+  @ApiBody({ type: AuthDto })
+  @ApiResponse({
+    status: 204,
+    description:
+      'Input data is accepted. Email with confirmation code will be send to passed email address',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'If the inputModel has incorrect values (in particular if the user with the given email or password already exists)',
+    type: APIErrorResult,
+  })
   @HttpCode(204)
   async registration(@Body() authDto: AuthDto): Promise<void> {
     return this.commandBus.execute(new RegisterUserCommand(authDto));
   }
   @Post('registration-confirmation')
+  @ApiBody({ type: ConfirmationCodeDto })
   @HttpCode(204)
   async registrationConfirmation(
     @Body() codeDto: ConfirmationCodeDto,
@@ -53,6 +74,7 @@ export class AuthController {
     return this.commandBus.execute(new ConfirmEmailCommand(codeDto));
   }
   @Post('registration-email-resending')
+  @ApiBody({ type: EmailDto })
   @HttpCode(204)
   async registrationEmailResending(@Body() emailDto: EmailDto): Promise<void> {
     return this.commandBus.execute(
@@ -60,6 +82,7 @@ export class AuthController {
     );
   }
   @Post('login')
+  @ApiBody({ type: LoginDto })
   @HttpCode(200)
   async login(
     @Body() loginDto: LoginDto,
@@ -111,11 +134,13 @@ export class AuthController {
     return { accessToken };
   }
   @Post('password-recovery')
+  @ApiBody({ type: EmailDto })
   @HttpCode(204)
   async passwordRecovery(@Body() emailDto: EmailDto): Promise<void> {
     return this.commandBus.execute(new PasswordRecoveryCommand(emailDto));
   }
   @Post('new-password')
+  @ApiBody({ type: NewPasswordDto })
   @HttpCode(204)
   async newPassword(@Body() newPasswordDto: NewPasswordDto): Promise<void> {
     return this.commandBus.execute(new NewPasswordCommand(newPasswordDto));

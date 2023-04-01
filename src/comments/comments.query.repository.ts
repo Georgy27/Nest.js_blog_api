@@ -19,7 +19,7 @@ import { CommentViewModel } from './index';
 import { CommentsPaginationQueryDto } from '../helpers/pagination/dto/comments.pagination.dto';
 import { Post } from '../posts/schemas/post.schema';
 import { Blog } from '../blogs/schemas/blog.schema';
-import { PostsRepository } from '../posts/posts.repository';
+import { PostsRepository } from '../posts/repositories/mongo/posts.repository';
 
 @Injectable()
 export class CommentsQueryRepository {

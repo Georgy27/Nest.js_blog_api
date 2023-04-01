@@ -3,8 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Post, PostSchema } from './schemas/post.schema';
 import { PostsController } from './api/posts.controller';
 import { PostsService } from './posts.service';
-import { PostsQueryRepository } from './posts.query.repository';
-import { PostsRepository } from './posts.repository';
+import { PostsQueryRepository } from './repositories/mongo/posts.query.repository';
+import { PostsRepository } from './repositories/mongo/posts.repository';
 import { CommentsModule } from '../comments/comments.module';
 import { BlogsModule } from '../blogs/blogs.module';
 import { UsersModule } from '../users/users.module';
@@ -15,6 +15,8 @@ import { CreatePostForSpecifiedBlogUseCase } from './use-cases/create-post-for-s
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdatePostUseCase } from './use-cases/update-post-use-case';
 import { DeletePostUseCase } from './use-cases/delete-post-use-case';
+import { PostsSqlRepository } from './repositories/PostgreSQL/posts.sql.repository';
+import { PostsQuerySqlRepository } from './repositories/PostgreSQL/posts.query.sql.repository';
 
 const useCases = [
   CreatePostForSpecifiedBlogUseCase,
@@ -35,7 +37,20 @@ const useCases = [
     JwtModule.register({}),
   ],
   controllers: [PostsController],
-  providers: [PostsService, PostsQueryRepository, PostsRepository, ...useCases],
-  exports: [PostsQueryRepository, PostsService, PostsRepository],
+  providers: [
+    PostsService,
+    PostsQueryRepository,
+    PostsRepository,
+    PostsSqlRepository,
+    PostsQuerySqlRepository,
+    ...useCases,
+  ],
+  exports: [
+    PostsQueryRepository,
+    PostsService,
+    PostsRepository,
+    PostsSqlRepository,
+    PostsQuerySqlRepository,
+  ],
 })
 export class PostsModule {}

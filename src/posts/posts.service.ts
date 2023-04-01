@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from './schemas/post.schema';
 import { Model } from 'mongoose';
-import { PostsRepository } from './posts.repository';
+import { PostsRepository } from './repositories/mongo/posts.repository';
 import { BlogsRepository } from '../blogs/repositories/mongo/blogs.repository';
 import { CreatePostDto } from './dto/create.post.dto';
 import { UpdatePostDto } from './dto/update.post.dto';

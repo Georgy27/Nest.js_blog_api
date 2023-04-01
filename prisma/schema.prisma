@@ -93,6 +93,17 @@ model Blog {
   bannedUsers  BannedUsers[]
   Blogger      Blogger       @relation(fields: [bloggerId], references: [bloggerId], onDelete: Cascade)
   bloggerId    String
+  post         Post[]
+}
+
+model Post {
+  id               String @id @default(uuid())
+  title            String
+  shortDescription String
+  content          String
+  blog             Blog   @relation(fields: [blogId], references: [id])
+  blogId           String
+  createdAt        String
 }
 
 model BannedBlogs {

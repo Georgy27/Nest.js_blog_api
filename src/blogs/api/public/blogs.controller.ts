@@ -12,7 +12,7 @@ import { Blog } from '../../schemas/blog.schema';
 import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/posts.pagination.query.dto';
-import { PostsQueryRepository } from '../../../posts/posts.query.repository';
+import { PostsQueryRepository } from '../../../posts/repositories/mongo/posts.query.repository';
 import { PostsService } from '../../../posts/posts.service';
 import { PostViewModel } from '../../../posts';
 import { JwtService } from '@nestjs/jwt';

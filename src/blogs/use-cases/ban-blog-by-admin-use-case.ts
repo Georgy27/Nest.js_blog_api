@@ -6,7 +6,7 @@ import { BlogsRepository } from '../repositories/mongo/blogs.repository';
 import { UsersRepository } from '../../users/repositories/mongo/users.repository';
 import { BanBlogAdminDto } from '../dto/ban.blog.admin.dto';
 import { NotFoundException } from '@nestjs/common';
-import { PostsRepository } from '../../posts/posts.repository';
+import { PostsRepository } from '../../posts/repositories/mongo/posts.repository';
 
 export class BanBlogByAdminCommand {
   constructor(public blogId: string, public banBlogAdminDto: BanBlogAdminDto) {}

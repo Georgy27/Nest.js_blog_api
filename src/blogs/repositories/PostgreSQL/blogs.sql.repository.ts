@@ -56,8 +56,18 @@ export class BlogsSqlRepository {
       throw error;
     }
   }
-  async findBlogById(id: string): Promise<Blog | null> {
-    return this.prisma.blog.findUnique({ where: { id } });
+  async findBlogById(id: string) {
+    return this.prisma.blog.findUnique({
+      where: { id },
+      include: {
+        bannedBlogs: {
+          select: {
+            isBanned: true,
+            banDate: true,
+          },
+        },
+      },
+    });
   }
   async clearBlogs() {
     return this.prisma.blog.deleteMany({});

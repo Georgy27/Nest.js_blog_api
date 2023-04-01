@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../schemas/post.schema';
 import { Model } from 'mongoose';
-import { PostsRepository } from '../posts.repository';
+import { PostsRepository } from '../repositories/mongo/posts.repository';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { BlogsRepository } from '../../blogs/repositories/mongo/blogs.repository';
 

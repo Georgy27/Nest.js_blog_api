@@ -15,7 +15,7 @@ import { BlogsService } from '../../blogs.service';
 import { CreateBlogDto } from '../../dto/create.blog.dto';
 import { UpdateBlogDto } from '../../dto/update.blog.dto';
 import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
-import { PostsQueryRepository } from '../../../posts/posts.query.repository';
+import { PostsQueryRepository } from '../../../posts/repositories/mongo/posts.query.repository';
 import { CreatePostByBlogIdDto } from '../../dto/create.post.blogId.dto';
 import { PostsService } from '../../../posts/posts.service';
 import { JwtService } from '@nestjs/jwt';

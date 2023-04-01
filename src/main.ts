@@ -6,7 +6,7 @@ import { prepareErrorResult } from './pipes/validation.pipe';
 import { HttpExceptionFilter } from './http.exception-filter';
 import cookieParser from 'cookie-parser';
 import { TrimPipe } from './pipes/trim.pipe';
-
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -24,6 +24,15 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
+  const config = new DocumentBuilder()
+    .setTitle('Blogger_Api')
+    .setDescription('The blogs API description')
+    .setVersion('1.0')
+    .addTag('blogs')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(3000);
 }
 bootstrap();

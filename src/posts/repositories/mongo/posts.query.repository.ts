@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { PaginationViewModel } from '../helpers/pagination/pagination.view.model.wrapper';
-import { Post, PostDocument } from './schemas/post.schema';
+import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
+import { Post, PostDocument } from '../../schemas/post.schema';
 import { FilterQuery, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { PostReactionViewModel } from '../helpers/reaction/reaction.view.model.wrapper';
+import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
 import {
   reactionStatusEnum,
   reactionStatusEnumKeys,
-} from '../helpers/reaction';
+} from '../../../helpers/reaction';
 import {
   Reaction,
   ReactionDocument,
-} from '../reactions/schemas/reaction.schema';
-import { PostViewModel } from './index';
+} from '../../../reactions/schemas/reaction.schema';
+import { PostViewModel } from '../../index';
 
 @Injectable()
 export class PostsQueryRepository {
