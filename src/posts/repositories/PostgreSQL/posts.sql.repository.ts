@@ -50,4 +50,7 @@ export class PostsSqlRepository {
       },
     });
   }
+  async deletePostById(id: string) {
+    return this.prisma.post.delete({ where: { id } });
+  }
 }
