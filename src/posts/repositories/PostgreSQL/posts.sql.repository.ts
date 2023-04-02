@@ -3,6 +3,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { CreatePostDto } from '../../dto/create.post.dto';
 import { Post } from '@prisma/client';
 import { CreatePostModel } from '../../types';
+import { UpdatePostForBloggerDto } from '../../../blogs/dto/update.post.blogger.dto';
 
 @Injectable()
 export class PostsSqlRepository {
@@ -30,6 +31,22 @@ export class PostsSqlRepository {
             name: true,
           },
         },
+      },
+    });
+  }
+  async findPostById(id: string): Promise<Post | null> {
+    return this.prisma.post.findUnique({ where: { id } });
+  }
+  async updatePostById(
+    id: string,
+    updatePostForBloggerDto: UpdatePostForBloggerDto,
+  ) {
+    return this.prisma.post.update({
+      where: { id },
+      data: {
+        title: updatePostForBloggerDto.title,
+        content: updatePostForBloggerDto.content,
+        shortDescription: updatePostForBloggerDto.shortDescription,
       },
     });
   }
