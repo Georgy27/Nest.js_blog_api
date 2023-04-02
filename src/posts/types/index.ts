@@ -1,4 +1,5 @@
-import { reactionStatusEnumKeys } from '../helpers/reaction';
+import { reactionStatusEnumKeys } from '../../helpers/reaction';
+import { Post } from '@prisma/client';
 
 export interface extendedLikesInfo {
   likesCount: number;
@@ -11,7 +12,9 @@ export interface newestLikes {
   userId: string;
   login: string;
 }
-
+export interface CreatePostModel extends Post {
+  blog: { name: string };
+}
 export type PostViewModel = {
   id: string;
   title: string;

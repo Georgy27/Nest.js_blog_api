@@ -36,6 +36,9 @@ import { CommentsQueryRepository } from '../../../comments/comments.query.reposi
 import { BlogsSQLQueryRepository } from '../../repositories/PostgreSQL/blogs.query.sql.repository';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { BlogViewModel } from '../../types';
+import { CreatePostModel } from '../../../posts/types';
+import { PostsQuerySqlRepository } from '../../../posts/repositories/PostgreSQL/posts.query.sql.repository';
+import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
@@ -44,6 +47,7 @@ export class BloggersController {
     private readonly blogsService: BlogsService,
     private readonly blogsSQLQueryRepository: BlogsSQLQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
+    private readonly postsQuerySqlRepository: PostsQuerySqlRepository,
     private readonly postsService: PostsService,
     private readonly commentsQueryRepository: CommentsQueryRepository,
     private jwtService: JwtService,
@@ -107,12 +111,12 @@ export class BloggersController {
   ) {
     // create post
     const newCreatePostDto = { ...createPostDto, blogId: blogId };
-    const newPostId: string | null = await this.commandBus.execute(
-      new CreatePostForSpecifiedBlogCommand(newCreatePostDto, jwtAtPayload),
-    );
-    if (!newPostId) throw new NotFoundException();
+    const newPost = await this.commandBus.execute<
+      CreatePostForSpecifiedBlogCommand,
+      CreatePostModel
+    >(new CreatePostForSpecifiedBlogCommand(newCreatePostDto, jwtAtPayload));
     // return post to user
-    return this.postsQueryRepository.getMappedPost(newPostId);
+    return new PostReactionViewModel(newPost);
   }
   @UseGuards(AuthGuard('jwt'))
   @Put(':id')

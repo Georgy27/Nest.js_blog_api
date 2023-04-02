@@ -65,25 +65,25 @@ export class PostsController {
     if (!post) throw new NotFoundException();
     return post;
   }
-  @UseGuards(ExtractUserPayloadFromAt)
-  @Get(':postId/comments')
-  async getAllCommentsForPostId(
-    @Query() postsPaginationDto: PostPaginationQueryDto,
-    @Param('postId') postId: string,
-    @GetUserIdFromAtDecorator() userId: string | null,
-  ): Promise<PaginationViewModel<CommentViewModel[]>> {
-    const isPost = await this.postsQueryRepository.getMappedPost(postId);
-    if (!isPost) throw new NotFoundException();
-
-    return this.commentsQueryRepository.findCommentsByPostId(
-      postsPaginationDto.pageSize,
-      postsPaginationDto.sortBy,
-      postsPaginationDto.pageNumber,
-      postsPaginationDto.sortDirection,
-      postId,
-      userId,
-    );
-  }
+  // @UseGuards(ExtractUserPayloadFromAt)
+  // @Get(':postId/comments')
+  // async getAllCommentsForPostId(
+  //   @Query() postsPaginationDto: PostPaginationQueryDto,
+  //   @Param('postId') postId: string,
+  //   @GetUserIdFromAtDecorator() userId: string | null,
+  // ): Promise<PaginationViewModel<CommentViewModel[]>> {
+  //   const isPost = await this.postsQueryRepository.getMappedPost(postId);
+  //   if (!isPost) throw new NotFoundException();
+  //
+  //   return this.commentsQueryRepository.findCommentsByPostId(
+  //     postsPaginationDto.pageSize,
+  //     postsPaginationDto.sortBy,
+  //     postsPaginationDto.pageNumber,
+  //     postsPaginationDto.sortDirection,
+  //     postId,
+  //     userId,
+  //   );
+  // }
   @UseGuards(AuthGuard('jwt'))
   @Post(':postId/comments')
   @HttpCode(201)

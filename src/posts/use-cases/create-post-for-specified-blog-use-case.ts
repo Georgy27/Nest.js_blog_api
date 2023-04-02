@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtAtPayload } from '../../auth/strategies';
 import { BlogsSqlRepository } from '../../blogs/repositories/PostgreSQL/blogs.sql.repository';
 import { PostsSqlRepository } from '../repositories/PostgreSQL/posts.sql.repository';
+import { CreatePostModel } from '../types';
 
 export class CreatePostForSpecifiedBlogCommand {
   constructor(
@@ -26,7 +27,9 @@ export class CreatePostForSpecifiedBlogUseCase
     private readonly postsSqlRepository: PostsSqlRepository,
     private readonly blogsSqlRepository: BlogsSqlRepository,
   ) {}
-  async execute(command: CreatePostForSpecifiedBlogCommand) {
+  async execute(
+    command: CreatePostForSpecifiedBlogCommand,
+  ): Promise<CreatePostModel> {
     // find a blog
     const blog = await this.blogsSqlRepository.findBlogById(
       command.createPostDto.blogId,
@@ -43,13 +46,8 @@ export class CreatePostForSpecifiedBlogUseCase
       );
 
     // create new post
-    // const newPost = new this.postModel();
-    // newPost.createPost(
-    //   command.createPostDto,
-    //   blog.name,
-    //   command.jwtAtPayload.userId,
-    // );
-    //
-    // return this.postsRepository.save(newPost);
+    return this.postsSqlRepository.createPostForSpecifiedBlog(
+      command.createPostDto,
+    );
   }
 }

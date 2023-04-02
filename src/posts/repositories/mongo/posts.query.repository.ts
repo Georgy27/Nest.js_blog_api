@@ -12,7 +12,7 @@ import {
   Reaction,
   ReactionDocument,
 } from '../../../reactions/schemas/reaction.schema';
-import { PostViewModel } from '../../index';
+import { PostViewModel } from '../../types';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -80,16 +80,16 @@ export class PostsQueryRepository {
     if (!newPost) return null;
     return this.addReactionsInfoToPost(newPost, userId);
   }
-  async getMappedPost(id: string): Promise<PostViewModel | null> {
-    const post = await this.postModel
-      .findOne(
-        { id, isUserBanned: false, isBlogBanned: false },
-        { _id: false, isUserBanned: false },
-      )
-      .lean();
-    if (!post) return null;
-    return new PostReactionViewModel(post);
-  }
+  // async getMappedPost(id: string): Promise<PostViewModel | null> {
+  //   const post = await this.postModel
+  //     .findOne(
+  //       { id, isUserBanned: false, isBlogBanned: false },
+  //       { _id: false, isUserBanned: false },
+  //     )
+  //     .lean();
+  //   if (!post) return null;
+  //   return new PostReactionViewModel(post);
+  // }
   private async addReactionsInfoToPost(post: Post, userId: string | null) {
     const likes = await this.reactionModel.countDocuments({
       parentId: post.id,

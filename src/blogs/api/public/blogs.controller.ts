@@ -14,7 +14,7 @@ import { PaginationViewModel } from '../../../helpers/pagination/pagination.view
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/posts.pagination.query.dto';
 import { PostsQueryRepository } from '../../../posts/repositories/mongo/posts.query.repository';
 import { PostsService } from '../../../posts/posts.service';
-import { PostViewModel } from '../../../posts';
+import { PostViewModel } from '../../../posts/types';
 import { JwtService } from '@nestjs/jwt';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
