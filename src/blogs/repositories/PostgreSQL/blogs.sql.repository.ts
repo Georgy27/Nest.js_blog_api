@@ -26,6 +26,7 @@ export class BlogsSqlRepository {
         },
       },
       select: {
+        id: true,
         name: true,
         description: true,
         websiteUrl: true,
