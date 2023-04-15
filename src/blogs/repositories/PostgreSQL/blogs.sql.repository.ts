@@ -70,6 +70,18 @@ export class BlogsSqlRepository {
       },
     });
   }
+
+  async updateBanBlogStatus(
+    blogId: string,
+    updateBlogBanInfo:
+      | { isBanned: true; banDate: string }
+      | { isBanned: false; banDate: null },
+  ) {
+    return this.prisma.bannedBlogs.update({
+      where: { blogId },
+      data: updateBlogBanInfo,
+    });
+  }
   async clearBlogs() {
     return this.prisma.blog.deleteMany({});
   }

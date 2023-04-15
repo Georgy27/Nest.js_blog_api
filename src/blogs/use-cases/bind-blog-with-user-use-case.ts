@@ -1,10 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../schemas/blog.schema';
-import { BlogsRepository } from '../repositories/mongo/blogs.repository';
 import { BadRequestException } from '@nestjs/common';
-import { UsersRepository } from '../../users/repositories/mongo/users.repository';
-import { Model } from 'mongoose';
+import { BlogsSqlRepository } from '../repositories/PostgreSQL/blogs.sql.repository';
+import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
 
 export class BindBlogWithUserCommand {
   constructor(public blogId: string, public userId: string) {}
@@ -14,34 +13,30 @@ export class BindBlogWithUserUseCase
   implements ICommandHandler<BindBlogWithUserCommand>
 {
   constructor(
-    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
-    private readonly blogsRepository: BlogsRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly blogsSqlRepository: BlogsSqlRepository,
+    private readonly usersSqlRepository: UsersSQLRepository,
   ) {}
 
   async execute(command: BindBlogWithUserCommand): Promise<void> {
     // find blog
-    const isBlog = await this.blogsRepository.findBlogById(command.blogId);
+    const isBlog = await this.blogsSqlRepository.findBlogById(command.blogId);
     if (!isBlog)
       throw new BadRequestException({
         message: 'Blog does not exist',
         field: 'blogId',
       });
-    if (isBlog.blogOwnerInfo.userId)
+    if (isBlog.bloggerId)
       throw new BadRequestException({
         message: 'User already bound to this blog',
         field: 'blogId',
       });
     // find user
-    const isUser = await this.usersRepository.findUserById(command.userId);
+    const isUser = await this.usersSqlRepository.findUserById(command.userId);
     if (!isUser)
       throw new BadRequestException({
         message: 'User with the given id does not exist',
         field: 'userId',
       });
     // bind blog with user
-    isBlog.blogOwnerInfo.userId = isUser.id;
-    isBlog.blogOwnerInfo.userLogin = isUser.accountData.login;
-    await this.blogsRepository.save(isBlog);
   }
 }

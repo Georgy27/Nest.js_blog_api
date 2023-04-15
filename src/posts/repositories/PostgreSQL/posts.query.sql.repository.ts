@@ -18,17 +18,29 @@ export class PostsQuerySqlRepository {
     userId: string | null,
     blogId?: string,
   ) {
+    const postFilter = {
+      AND: [
+        {
+          blogId: {
+            contains: blogId ?? '',
+          },
+        },
+        {
+          blog: {
+            bannedBlogs: {
+              isBanned: false,
+            },
+          },
+        },
+      ],
+    };
     const posts: PostDbModel[] = await this.prisma.post.findMany({
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
       orderBy: {
         [sortBy]: sortDirection,
       },
-      where: {
-        blogId: {
-          contains: blogId ?? '',
-        },
-      },
+      where: postFilter,
       select: {
         id: true,
         title: true,
@@ -44,11 +56,7 @@ export class PostsQuerySqlRepository {
       },
     });
     const numberOfPosts = await this.prisma.post.count({
-      where: {
-        blogId: {
-          contains: blogId ?? '',
-        },
-      },
+      where: postFilter,
     });
     const postsWithLikesInfo = posts.map((post) => {
       return new PostReactionViewModel(post);
@@ -74,10 +82,16 @@ export class PostsQuerySqlRepository {
         blog: {
           select: {
             name: true,
+            bannedBlogs: {
+              select: {
+                isBanned: true,
+              },
+            },
           },
         },
       },
     });
+    // if (post?.blog?.bannedBlogs?.isBanned) return [];
     if (post) return new PostReactionViewModel(post);
     return null;
   }

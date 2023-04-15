@@ -46,8 +46,6 @@ export class PostsController {
     @Query() postsPaginationDto: PostPaginationQueryDto,
     @GetUserIdFromAtDecorator() userId: string | null,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
-    // // check if the blog is banned
-    // const isBlog = await this.blogsQueryRepository.findBlogByUserId(userId);
     return this.postsSqlQueryRepository.findPosts(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,

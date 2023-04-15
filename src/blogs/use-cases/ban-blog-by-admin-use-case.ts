@@ -1,12 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from '../schemas/blog.schema';
-import { Model } from 'mongoose';
-import { BlogsRepository } from '../repositories/mongo/blogs.repository';
-import { UsersRepository } from '../../users/repositories/mongo/users.repository';
 import { BanBlogAdminDto } from '../dto/ban.blog.admin.dto';
 import { NotFoundException } from '@nestjs/common';
-import { PostsRepository } from '../../posts/repositories/mongo/posts.repository';
+import { PostsSqlRepository } from '../../posts/repositories/PostgreSQL/posts.sql.repository';
+import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
+import { BlogsSqlRepository } from '../repositories/PostgreSQL/blogs.sql.repository';
 
 export class BanBlogByAdminCommand {
   constructor(public blogId: string, public banBlogAdminDto: BanBlogAdminDto) {}
@@ -16,19 +13,18 @@ export class BanBlogByAdminUseCase
   implements ICommandHandler<BanBlogByAdminCommand>
 {
   constructor(
-    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
-    private readonly blogsRepository: BlogsRepository,
-    private readonly usersRepository: UsersRepository,
-    private readonly postsRepository: PostsRepository,
+    private readonly blogsSqlRepository: BlogsSqlRepository,
+    private readonly usersSqlRepository: UsersSQLRepository,
+    private readonly postsSqlRepository: PostsSqlRepository,
   ) {}
 
   async execute(command: BanBlogByAdminCommand): Promise<void> {
     // find blog
-    const isBlog = await this.blogsRepository.findBlogById(command.blogId);
+    const isBlog = await this.blogsSqlRepository.findBlogById(command.blogId);
     if (!isBlog)
       throw new NotFoundException('blog with this id does not exist');
     // ban or unban the blog
-    const updateBanInfo = command.banBlogAdminDto.isBanned
+    const updateBlogBanInfo = command.banBlogAdminDto.isBanned
       ? {
           isBanned: command.banBlogAdminDto.isBanned,
           banDate: new Date().toISOString(),
@@ -37,12 +33,10 @@ export class BanBlogByAdminUseCase
           isBanned: command.banBlogAdminDto.isBanned,
           banDate: null,
         };
-    isBlog.banInfo = updateBanInfo;
-    await this.blogsRepository.save(isBlog);
-    // change status for post
-    await this.postsRepository.updateBlogBanStatus(
+
+    await this.blogsSqlRepository.updateBanBlogStatus(
       command.blogId,
-      command.banBlogAdminDto.isBanned,
+      updateBlogBanInfo,
     );
   }
 }

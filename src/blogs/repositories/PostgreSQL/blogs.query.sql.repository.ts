@@ -41,8 +41,19 @@ export class BlogsSQLQueryRepository {
   }
 
   async findBlog(id: string) {
-    return this.prisma.blog.findUnique({
-      where: { id },
+    return this.prisma.blog.findFirst({
+      where: {
+        AND: [
+          {
+            id,
+          },
+          {
+            bannedBlogs: {
+              isBanned: false,
+            },
+          },
+        ],
+      },
       select: {
         id: true,
         name: true,
@@ -106,18 +117,18 @@ export class BlogsSQLQueryRepository {
         websiteUrl: true,
         createdAt: true,
         isMembership: true,
+        bannedBlogs: {
+          select: {
+            isBanned: true,
+            banDate: true,
+          },
+        },
         blogger: {
           select: {
             user: {
               select: {
                 id: true,
                 login: true,
-                banInfo: {
-                  select: {
-                    isBanned: true,
-                    banDate: true,
-                  },
-                },
               },
             },
           },
@@ -137,8 +148,8 @@ export class BlogsSQLQueryRepository {
           userLogin: blog.blogger.user.login,
         },
         banInfo: {
-          isBanned: blog.blogger.user.banInfo?.isBanned,
-          banDate: blog.blogger.user.banInfo?.banDate,
+          isBanned: blog.bannedBlogs?.isBanned,
+          banDate: blog.bannedBlogs?.banDate,
         },
       };
     });

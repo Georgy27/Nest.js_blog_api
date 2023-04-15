@@ -17,10 +17,8 @@ export class BlogsRepository {
     const result = await this.blogModel.deleteOne({ id });
     return result.deletedCount === 1;
   }
+
   async clearBlogs() {
     await this.blogModel.deleteMany({});
   }
-  // async addBannedUser(){
-  //   await this.blogModel.
-  // }
 }

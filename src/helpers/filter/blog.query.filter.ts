@@ -59,5 +59,9 @@ export const blogQueryFilter = (
       ],
     };
   }
-  return {};
+  return {
+    bannedBlogs: {
+      isBanned: false,
+    },
+  };
 };

@@ -39,7 +39,9 @@ export class BlogsController {
     );
   }
   @Get(':id')
-  async getBlogById(@Param('id') id: string): Promise<BlogViewModel | null> {
+  async getBlogById(
+    @Param('id') id: string,
+  ): Promise<BlogViewModel | null | []> {
     const blog = await this.blogsSqlQueryRepository.findBlog(id);
     if (!blog) throw new NotFoundException();
     return blog;
