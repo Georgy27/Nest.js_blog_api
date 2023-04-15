@@ -28,13 +28,14 @@ import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-f
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
 import { BlogsQueryRepository } from '../../blogs/repositories/mongo/blogs.query.repository';
 import { PostViewModel } from '../types';
+import { PostsQuerySqlRepository } from '../repositories/PostgreSQL/posts.query.sql.repository';
 
 @SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
-    private readonly postsQueryRepository: PostsQueryRepository,
+    private readonly postsSqlQueryRepository: PostsQuerySqlRepository,
     private readonly commentsQueryRepository: CommentsQueryRepository,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private jwtService: JwtService,
@@ -47,7 +48,7 @@ export class PostsController {
   ): Promise<PaginationViewModel<PostViewModel[]>> {
     // // check if the blog is banned
     // const isBlog = await this.blogsQueryRepository.findBlogByUserId(userId);
-    return this.postsQueryRepository.findPosts(
+    return this.postsSqlQueryRepository.findPosts(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
       postsPaginationDto.pageNumber,
@@ -60,8 +61,8 @@ export class PostsController {
   async getPostById(
     @Param('id') id: string,
     @GetUserIdFromAtDecorator() userId: string | null,
-  ): Promise<PostReactionViewModel> {
-    const post = await this.postsQueryRepository.findPost(id, userId);
+  ) {
+    const post = await this.postsSqlQueryRepository.findPost(id, userId);
 
     if (!post) throw new NotFoundException();
     return post;

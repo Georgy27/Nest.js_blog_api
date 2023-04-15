@@ -3,6 +3,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { CreatePostModel, PostDbModel, PostViewModel } from '../../types';
 import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
+import { Post } from '@prisma/client';
 @Injectable()
 export class PostsQuerySqlRepository {
   constructor(private prisma: PrismaService) {}
@@ -58,5 +59,26 @@ export class PostsQuerySqlRepository {
       pageSize,
       postsWithLikesInfo,
     );
+  }
+
+  async findPost(id: string, userId: string | null) {
+    const post = await this.prisma.post.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        shortDescription: true,
+        content: true,
+        createdAt: true,
+        blogId: true,
+        blog: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+    if (post) return new PostReactionViewModel(post);
+    return null;
   }
 }
