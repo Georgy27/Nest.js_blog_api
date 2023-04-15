@@ -87,6 +87,7 @@ export class UsersSQLQueryRepository {
         [sortBy]: sortDirection,
       },
       where: {
+        blogId: blog.id,
         login: { contains: searchLoginTerm ?? '', mode: 'insensitive' },
       },
     });
@@ -104,6 +105,7 @@ export class UsersSQLQueryRepository {
     });
     const numberOfBannedUsers = await this.prisma.bannedUsers.count({
       where: {
+        blogId: blog.id,
         login: { contains: searchLoginTerm ?? '', mode: 'insensitive' },
       },
     });
