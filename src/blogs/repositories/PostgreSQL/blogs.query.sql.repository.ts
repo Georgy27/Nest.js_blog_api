@@ -102,14 +102,18 @@ export class BlogsSQLQueryRepository {
     pageNumber: number,
     sortDirection: string,
   ) {
-    const blogFilter = blogQueryFilter(searchNameTerm);
     const blogs = await this.prisma.blog.findMany({
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
       orderBy: {
         [sortBy]: sortDirection,
       },
-      where: blogFilter,
+      where: {
+        name: {
+          contains: searchNameTerm ?? '',
+          mode: 'insensitive',
+        },
+      },
       select: {
         id: true,
         name: true,
@@ -153,7 +157,14 @@ export class BlogsSQLQueryRepository {
         },
       };
     });
-    const numberOfBlogs = await this.prisma.blog.count({ where: blogFilter });
+    const numberOfBlogs = await this.prisma.blog.count({
+      where: {
+        name: {
+          contains: searchNameTerm ?? '',
+          mode: 'insensitive',
+        },
+      },
+    });
     return new PaginationViewModel(
       numberOfBlogs,
       pageNumber,
