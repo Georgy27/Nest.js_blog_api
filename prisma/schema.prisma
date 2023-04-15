@@ -92,7 +92,7 @@ model Blog {
   isMembership Boolean
   bannedBlogs  BannedBlogs?
   bannedUsers  BannedUsers[]
-  Blogger      Blogger       @relation(fields: [bloggerId], references: [bloggerId], onDelete: Cascade)
+  blogger      Blogger       @relation(fields: [bloggerId], references: [bloggerId], onDelete: Cascade)
   bloggerId    String
   post         Post[]
 }

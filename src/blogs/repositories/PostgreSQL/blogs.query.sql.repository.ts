@@ -83,4 +83,71 @@ export class BlogsSQLQueryRepository {
 
     return new PaginationViewModel(numberOfBlogs, pageNumber, pageSize, blogs);
   }
+
+  async findBlogsForSuperAdmin(
+    searchNameTerm: string | null,
+    pageSize: number,
+    sortBy: string,
+    pageNumber: number,
+    sortDirection: string,
+  ) {
+    const blogFilter = blogQueryFilter(searchNameTerm);
+    const blogs = await this.prisma.blog.findMany({
+      skip: (pageNumber - 1) * pageSize,
+      take: pageSize,
+      orderBy: {
+        [sortBy]: sortDirection,
+      },
+      where: blogFilter,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        websiteUrl: true,
+        createdAt: true,
+        isMembership: true,
+        blogger: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                login: true,
+                banInfo: {
+                  select: {
+                    isBanned: true,
+                    banDate: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    const mappedViewBlogs = blogs.map((blog) => {
+      return {
+        id: blog.id,
+        name: blog.name,
+        description: blog.description,
+        websiteUrl: blog.websiteUrl,
+        createdAt: blog.createdAt,
+        isMembership: blog.isMembership,
+        blogOwnerInfo: {
+          userId: blog.blogger.user.id,
+          userLogin: blog.blogger.user.login,
+        },
+        banInfo: {
+          isBanned: blog.blogger.user.banInfo?.isBanned,
+          banDate: blog.blogger.user.banInfo?.banDate,
+        },
+      };
+    });
+    const numberOfBlogs = await this.prisma.blog.count({ where: blogFilter });
+    return new PaginationViewModel(
+      numberOfBlogs,
+      pageNumber,
+      pageSize,
+      mappedViewBlogs,
+    );
+  }
 }
