@@ -8,7 +8,6 @@ export class BanUserByBloggerDto {
   @IsNotEmpty()
   @IsString()
   banReason: string;
-  @BlogIsExist()
   @IsString()
   blogId: string;
 }

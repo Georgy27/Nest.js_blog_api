@@ -3,8 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import {
   BanInfo,
+  BannedUsers,
   EmailConfirmation,
   PasswordRecovery,
+  User,
   User as UserModel,
 } from '@prisma/client';
 import { UserViewModel } from '../../types/user.view.model';
@@ -15,6 +17,7 @@ import {
   UserWithEmailConfirmation,
   UserWithPasswordRecoveryInfo,
 } from '../../../auth/types';
+import { BanUserByBloggerDto } from '../../dto/ban.user.blogger.dto';
 @Injectable()
 export class UsersSQLRepository {
   constructor(private prisma: PrismaService) {}
@@ -75,6 +78,41 @@ export class UsersSQLRepository {
         banReason: updateBanInfo.banReason,
       },
     });
+  }
+
+  async findBannedUserByBlogger(
+    userId: string,
+    bloggerId: string,
+    blogId: string,
+  ): Promise<BannedUsers | null> {
+    return this.prisma.bannedUsers.findFirst({
+      where: {
+        userId,
+        bloggerId,
+        blogId,
+      },
+    });
+  }
+  async banUserByBlogger(
+    bloggerId: string,
+    user: User,
+    banUserByBloggerDto: BanUserByBloggerDto,
+  ) {
+    return this.prisma.bannedUsers.create({
+      data: {
+        login: user.login,
+        isBanned: banUserByBloggerDto.isBanned,
+        banDate: new Date().toISOString(),
+        banReason: banUserByBloggerDto.banReason,
+        blogId: banUserByBloggerDto.blogId,
+        bloggerId: bloggerId,
+        userId: user.id,
+        createdAt: new Date().toISOString(),
+      },
+    });
+  }
+  async unbanUserByBlogger(id: string) {
+    return this.prisma.bannedUsers.delete({ where: { id } });
   }
   async getEmailConfirmationCode(
     userEmail: string,
@@ -198,6 +236,7 @@ export class UsersSQLRepository {
       },
     });
   }
+
   async clearUsers() {
     return this.prisma.user.deleteMany({});
   }

@@ -19,8 +19,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
 import { JwtAtPayload } from '../../../auth/strategies';
 import { UsersBannedByBloggerPaginationQueryDto } from '../../../helpers/pagination/dto/users-banned-by-blogger.pagination.query.dto';
-import { BlogsQueryRepository } from '../../../blogs/repositories/mongo/blogs.query.repository';
-import { BlogsRepository } from '../../../blogs/repositories/mongo/blogs.repository';
+import { BlogsSQLQueryRepository } from '../../../blogs/repositories/PostgreSQL/blogs.query.sql.repository';
+import { BlogsSqlRepository } from '../../../blogs/repositories/PostgreSQL/blogs.sql.repository';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('blogger/users')
@@ -28,8 +28,8 @@ export class UsersBloggerController {
   constructor(
     private readonly usersService: UsersService,
     private readonly usersQueryRepository: UsersQueryRepository,
-    private readonly blogsQueryRepository: BlogsQueryRepository,
-    private readonly blogsRepository: BlogsRepository,
+    private readonly blogsSqlQueryRepository: BlogsSQLQueryRepository,
+    private readonly blogsSqlRepository: BlogsSqlRepository,
     private commandBus: CommandBus,
   ) {}
   @Get('blog/:id')
@@ -39,16 +39,16 @@ export class UsersBloggerController {
     usersBannedByBloggerPaginationDto: UsersBannedByBloggerPaginationQueryDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ) {
-    const blog = await this.blogsRepository.findBlogById(id);
+    const blog = await this.blogsSqlRepository.findBlogById(id);
     if (!blog) throw new NotFoundException('blog is not found');
-    console.log(blog);
-    if (blog.blogOwnerInfo.userId !== jwtAtPayload.userId)
+    if (blog.bloggerId !== jwtAtPayload.userId)
       throw new ForbiddenException(
         'can not view the blogs that belong to another blogger',
       );
-    if (blog.banInfo.isBanned)
+    if (blog?.bannedBlogs?.isBanned)
       throw new ForbiddenException('blog is banned by admin');
-    return this.blogsQueryRepository.getBannedUsersForBlog(
+
+    return this.blogsSqlQueryRepository.getBannedUsersForBlog(
       blog,
       usersBannedByBloggerPaginationDto,
     );

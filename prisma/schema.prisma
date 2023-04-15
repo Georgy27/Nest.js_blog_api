@@ -64,6 +64,7 @@ model BannedUsers {
   isBanned  Boolean
   banDate   String
   banReason String
+  createdAt String
   blog      Blog     @relation(fields: [blogId], references: [id])
   blogId    String
   bloggerId String?

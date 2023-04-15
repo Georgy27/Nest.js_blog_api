@@ -5,6 +5,7 @@ import { JwtAtPayload } from '../../../auth/strategies';
 import { BlogDocument } from '../../schemas/blog.schema';
 import { Blog } from '@prisma/client';
 import { UpdateBlogDto } from '../../dto/update.blog.dto';
+import { BlogWithBannInfoModel } from '../../types';
 
 @Injectable()
 export class BlogsSqlRepository {
@@ -56,7 +57,7 @@ export class BlogsSqlRepository {
       throw error;
     }
   }
-  async findBlogById(id: string) {
+  async findBlogById(id: string): Promise<BlogWithBannInfoModel | null> {
     return this.prisma.blog.findUnique({
       where: { id },
       include: {
