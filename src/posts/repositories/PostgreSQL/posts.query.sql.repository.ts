@@ -91,7 +91,7 @@ export class PostsQuerySqlRepository {
         },
       },
     });
-    // if (post?.blog?.bannedBlogs?.isBanned) return [];
+    if (post?.blog?.bannedBlogs?.isBanned) return null;
     if (post) return new PostReactionViewModel(post);
     return null;
   }
