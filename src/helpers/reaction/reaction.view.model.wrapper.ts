@@ -1,5 +1,5 @@
 import { extendedLikesInfo } from './types/posts.reaction.query';
-import { CreatePostModel } from '../../posts/types';
+import { PostDbModel } from '../../posts/types';
 
 export class PostReactionViewModel {
   id: string;
@@ -11,7 +11,7 @@ export class PostReactionViewModel {
   createdAt: string;
   extendedLikesInfo: extendedLikesInfo;
 
-  constructor(post: CreatePostModel) {
+  constructor(post: PostDbModel) {
     this.id = post.id;
     this.title = post.title;
     this.shortDescription = post.shortDescription;

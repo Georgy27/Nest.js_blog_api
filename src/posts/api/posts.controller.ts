@@ -27,6 +27,7 @@ import { JwtAtPayload } from '../../auth/strategies';
 import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-from-AT.guard';
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
 import { BlogsQueryRepository } from '../../blogs/repositories/mongo/blogs.query.repository';
+import { PostViewModel } from '../types';
 
 @SkipThrottle()
 @Controller('posts')
@@ -43,7 +44,7 @@ export class PostsController {
   async getAllPosts(
     @Query() postsPaginationDto: PostPaginationQueryDto,
     @GetUserIdFromAtDecorator() userId: string | null,
-  ): Promise<PaginationViewModel<PostReactionViewModel[]>> {
+  ): Promise<PaginationViewModel<PostViewModel[]>> {
     // // check if the blog is banned
     // const isBlog = await this.blogsQueryRepository.findBlogByUserId(userId);
     return this.postsQueryRepository.findPosts(
@@ -84,37 +85,37 @@ export class PostsController {
   //     userId,
   //   );
   // }
-  @UseGuards(AuthGuard('jwt'))
-  @Post(':postId/comments')
-  @HttpCode(201)
-  async createCommentForSpecifiedPost(
-    @Param('postId') postId: string,
-    @Body() createCommentForPostDto: CreateCommentForPostDto,
-    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  ): Promise<CommentViewModel> {
-    const newCommentId = await this.postsService.createCommentForSpecifiedPost(
-      postId,
-      createCommentForPostDto,
-      jwtAtPayload.userId,
-    );
-    const commentToView = await this.commentsQueryRepository.getMappedComment(
-      newCommentId,
-    );
-    if (!commentToView) throw new NotFoundException();
-    return commentToView;
-  }
-  @UseGuards(AuthGuard('jwt'))
-  @Put(':postId/like-status')
-  @HttpCode(204)
-  async updateReactionToPost(
-    @Param('postId') postId: string,
-    @Body() updateReactionPostDto: UpdateReactionPostDto,
-    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  ): Promise<void> {
-    return this.postsService.updateReactionToPost(
-      postId,
-      updateReactionPostDto,
-      jwtAtPayload.userId,
-    );
-  }
+  // @UseGuards(AuthGuard('jwt'))
+  // @Post(':postId/comments')
+  // @HttpCode(201)
+  // async createCommentForSpecifiedPost(
+  //   @Param('postId') postId: string,
+  //   @Body() createCommentForPostDto: CreateCommentForPostDto,
+  //   @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
+  // ): Promise<CommentViewModel> {
+  //   const newCommentId = await this.postsService.createCommentForSpecifiedPost(
+  //     postId,
+  //     createCommentForPostDto,
+  //     jwtAtPayload.userId,
+  //   );
+  //   const commentToView = await this.commentsQueryRepository.getMappedComment(
+  //     newCommentId,
+  //   );
+  //   if (!commentToView) throw new NotFoundException();
+  //   return commentToView;
+  // }
+  // @UseGuards(AuthGuard('jwt'))
+  // @Put(':postId/like-status')
+  // @HttpCode(204)
+  // async updateReactionToPost(
+  //   @Param('postId') postId: string,
+  //   @Body() updateReactionPostDto: UpdateReactionPostDto,
+  //   @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
+  // ): Promise<void> {
+  //   return this.postsService.updateReactionToPost(
+  //     postId,
+  //     updateReactionPostDto,
+  //     jwtAtPayload.userId,
+  //   );
+  // }
 }
