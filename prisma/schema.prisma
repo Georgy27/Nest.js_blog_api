@@ -65,11 +65,11 @@ model BannedUsers {
   banDate   String
   banReason String
   createdAt String
-  blog      Blog     @relation(fields: [blogId], references: [id])
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
   blogId    String
   bloggerId String?
-  Blogger   Blogger? @relation(fields: [bloggerId], references: [bloggerId])
-  User      User?    @relation(fields: [userId], references: [id])
+  blogger   Blogger? @relation(fields: [bloggerId], references: [bloggerId], onDelete: Cascade)
+  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
 }
 
@@ -102,7 +102,7 @@ model Post {
   title            String
   shortDescription String
   content          String
-  blog             Blog   @relation(fields: [blogId], references: [id])
+  blog             Blog   @relation(fields: [blogId], references: [id], onDelete: Cascade)
   blogId           String
   createdAt        String
 }
