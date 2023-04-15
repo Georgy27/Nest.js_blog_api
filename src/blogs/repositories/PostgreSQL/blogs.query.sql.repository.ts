@@ -5,10 +5,54 @@ import { blogQueryFilter } from '../../../helpers/filter/blog.query.filter';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { BlogViewModel, BlogWithBannInfoModel } from '../../types';
 import { UsersBannedByBloggerPaginationQueryDto } from '../../../helpers/pagination/dto/users-banned-by-blogger.pagination.query.dto';
+import { Blog } from '@prisma/client';
 
 @Injectable()
 export class BlogsSQLQueryRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findBlogs(
+    searchNameTerm: string | null,
+    pageSize: number,
+    sortBy: string,
+    pageNumber: number,
+    sortDirection: string,
+  ): Promise<PaginationViewModel<BlogViewModel[]>> {
+    const blogFilter = blogQueryFilter(searchNameTerm);
+
+    const blogs = await this.prisma.blog.findMany({
+      skip: (pageNumber - 1) * pageSize,
+      take: pageSize,
+      orderBy: {
+        [sortBy]: sortDirection,
+      },
+      where: blogFilter,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        websiteUrl: true,
+        createdAt: true,
+        isMembership: true,
+      },
+    });
+    const numberOfBlogs = await this.prisma.blog.count({ where: blogFilter });
+    return new PaginationViewModel(numberOfBlogs, pageNumber, pageSize, blogs);
+  }
+
+  async findBlog(id: string) {
+    return this.prisma.blog.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        websiteUrl: true,
+        createdAt: true,
+        isMembership: true,
+      },
+    });
+  }
   async findBlogsForBlogger(
     searchNameTerm: string | null,
     pageSize: number,
@@ -38,36 +82,5 @@ export class BlogsSQLQueryRepository {
     const numberOfBlogs = await this.prisma.blog.count({ where: blogFilter });
 
     return new PaginationViewModel(numberOfBlogs, pageNumber, pageSize, blogs);
-  }
-
-  async getBannedUsersForBlog(
-    blog: BlogWithBannInfoModel,
-    usersBannedByBloggerPaginationDto: UsersBannedByBloggerPaginationQueryDto,
-  ) {
-    const { sortBy, pageNumber, sortDirection, pageSize, searchLoginTerm } =
-      usersBannedByBloggerPaginationDto;
-
-    const allBannedUsers = await this.prisma.bannedUsers.findMany({
-      skip: (pageNumber - 1) * pageSize,
-      take: pageSize,
-      orderBy: {
-        [sortBy]: sortDirection,
-      },
-      where: {
-        login: { contains: searchLoginTerm ?? '', mode: 'insensitive' },
-      },
-    });
-
-    return allBannedUsers.map((bannedUser) => {
-      return {
-        id: bannedUser.userId,
-        login: bannedUser.login,
-        banInfo: {
-          isBanned: bannedUser.isBanned,
-          banDate: bannedUser.banDate,
-          banReason: bannedUser.banReason,
-        },
-      };
-    });
   }
 }

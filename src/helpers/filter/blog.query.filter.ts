@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 export type BlogFilter = Prisma.BlogWhereInput;
 export const blogQueryFilter = (
   searchNameTerm: string | null,
-  userId: string | undefined,
+  userId?: string | undefined,
 ): BlogFilter => {
   if (searchNameTerm && userId) {
     return {

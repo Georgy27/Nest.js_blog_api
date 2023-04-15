@@ -7,6 +7,8 @@ import { UserViewModel } from '../../types/user.view.model';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Model } from 'mongoose';
 import { userQueryFilter } from '../../../helpers/filter/user.query.filter';
+import { BlogWithBannInfoModel } from '../../../blogs/types';
+import { UsersBannedByBloggerPaginationQueryDto } from '../../../helpers/pagination/dto/users-banned-by-blogger.pagination.query.dto';
 
 @Injectable()
 export class UsersSQLQueryRepository {
@@ -70,5 +72,46 @@ export class UsersSQLQueryRepository {
 
   async findUser(id: string) {
     return this.prisma.user.findUnique({ where: { id } });
+  }
+  async getBannedUsersForBlog(
+    blog: BlogWithBannInfoModel,
+    usersBannedByBloggerPaginationDto: UsersBannedByBloggerPaginationQueryDto,
+  ) {
+    const { sortBy, pageNumber, sortDirection, pageSize, searchLoginTerm } =
+      usersBannedByBloggerPaginationDto;
+
+    const allBannedUsers = await this.prisma.bannedUsers.findMany({
+      skip: (pageNumber - 1) * pageSize,
+      take: pageSize,
+      orderBy: {
+        [sortBy]: sortDirection,
+      },
+      where: {
+        login: { contains: searchLoginTerm ?? '', mode: 'insensitive' },
+      },
+    });
+
+    const mappedBannedUsers = allBannedUsers.map((bannedUser) => {
+      return {
+        id: bannedUser.userId,
+        login: bannedUser.login,
+        banInfo: {
+          isBanned: bannedUser.isBanned,
+          banDate: bannedUser.banDate,
+          banReason: bannedUser.banReason,
+        },
+      };
+    });
+    const numberOfBannedUsers = await this.prisma.bannedUsers.count({
+      where: {
+        login: { contains: searchLoginTerm ?? '', mode: 'insensitive' },
+      },
+    });
+    return new PaginationViewModel(
+      numberOfBannedUsers,
+      pageNumber,
+      pageSize,
+      mappedBannedUsers,
+    );
   }
 }
