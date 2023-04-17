@@ -19,7 +19,7 @@ import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.mode
 import { AuthGuard } from '@nestjs/passport';
 import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
-import { CommentViewModel } from '../../comments';
+import { CommentViewModel, CreateCommentDbModel } from '../../comments';
 import { UpdateReactionPostDto } from '../dto/update-reaction-post.dto';
 import { JwtService } from '@nestjs/jwt';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -31,6 +31,8 @@ import { PostViewModel } from '../types';
 import { PostsQuerySqlRepository } from '../repositories/PostgreSQL/posts.query.sql.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentForSpecifiedPostCommand } from '../../comments/use-cases/create-comment-for-specified-post-use-case';
+import { CommentsQueryRepositoryAdapter } from '../../comments/repositories/adapters/comments-query-repository.adapter';
+import { getMappedComment } from '../../comments/helpers/getMappedComment';
 
 @SkipThrottle()
 @Controller('posts')
@@ -38,7 +40,7 @@ export class PostsController {
   constructor(
     private readonly postsService: PostsService,
     private readonly postsSqlQueryRepository: PostsQuerySqlRepository,
-    private readonly commentsQueryRepository: CommentsQueryRepository,
+    private readonly commentsQueryRepositoryAdapter: CommentsQueryRepositoryAdapter,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private commandBus: CommandBus,
   ) {}
@@ -93,19 +95,18 @@ export class PostsController {
     @Param('postId') postId: string,
     @Body() createCommentForPostDto: CreateCommentForPostDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  ) {
-    return this.commandBus.execute(
+  ): Promise<CommentViewModel> {
+    const comment = await this.commandBus.execute<
+      CreateCommentForSpecifiedPostCommand,
+      CreateCommentDbModel
+    >(
       new CreateCommentForSpecifiedPostCommand(
         postId,
         createCommentForPostDto,
         jwtAtPayload,
       ),
     );
-    // const commentToView = await this.commentsQueryRepository.getMappedComment(
-    //   newCommentId,
-    // );
-    // if (!commentToView) throw new NotFoundException();
-    // return commentToView;
+    return getMappedComment(comment);
   }
   // @UseGuards(AuthGuard('jwt'))
   // @Put(':postId/like-status')

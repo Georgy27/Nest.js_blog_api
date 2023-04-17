@@ -14,8 +14,18 @@ import { CommentsQuerySqlRepository } from './repositories/PostgreSQL/comments.q
 import { CommentsSqlRepository } from './repositories/PostgreSQL/comments.sql.repository';
 import { CreateCommentForSpecifiedPostUseCase } from './use-cases/create-comment-for-specified-post-use-case';
 import { CqrsModule } from '@nestjs/cqrs';
+import { CommentsRepositoryAdapter } from './repositories/adapters/comments-repository.adapter';
+import { CommentsQueryRepositoryAdapter } from './repositories/adapters/comments-query-repository.adapter';
 
 const useCases = [CreateCommentForSpecifiedPostUseCase];
+const CommentsRepositoryProvider = {
+  provide: CommentsRepositoryAdapter,
+  useClass: CommentsSqlRepository,
+};
+const CommentsQueryRepositoryProvider = {
+  provide: CommentsQueryRepositoryAdapter,
+  useClass: CommentsQuerySqlRepository,
+};
 @Module({
   imports: [
     CqrsModule,
@@ -33,16 +43,17 @@ const useCases = [CreateCommentForSpecifiedPostUseCase];
     CommentsService,
     CommentsQueryRepository,
     CommentsRepository,
-    CommentsQuerySqlRepository,
     CommentsSqlRepository,
+    CommentsRepositoryProvider,
+    CommentsQueryRepositoryProvider,
     ...useCases,
   ],
   exports: [
     CommentsQueryRepository,
     CommentsRepository,
     CommentsService,
-    CommentsQuerySqlRepository,
-    CommentsSqlRepository,
+    CommentsRepositoryProvider,
+    CommentsQueryRepositoryProvider,
   ],
 })
 export class CommentsModule {}

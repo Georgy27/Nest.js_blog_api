@@ -1,4 +1,5 @@
 import { ReactionsInfo } from '../reactions/schemas';
+import { Comment } from '@prisma/client';
 
 export type CommentViewModel = {
   id: string;
@@ -10,3 +11,9 @@ export type CommentViewModel = {
   createdAt: string;
   likesInfo: ReactionsInfo;
 };
+
+export interface CreateCommentDbModel extends Omit<Comment, 'postId'> {
+  user: {
+    login: string;
+  } | null;
+}

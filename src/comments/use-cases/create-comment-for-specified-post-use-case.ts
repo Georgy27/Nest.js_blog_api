@@ -2,11 +2,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateCommentForPostDto } from '../../posts/dto/createCommentForPost.dto';
 import { JwtAtPayload } from '../../auth/strategies';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { User } from '../../users/schemas/user.schema';
-import { Comment } from '../schemas/comment.schema';
-import { randomUUID } from 'crypto';
 import { PostsSqlRepository } from '../../posts/repositories/PostgreSQL/posts.sql.repository';
 import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
+import { CommentsRepositoryAdapter } from '../repositories/adapters/comments-repository.adapter';
+import { Comment } from '@prisma/client';
 
 export class CreateCommentForSpecifiedPostCommand {
   constructor(
@@ -22,6 +21,7 @@ export class CreateCommentForSpecifiedPostUseCase
   constructor(
     private readonly postsSqlRepository: PostsSqlRepository,
     private readonly usersSqlRepository: UsersSQLRepository,
+    private readonly commentsRepositoryAdapter: CommentsRepositoryAdapter,
   ) {}
   async execute(command: CreateCommentForSpecifiedPostCommand) {
     const { postId, jwtAtPayload, createCommentForPostDto } = command;
@@ -45,5 +45,10 @@ export class CreateCommentForSpecifiedPostUseCase
     if (isUserBannedByBlogger)
       throw new ForbiddenException('You have been banned by the blogger');
     // create comment
+    return this.commentsRepositoryAdapter.createCommentForPost(
+      isUser.id,
+      isPost.id,
+      createCommentForPostDto,
+    );
   }
 }
