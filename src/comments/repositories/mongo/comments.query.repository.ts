@@ -4,22 +4,22 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Comment, CommentDocument } from './schemas/comment.schema';
+import { Comment, CommentDocument } from '../../schemas/comment.schema';
 import { Model } from 'mongoose';
-import { PaginationViewModel } from '../helpers/pagination/pagination.view.model.wrapper';
+import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import {
   Reaction,
   ReactionDocument,
-} from '../reactions/schemas/reaction.schema';
+} from '../../../reactions/schemas/reaction.schema';
 import {
   reactionStatusEnum,
   reactionStatusEnumKeys,
-} from '../helpers/reaction';
-import { CommentViewModel } from './index';
-import { CommentsPaginationQueryDto } from '../helpers/pagination/dto/comments.pagination.dto';
-import { Post } from '../posts/schemas/post.schema';
-import { Blog } from '../blogs/schemas/blog.schema';
-import { PostsRepository } from '../posts/repositories/mongo/posts.repository';
+} from '../../../helpers/reaction';
+import { CommentViewModel } from '../../index';
+import { CommentsPaginationQueryDto } from '../../../helpers/pagination/dto/comments.pagination.dto';
+import { Post } from '../../../posts/schemas/post.schema';
+import { Blog } from '../../../blogs/schemas/blog.schema';
+import { PostsRepository } from '../../../posts/repositories/mongo/posts.repository';
 
 @Injectable()
 export class CommentsQueryRepository {

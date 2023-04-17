@@ -37,6 +37,24 @@ export class PostsSqlRepository {
   async findPostById(id: string): Promise<Post | null> {
     return this.prisma.post.findUnique({ where: { id } });
   }
+  async findPostWithBloggerIdById(id: string) {
+    return this.prisma.post.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        shortDescription: true,
+        content: true,
+        blogId: true,
+        createdAt: true,
+        blog: {
+          select: {
+            bloggerId: true,
+          },
+        },
+      },
+    });
+  }
   async updatePostById(
     id: string,
     updatePostForBloggerDto: UpdatePostForBloggerDto,

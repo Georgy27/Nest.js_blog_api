@@ -14,7 +14,7 @@ import { PostPaginationQueryDto } from '../../helpers/pagination/dto/posts.pagin
 import { PaginationViewModel } from '../../helpers/pagination/pagination.view.model.wrapper';
 import { PostsService } from '../posts.service';
 import { PostsQueryRepository } from '../repositories/mongo/posts.query.repository';
-import { CommentsQueryRepository } from '../../comments/comments.query.repository';
+import { CommentsQueryRepository } from '../../comments/repositories/mongo/comments.query.repository';
 import { PostReactionViewModel } from '../../helpers/reaction/reaction.view.model.wrapper';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
@@ -29,6 +29,8 @@ import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromA
 import { BlogsQueryRepository } from '../../blogs/repositories/mongo/blogs.query.repository';
 import { PostViewModel } from '../types';
 import { PostsQuerySqlRepository } from '../repositories/PostgreSQL/posts.query.sql.repository';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateCommentForSpecifiedPostCommand } from '../../comments/use-cases/create-comment-for-specified-post-use-case';
 
 @SkipThrottle()
 @Controller('posts')
@@ -38,7 +40,7 @@ export class PostsController {
     private readonly postsSqlQueryRepository: PostsQuerySqlRepository,
     private readonly commentsQueryRepository: CommentsQueryRepository,
     private readonly blogsQueryRepository: BlogsQueryRepository,
-    private jwtService: JwtService,
+    private commandBus: CommandBus,
   ) {}
   @UseGuards(ExtractUserPayloadFromAt)
   @Get()
@@ -84,25 +86,27 @@ export class PostsController {
   //     userId,
   //   );
   // }
-  // @UseGuards(AuthGuard('jwt'))
-  // @Post(':postId/comments')
-  // @HttpCode(201)
-  // async createCommentForSpecifiedPost(
-  //   @Param('postId') postId: string,
-  //   @Body() createCommentForPostDto: CreateCommentForPostDto,
-  //   @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  // ): Promise<CommentViewModel> {
-  //   const newCommentId = await this.postsService.createCommentForSpecifiedPost(
-  //     postId,
-  //     createCommentForPostDto,
-  //     jwtAtPayload.userId,
-  //   );
-  //   const commentToView = await this.commentsQueryRepository.getMappedComment(
-  //     newCommentId,
-  //   );
-  //   if (!commentToView) throw new NotFoundException();
-  //   return commentToView;
-  // }
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':postId/comments')
+  @HttpCode(201)
+  async createCommentForSpecifiedPost(
+    @Param('postId') postId: string,
+    @Body() createCommentForPostDto: CreateCommentForPostDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
+  ) {
+    return this.commandBus.execute(
+      new CreateCommentForSpecifiedPostCommand(
+        postId,
+        createCommentForPostDto,
+        jwtAtPayload,
+      ),
+    );
+    // const commentToView = await this.commentsQueryRepository.getMappedComment(
+    //   newCommentId,
+    // );
+    // if (!commentToView) throw new NotFoundException();
+    // return commentToView;
+  }
   // @UseGuards(AuthGuard('jwt'))
   // @Put(':postId/like-status')
   // @HttpCode(204)

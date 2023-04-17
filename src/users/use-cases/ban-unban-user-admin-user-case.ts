@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BanUserDto } from '../dto/ban.user.dto';
 import { NotFoundException } from '@nestjs/common';
-import { CommentsRepository } from '../../comments/comments.repository';
+import { CommentsRepository } from '../../comments/repositories/mongo/comments.repository';
 import { ReactionsRepository } from '../../reactions/reactions.repository';
 import { UsersSQLRepository } from '../repositories/PostgreSQL/users.sql.repository';
 import { SecurityDevicesSQLRepository } from '../../security-devices/repositories/security.devices.sql.repository';

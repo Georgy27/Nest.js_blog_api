@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from '../comments.service';
-import { CommentsQueryRepository } from '../comments.query.repository';
+import { CommentsQueryRepository } from '../repositories/mongo/comments.query.repository';
 import { UpdateReactionCommentDto } from '../dto/update-reaction-comment.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';

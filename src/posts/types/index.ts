@@ -15,16 +15,6 @@ export interface newestLikes {
 export interface CreatePostModel extends Post {
   blog: { name: string };
 }
-// export type PostViewModel = {
-//   id: string;
-//   title: string;
-//   shortDescription: string;
-//   content: string;
-//   blogId: string;
-//   blogName: string;
-//   createdAt: string;
-//   extendedLikesInfo: extendedLikesInfo;
-// };
 
 export interface PostDbModel extends Post {
   blog: {
