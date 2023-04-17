@@ -5,7 +5,6 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PostsSqlRepository } from '../../posts/repositories/PostgreSQL/posts.sql.repository';
 import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
 import { CommentsRepositoryAdapter } from '../repositories/adapters/comments-repository.adapter';
-import { Comment } from '@prisma/client';
 
 export class CreateCommentForSpecifiedPostCommand {
   constructor(

@@ -15,7 +15,6 @@ export class PostsQuerySqlRepository {
     sortBy: string,
     pageNumber: number,
     sortDirection: string,
-    userId: string | null,
     blogId?: string,
   ) {
     const postFilter = {
@@ -69,7 +68,7 @@ export class PostsQuerySqlRepository {
     );
   }
 
-  async findPost(id: string, userId: string | null) {
+  async findPost(id: string) {
     const post = await this.prisma.post.findUnique({
       where: { id },
       select: {

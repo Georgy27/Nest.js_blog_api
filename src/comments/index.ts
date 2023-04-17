@@ -12,7 +12,7 @@ export type CommentViewModel = {
   likesInfo: ReactionsInfo;
 };
 
-export interface CreateCommentDbModel extends Omit<Comment, 'postId'> {
+export interface CommentDbModel extends Omit<Comment, 'postId'> {
   user: {
     login: string;
   } | null;

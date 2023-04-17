@@ -152,6 +152,6 @@ model BannedBlogs {
 }
 
 enum LikeStatus {
-  like
-  dislike
+  Like
+  Dislike
 }

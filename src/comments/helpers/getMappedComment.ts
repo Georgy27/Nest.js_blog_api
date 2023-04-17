@@ -1,7 +1,7 @@
-import { CommentViewModel, CreateCommentDbModel } from '../index';
+import { CommentViewModel, CommentDbModel } from '../index';
 
 export const getMappedComment = function (
-  comment: CreateCommentDbModel,
+  comment: CommentDbModel,
 ): CommentViewModel {
   return {
     id: comment.id,

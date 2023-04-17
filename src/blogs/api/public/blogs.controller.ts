@@ -63,7 +63,6 @@ export class BlogsController {
       postsPaginationDto.sortBy,
       postsPaginationDto.pageNumber,
       postsPaginationDto.sortDirection,
-      userId,
       blogId,
     );
   }

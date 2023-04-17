@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCommentForPostDto } from '../../../posts/dto/createCommentForPost.dto';
-import { CreateCommentDbModel } from '../../index';
+import { CommentDbModel } from '../../index';
 
 @Injectable()
 export abstract class CommentsRepositoryAdapter {
@@ -8,5 +8,5 @@ export abstract class CommentsRepositoryAdapter {
     userId: string,
     postId: string,
     createCommentForPostDto: CreateCommentForPostDto,
-  ): Promise<CreateCommentDbModel>;
+  ): Promise<CommentDbModel>;
 }

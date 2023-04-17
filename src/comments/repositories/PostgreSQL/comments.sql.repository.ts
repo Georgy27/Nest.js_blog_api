@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CommentsRepositoryAdapter } from '../adapters/comments-repository.adapter';
-import { Comment } from '@prisma/client';
 import { CreateCommentForPostDto } from '../../../posts/dto/createCommentForPost.dto';
-import { CreateCommentDbModel } from '../../index';
+import { CommentDbModel } from '../../index';
 
 @Injectable()
 export class CommentsSqlRepository extends CommentsRepositoryAdapter {
@@ -14,7 +13,7 @@ export class CommentsSqlRepository extends CommentsRepositoryAdapter {
     userId: string,
     postId: string,
     createCommentForPostDto: CreateCommentForPostDto,
-  ): Promise<CreateCommentDbModel> {
+  ): Promise<CommentDbModel> {
     try {
       return this.prisma.comment.create({
         data: {
