@@ -12,9 +12,9 @@ datasource db {
 }
 
 model User {
-  id                String             @id @default(uuid())
-  login             String             @unique
-  email             String             @unique
+  id                String              @id @default(uuid())
+  login             String              @unique
+  email             String              @unique
   hash              String
   createdAt         String
   passwordRecovery  PasswordRecovery?
@@ -23,6 +23,9 @@ model User {
   deviceSessions    DeviceSessions[]
   blogger           Blogger?
   bannedUsers       BannedUsers[]
+  comment           Comment[]
+  commentLikeStatus CommentLikeStatus[]
+  postLikeStatus    PostLikeStatus[]
 }
 
 model Blogger {
@@ -69,7 +72,7 @@ model BannedUsers {
   blogId    String
   bloggerId String?
   blogger   Blogger? @relation(fields: [bloggerId], references: [bloggerId], onDelete: Cascade)
-  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
 }
 
@@ -98,13 +101,46 @@ model Blog {
 }
 
 model Post {
-  id               String @id @default(uuid())
+  id               String           @id @default(uuid())
   title            String
   shortDescription String
   content          String
-  blog             Blog   @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  blog             Blog             @relation(fields: [blogId], references: [id], onDelete: Cascade)
   blogId           String
   createdAt        String
+  comment          Comment[]
+  postLikeStatus   PostLikeStatus[]
+}
+
+model Comment {
+  id                String              @id @default(uuid())
+  content           String
+  createdAt         String
+  post              Post?               @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId            String
+  user              User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  commentLikeStatus CommentLikeStatus[]
+}
+
+model CommentLikeStatus {
+  id         String     @id @default(uuid())
+  likeStatus LikeStatus
+  addedAt    DateTime   @default(now())
+  user       User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  comment    Comment?   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId  String
+}
+
+model PostLikeStatus {
+  id         String     @id @default(uuid())
+  likeStatus LikeStatus
+  addedAt    DateTime   @default(now())
+  user       User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  post       Post?      @relation(fields: [postId], references: [id])
+  postId     String
 }
 
 model BannedBlogs {
@@ -113,4 +149,9 @@ model BannedBlogs {
   banDate  String?
   blog     Blog    @relation(fields: [blogId], references: [id], onDelete: Cascade)
   blogId   String  @unique
+}
+
+enum LikeStatus {
+  like
+  dislike
 }
