@@ -20,13 +20,14 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { JwtAtPayload } from '../../auth/strategies';
 import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-from-AT.guard';
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
+import { CommentsQueryRepositoryAdapter } from '../repositories/adapters/comments-query-repository.adapter';
 
 @SkipThrottle()
 @Controller('comments')
 export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService,
-    private readonly commentsQueryRepository: CommentsQueryRepository,
+    private readonly commentsQueryRepositoryAdapter: CommentsQueryRepositoryAdapter,
     private jwtService: JwtService,
   ) {}
   @UseGuards(ExtractUserPayloadFromAt)
@@ -35,9 +36,9 @@ export class CommentsController {
     @Param('id') id: string,
     @GetUserIdFromAtDecorator() userId: string | null,
   ) {
-    const comment = await this.commentsQueryRepository.findComment(id, userId);
-    if (!comment) throw new NotFoundException();
-    return comment;
+    // const comment = await this.commentsSqlQueryRepository.findComment(id, userId);
+    // if (!comment) throw new NotFoundException();
+    // return comment;
   }
   @UseGuards(AuthGuard('jwt'))
   @Put(':commentId/like-status')

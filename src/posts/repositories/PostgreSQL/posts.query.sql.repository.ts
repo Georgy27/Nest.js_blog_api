@@ -17,29 +17,29 @@ export class PostsQuerySqlRepository {
     sortDirection: string,
     blogId?: string,
   ) {
-    const postFilter = {
-      AND: [
-        {
-          blogId: {
-            contains: blogId ?? '',
-          },
+    const postsFilter = {
+      blogId,
+      blog: {
+        bannedBlogs: {
+          isBanned: false,
         },
-        {
-          blog: {
-            bannedBlogs: {
+        blogger: {
+          user: {
+            banInfo: {
               isBanned: false,
             },
           },
         },
-      ],
+      },
     };
+
     const posts: PostDbModel[] = await this.prisma.post.findMany({
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
       orderBy: {
         [sortBy]: sortDirection,
       },
-      where: postFilter,
+      where: postsFilter,
       select: {
         id: true,
         title: true,
@@ -55,7 +55,7 @@ export class PostsQuerySqlRepository {
       },
     });
     const numberOfPosts = await this.prisma.post.count({
-      where: postFilter,
+      where: postsFilter,
     });
     const postsWithLikesInfo = posts.map((post) => {
       return new PostReactionViewModel(post);
@@ -69,8 +69,24 @@ export class PostsQuerySqlRepository {
   }
 
   async findPost(id: string) {
-    const post = await this.prisma.post.findUnique({
-      where: { id },
+    const postFilter = {
+      id,
+      blog: {
+        bannedBlogs: {
+          isBanned: false,
+        },
+        blogger: {
+          user: {
+            banInfo: {
+              isBanned: false,
+            },
+          },
+        },
+      },
+    };
+
+    const post = await this.prisma.post.findFirst({
+      where: postFilter,
       select: {
         id: true,
         title: true,
@@ -81,16 +97,10 @@ export class PostsQuerySqlRepository {
         blog: {
           select: {
             name: true,
-            bannedBlogs: {
-              select: {
-                isBanned: true,
-              },
-            },
           },
         },
       },
     });
-    if (post?.blog?.bannedBlogs?.isBanned) return null;
     if (post) return new PostReactionViewModel(post);
     return null;
   }

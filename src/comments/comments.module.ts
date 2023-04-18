@@ -26,6 +26,7 @@ const CommentsQueryRepositoryProvider = {
   provide: CommentsQueryRepositoryAdapter,
   useClass: CommentsQuerySqlRepository,
 };
+const Providers = [CommentsRepositoryProvider, CommentsQueryRepositoryProvider];
 @Module({
   imports: [
     CqrsModule,
@@ -44,16 +45,14 @@ const CommentsQueryRepositoryProvider = {
     CommentsQueryRepository,
     CommentsRepository,
     CommentsSqlRepository,
-    CommentsRepositoryProvider,
-    CommentsQueryRepositoryProvider,
+    ...Providers,
     ...useCases,
   ],
   exports: [
     CommentsQueryRepository,
     CommentsRepository,
     CommentsService,
-    CommentsRepositoryProvider,
-    CommentsQueryRepositoryProvider,
+    ...Providers,
   ],
 })
 export class CommentsModule {}

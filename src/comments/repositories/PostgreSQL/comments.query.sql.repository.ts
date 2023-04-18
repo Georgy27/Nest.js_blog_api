@@ -8,6 +8,10 @@ import { reactionQueryFilter } from '../../../helpers/filter/reaction.query.filt
 import { userStatusQueryFilter } from '../../../helpers/filter/user-status.query.filter';
 import { CommentDbModel, CommentViewModel } from '../../index';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
+import {
+  commentQueryFilter,
+  commentsQueryFilter,
+} from '../../../helpers/filter/comment.query.filter';
 
 @Injectable()
 export class CommentsQuerySqlRepository extends CommentsQueryRepositoryAdapter {
@@ -22,22 +26,7 @@ export class CommentsQuerySqlRepository extends CommentsQueryRepositoryAdapter {
     const { pageNumber, pageSize, sortDirection, sortBy } =
       postPaginationQueryDto;
 
-    const commentsFilter = {
-      AND: [
-        {
-          postId: {
-            contains: postId,
-          },
-        },
-        {
-          user: {
-            banInfo: {
-              isBanned: false,
-            },
-          },
-        },
-      ],
-    };
+    const commentsFilter = commentsQueryFilter(postId);
     const comments = await this.prisma.comment.findMany({
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
@@ -72,7 +61,14 @@ export class CommentsQuerySqlRepository extends CommentsQueryRepositoryAdapter {
       commentsWithLikesInfo,
     );
   }
+  async findCommentById(id: string, userId: string | null) {
+    const commentFilter = commentQueryFilter(id);
+    const comment = await this.prisma.comment.findFirst({
+      where: commentFilter,
+    });
 
+    if (!comment) return null;
+  }
   private async addReactionsInfoToComment(
     comment: CommentDbModel,
     userId: string | null,

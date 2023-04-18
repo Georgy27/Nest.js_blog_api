@@ -10,4 +10,9 @@ export abstract class CommentsQueryRepositoryAdapter {
     postId: string,
     userId: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>>;
+
+  abstract findCommentById(
+    id: string,
+    userId: string | null,
+  ): Promise<CommentViewModel | null> | any;
 }
