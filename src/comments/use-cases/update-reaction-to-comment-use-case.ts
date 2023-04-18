@@ -29,10 +29,11 @@ export class UpdateReactionToCommentUseCase
     const isComment = await this.commentsRepositoryAdapter.findCommentById(
       command.commentId,
     );
+
     if (!isComment) throw new NotFoundException();
     // check user
     const user = await this.usersSqlRepository.findUserById(command.userId);
-    if (!user) throw new NotFoundException();
+    if (!user) throw new NotFoundException('User not found');
 
     const isReaction =
       await this.commentsRepositoryAdapter.findReactionToComment(

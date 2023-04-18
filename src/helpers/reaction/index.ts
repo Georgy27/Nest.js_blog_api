@@ -1,6 +1,6 @@
 export enum reactionStatusEnum {
-  Like = 'like',
-  Dislike = 'dislike',
-  None = 'none',
+  Like = 'Like',
+  Dislike = 'Dislike',
+  None = 'None',
 }
 export type reactionStatusEnumKeys = keyof typeof reactionStatusEnum;

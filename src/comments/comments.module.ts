@@ -17,10 +17,12 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CommentsRepositoryAdapter } from './repositories/adapters/comments-repository.adapter';
 import { CommentsQueryRepositoryAdapter } from './repositories/adapters/comments-query-repository.adapter';
 import { UpdateReactionToCommentUseCase } from './use-cases/update-reaction-to-comment-use-case';
+import { UpdateCommentUseCase } from './use-cases/update-comment-use-case';
 
 const useCases = [
   CreateCommentForSpecifiedPostUseCase,
   UpdateReactionToCommentUseCase,
+  UpdateCommentUseCase,
 ];
 const CommentsRepositoryProvider = {
   provide: CommentsRepositoryAdapter,

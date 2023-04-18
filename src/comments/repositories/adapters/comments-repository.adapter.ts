@@ -3,6 +3,7 @@ import { CreateCommentForPostDto } from '../../../posts/dto/createCommentForPost
 import { CommentDbModel } from '../../index';
 import { Comment, CommentLikeStatus } from '@prisma/client';
 import { UpdateReactionCommentDto } from '../../dto/update-reaction-comment.dto';
+import { UpdateCommentDto } from '../../dto/update-comment.dto';
 
 @Injectable()
 export abstract class CommentsRepositoryAdapter {
@@ -28,4 +29,9 @@ export abstract class CommentsRepositoryAdapter {
     id: string,
     updateReactionCommentDto: UpdateReactionCommentDto,
   ): Promise<CommentLikeStatus>;
+
+  public abstract updateCommentById(
+    id: string,
+    content: string,
+  ): Promise<Comment>;
 }

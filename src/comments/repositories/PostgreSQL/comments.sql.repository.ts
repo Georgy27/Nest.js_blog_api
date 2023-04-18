@@ -6,6 +6,7 @@ import { CommentDbModel } from '../../index';
 import { commentQueryFilter } from '../../../helpers/filter/comment.query.filter';
 import { Comment, CommentLikeStatus } from '@prisma/client';
 import { UpdateReactionCommentDto } from '../../dto/update-reaction-comment.dto';
+import { UpdateCommentDto } from '../../dto/update-comment.dto';
 
 @Injectable()
 export class CommentsSqlRepository extends CommentsRepositoryAdapter {
@@ -35,6 +36,23 @@ export class CommentsSqlRepository extends CommentsRepositoryAdapter {
               login: true,
             },
           },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  public async updateCommentById(
+    id: string,
+    content: string,
+  ): Promise<Comment> {
+    try {
+      return this.prisma.comment.update({
+        where: { id },
+        data: {
+          content: content,
         },
       });
     } catch (error) {

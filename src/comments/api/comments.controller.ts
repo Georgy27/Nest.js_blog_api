@@ -23,6 +23,7 @@ import { CommentsQueryRepositoryAdapter } from '../repositories/adapters/comment
 import { CommentViewModel } from '../index';
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateReactionToCommentCommand } from '../use-cases/update-reaction-to-comment-use-case';
+import { UpdateCommentCommand } from '../use-cases/update-comment-use-case';
 
 @SkipThrottle()
 @Controller('comments')
@@ -70,10 +71,12 @@ export class CommentsController {
     @Body() updateCommentDto: UpdateCommentDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
-    return this.commentsService.updateComment(
-      commentId,
-      updateCommentDto,
-      jwtAtPayload.userId,
+    return this.commandBus.execute(
+      new UpdateCommentCommand(
+        commentId,
+        updateCommentDto,
+        jwtAtPayload.userId,
+      ),
     );
   }
   @UseGuards(AuthGuard('jwt'))
