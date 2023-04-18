@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from '../comments.service';
-import { CommentsQueryRepository } from '../repositories/mongo/comments.query.repository';
 import { UpdateReactionCommentDto } from '../dto/update-reaction-comment.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
@@ -21,6 +20,7 @@ import { JwtAtPayload } from '../../auth/strategies';
 import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-from-AT.guard';
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
 import { CommentsQueryRepositoryAdapter } from '../repositories/adapters/comments-query-repository.adapter';
+import { CommentViewModel } from '../index';
 
 @SkipThrottle()
 @Controller('comments')
@@ -32,13 +32,16 @@ export class CommentsController {
   ) {}
   @UseGuards(ExtractUserPayloadFromAt)
   @Get(':id')
-  async getCommentById(
+  async findCommentById(
     @Param('id') id: string,
     @GetUserIdFromAtDecorator() userId: string | null,
-  ) {
-    // const comment = await this.commentsSqlQueryRepository.findComment(id, userId);
-    // if (!comment) throw new NotFoundException();
-    // return comment;
+  ): Promise<CommentViewModel> {
+    const comment = await this.commentsQueryRepositoryAdapter.findCommentById(
+      id,
+      userId,
+    );
+    if (!comment) throw new NotFoundException();
+    return comment;
   }
   @UseGuards(AuthGuard('jwt'))
   @Put(':commentId/like-status')

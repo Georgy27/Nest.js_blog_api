@@ -14,5 +14,5 @@ export abstract class CommentsQueryRepositoryAdapter {
   abstract findCommentById(
     id: string,
     userId: string | null,
-  ): Promise<CommentViewModel | null> | any;
+  ): Promise<CommentViewModel | null>;
 }

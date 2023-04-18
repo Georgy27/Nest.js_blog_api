@@ -61,13 +61,30 @@ export class CommentsQuerySqlRepository extends CommentsQueryRepositoryAdapter {
       commentsWithLikesInfo,
     );
   }
-  async findCommentById(id: string, userId: string | null) {
+  async findCommentById(
+    id: string,
+    userId: string | null,
+  ): Promise<CommentViewModel | null> {
     const commentFilter = commentQueryFilter(id);
+
     const comment = await this.prisma.comment.findFirst({
       where: commentFilter,
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        userId: true,
+        user: {
+          select: {
+            login: true,
+          },
+        },
+      },
     });
 
     if (!comment) return null;
+
+    return await this.addReactionsInfoToComment(comment, userId);
   }
   private async addReactionsInfoToComment(
     comment: CommentDbModel,

@@ -1,33 +1,35 @@
 export const commentsQueryFilter = function (postId: string) {
   return {
-    AND: [
-      {
-        postId,
+    postId,
+    user: {
+      banInfo: {
+        isBanned: false,
       },
-      {
-        user: {
-          banInfo: {
-            isBanned: false,
-          },
+    },
+    post: {
+      blog: {
+        bannedBlogs: {
+          isBanned: false,
         },
       },
-    ],
+    },
   };
 };
 
 export const commentQueryFilter = function (id: string) {
   return {
-    AND: [
-      {
-        id,
+    id,
+    user: {
+      banInfo: {
+        isBanned: false,
       },
-      {
-        user: {
-          banInfo: {
-            isBanned: false,
-          },
+    },
+    post: {
+      blog: {
+        bannedBlogs: {
+          isBanned: false,
         },
       },
-    ],
+    },
   };
 };

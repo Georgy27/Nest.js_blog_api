@@ -4,6 +4,10 @@ import { CreatePostModel, PostDbModel, PostViewModel } from '../../types';
 import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { Post } from '@prisma/client';
+import {
+  postQueryFilter,
+  postsQueryFilter,
+} from '../../../helpers/filter/post.query.filter';
 @Injectable()
 export class PostsQuerySqlRepository {
   constructor(private prisma: PrismaService) {}
@@ -17,21 +21,7 @@ export class PostsQuerySqlRepository {
     sortDirection: string,
     blogId?: string,
   ) {
-    const postsFilter = {
-      blogId,
-      blog: {
-        bannedBlogs: {
-          isBanned: false,
-        },
-        blogger: {
-          user: {
-            banInfo: {
-              isBanned: false,
-            },
-          },
-        },
-      },
-    };
+    const postsFilter = postsQueryFilter(blogId);
 
     const posts: PostDbModel[] = await this.prisma.post.findMany({
       skip: (pageNumber - 1) * pageSize,
@@ -69,21 +59,7 @@ export class PostsQuerySqlRepository {
   }
 
   async findPost(id: string) {
-    const postFilter = {
-      id,
-      blog: {
-        bannedBlogs: {
-          isBanned: false,
-        },
-        blogger: {
-          user: {
-            banInfo: {
-              isBanned: false,
-            },
-          },
-        },
-      },
-    };
+    const postFilter = postQueryFilter(id);
 
     const post = await this.prisma.post.findFirst({
       where: postFilter,
