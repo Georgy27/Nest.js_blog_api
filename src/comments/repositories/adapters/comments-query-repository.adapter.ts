@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/posts.pagination.query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
-import { CommentViewModel } from '../../index';
+import { CommentDbModel, CommentViewModel } from '../../index';
 
 @Injectable()
 export abstract class CommentsQueryRepositoryAdapter {

@@ -21,6 +21,8 @@ import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-f
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
 import { CommentsQueryRepositoryAdapter } from '../repositories/adapters/comments-query-repository.adapter';
 import { CommentViewModel } from '../index';
+import { CommandBus } from '@nestjs/cqrs';
+import { UpdateReactionToCommentCommand } from '../use-cases/update-reaction-to-comment-use-case';
 
 @SkipThrottle()
 @Controller('comments')
@@ -29,6 +31,7 @@ export class CommentsController {
     private readonly commentsService: CommentsService,
     private readonly commentsQueryRepositoryAdapter: CommentsQueryRepositoryAdapter,
     private jwtService: JwtService,
+    private commandBus: CommandBus,
   ) {}
   @UseGuards(ExtractUserPayloadFromAt)
   @Get(':id')
@@ -51,10 +54,12 @@ export class CommentsController {
     @Body() updateReactionCommentDto: UpdateReactionCommentDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
-    return this.commentsService.updateReactionToComment(
-      updateReactionCommentDto,
-      commentId,
-      jwtAtPayload.userId,
+    return this.commandBus.execute(
+      new UpdateReactionToCommentCommand(
+        updateReactionCommentDto,
+        commentId,
+        jwtAtPayload.userId,
+      ),
     );
   }
   @UseGuards(AuthGuard('jwt'))

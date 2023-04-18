@@ -3,6 +3,9 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { CommentsRepositoryAdapter } from '../adapters/comments-repository.adapter';
 import { CreateCommentForPostDto } from '../../../posts/dto/createCommentForPost.dto';
 import { CommentDbModel } from '../../index';
+import { commentQueryFilter } from '../../../helpers/filter/comment.query.filter';
+import { Comment, CommentLikeStatus } from '@prisma/client';
+import { UpdateReactionCommentDto } from '../../dto/update-reaction-comment.dto';
 
 @Injectable()
 export class CommentsSqlRepository extends CommentsRepositoryAdapter {
@@ -32,6 +35,58 @@ export class CommentsSqlRepository extends CommentsRepositoryAdapter {
               login: true,
             },
           },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+  public async findCommentById(id: string): Promise<Comment | null> {
+    const commentFilter = commentQueryFilter(id);
+    return this.prisma.comment.findFirst({ where: commentFilter });
+  }
+
+  public async findReactionToComment(
+    userId: string,
+    commentId: string,
+  ): Promise<CommentLikeStatus | null> {
+    return this.prisma.commentLikeStatus.findFirst({
+      where: {
+        userId,
+        commentId,
+      },
+    });
+  }
+
+  public async createReactionToComment(
+    userId: string,
+    commentId: string,
+    updateReactionCommentDto: UpdateReactionCommentDto,
+  ): Promise<CommentLikeStatus> {
+    try {
+      return this.prisma.commentLikeStatus.create({
+        data: {
+          likeStatus: updateReactionCommentDto.likeStatus,
+          userId,
+          commentId,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  public async updateReactionToComment(
+    id: string,
+    updateReactionCommentDto: UpdateReactionCommentDto,
+  ): Promise<CommentLikeStatus> {
+    try {
+      return this.prisma.commentLikeStatus.update({
+        where: { id },
+        data: {
+          likeStatus: updateReactionCommentDto.likeStatus,
         },
       });
     } catch (error) {
