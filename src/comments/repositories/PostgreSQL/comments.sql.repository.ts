@@ -60,6 +60,17 @@ export class CommentsSqlRepository extends CommentsRepositoryAdapter {
       throw error;
     }
   }
+
+  public async deleteCommentById(id: string): Promise<Comment> {
+    try {
+      return this.prisma.comment.delete({
+        where: { id },
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
   public async findCommentById(id: string): Promise<Comment | null> {
     const commentFilter = commentQueryFilter(id);
     return this.prisma.comment.findFirst({ where: commentFilter });

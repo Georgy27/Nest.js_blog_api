@@ -18,11 +18,13 @@ import { CommentsRepositoryAdapter } from './repositories/adapters/comments-repo
 import { CommentsQueryRepositoryAdapter } from './repositories/adapters/comments-query-repository.adapter';
 import { UpdateReactionToCommentUseCase } from './use-cases/update-reaction-to-comment-use-case';
 import { UpdateCommentUseCase } from './use-cases/update-comment-use-case';
+import { DeleteCommentUseCase } from './use-cases/delete-comment-use-case';
 
 const useCases = [
   CreateCommentForSpecifiedPostUseCase,
   UpdateReactionToCommentUseCase,
   UpdateCommentUseCase,
+  DeleteCommentUseCase,
 ];
 const CommentsRepositoryProvider = {
   provide: CommentsRepositoryAdapter,

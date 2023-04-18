@@ -24,6 +24,10 @@ import { CommentViewModel } from '../index';
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateReactionToCommentCommand } from '../use-cases/update-reaction-to-comment-use-case';
 import { UpdateCommentCommand } from '../use-cases/update-comment-use-case';
+import {
+  DeleteCommentCommand,
+  DeleteCommentUseCase,
+} from '../use-cases/delete-comment-use-case';
 
 @SkipThrottle()
 @Controller('comments')
@@ -86,6 +90,8 @@ export class CommentsController {
     @Param('commentId') commentId: string,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
-    return this.commentsService.deleteComment(commentId, jwtAtPayload.userId);
+    return this.commandBus.execute(
+      new DeleteCommentCommand(commentId, jwtAtPayload.userId),
+    );
   }
 }
