@@ -10,9 +10,13 @@ export const commentReactionQueryFilter = function (
         isBanned: false,
       },
     },
-    blog: {
-      bannedBlogs: {
-        isBanned: false,
+    comment: {
+      post: {
+        blog: {
+          bannedBlogs: {
+            isBanned: false,
+          },
+        },
       },
     },
   };
@@ -30,9 +34,11 @@ export const postReactionQueryFilter = function (
         isBanned: false,
       },
     },
-    blog: {
-      bannedBlogs: {
-        isBanned: false,
+    post: {
+      blog: {
+        bannedBlogs: {
+          isBanned: false,
+        },
       },
     },
   };

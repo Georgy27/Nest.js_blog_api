@@ -19,11 +19,13 @@ import { PostsSqlRepository } from './repositories/PostgreSQL/posts.sql.reposito
 import { PostsQuerySqlRepository } from './repositories/PostgreSQL/posts.query.sql.repository';
 import { PostsRepositoryAdapter } from './repositories/adapters/posts-repository.adapter';
 import { PostsQueryRepositoryAdapter } from './repositories/adapters/posts-query-repository.adapter';
+import { UpdateReactionToPostUseCase } from './use-cases/update-reaction-to-post-use-case';
 
 const useCases = [
   CreatePostForSpecifiedBlogUseCase,
   UpdatePostUseCase,
   DeletePostUseCase,
+  UpdateReactionToPostUseCase,
 ];
 const PostsRepositoryProvider = {
   provide: PostsRepositoryAdapter,
