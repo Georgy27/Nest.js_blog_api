@@ -48,7 +48,7 @@ export class UpdateReactionToCommentUseCase
         command.updateReactionCommentDto,
       );
 
-    return this.commentsRepositoryAdapter.updateReactionToComment(
+    await this.commentsRepositoryAdapter.updateReactionToComment(
       isReaction.id,
       command.updateReactionCommentDto,
     );

@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -27,6 +28,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentForSpecifiedPostCommand } from '../../comments/use-cases/create-comment-for-specified-post-use-case';
 import { CommentsQueryRepositoryAdapter } from '../../comments/repositories/adapters/comments-query-repository.adapter';
 import { getMappedComment } from '../../comments/helpers/getMappedComment';
+import { UpdateReactionPostDto } from '../dto/update-reaction-post.dto';
 
 @SkipThrottle()
 @Controller('posts')
@@ -98,18 +100,18 @@ export class PostsController {
     );
     return getMappedComment(comment);
   }
-  // @UseGuards(AuthGuard('jwt'))
-  // @Put(':postId/like-status')
-  // @HttpCode(204)
-  // async updateReactionToPost(
-  //   @Param('postId') postId: string,
-  //   @Body() updateReactionPostDto: UpdateReactionPostDto,
-  //   @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  // ): Promise<void> {
-  //   return this.postsService.updateReactionToPost(
-  //     postId,
-  //     updateReactionPostDto,
-  //     jwtAtPayload.userId,
-  //   );
-  // }
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':postId/like-status')
+  @HttpCode(204)
+  async updateReactionToPost(
+    @Param('postId') postId: string,
+    @Body() updateReactionPostDto: UpdateReactionPostDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
+  ): Promise<void> {
+    return this.postsService.updateReactionToPost(
+      postId,
+      updateReactionPostDto,
+      jwtAtPayload.userId,
+    );
+  }
 }
