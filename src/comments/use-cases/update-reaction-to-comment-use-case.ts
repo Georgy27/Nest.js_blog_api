@@ -1,12 +1,8 @@
-import { CreateCommentForPostDto } from '../../posts/dto/createCommentForPost.dto';
-import { JwtAtPayload } from '../../auth/strategies';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostsSqlRepository } from '../../posts/repositories/PostgreSQL/posts.sql.repository';
 import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
 import { CommentsRepositoryAdapter } from '../repositories/adapters/comments-repository.adapter';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { UpdateReactionCommentDto } from '../dto/update-reaction-comment.dto';
-import { CommentsQueryRepositoryAdapter } from '../repositories/adapters/comments-query-repository.adapter';
 
 export class UpdateReactionToCommentCommand {
   constructor(
@@ -20,7 +16,6 @@ export class UpdateReactionToCommentUseCase
   implements ICommandHandler<UpdateReactionToCommentCommand>
 {
   constructor(
-    private readonly postsSqlRepository: PostsSqlRepository,
     private readonly usersSqlRepository: UsersSQLRepository,
     private readonly commentsRepositoryAdapter: CommentsRepositoryAdapter,
   ) {}

@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreatePostDto } from '../../dto/create.post.dto';
-import { CommentLikeStatus, Post, PostLikeStatus } from '@prisma/client';
-import { CreatePostModel } from '../../types';
+import { Post, PostLikeStatus } from '@prisma/client';
+import { CreatePostModel, PostWithBloggerId } from '../../types';
 import { UpdatePostForBloggerDto } from '../../../blogs/dto/update.post.blogger.dto';
-import { UpdateReactionCommentDto } from '../../../comments/dto/update-reaction-comment.dto';
 import { UpdateReactionPostDto } from '../../dto/update-reaction-post.dto';
+import { PostsRepositoryAdapter } from '../adapters/posts-repository.adapter';
 
 @Injectable()
-export class PostsSqlRepository {
-  constructor(private prisma: PrismaService) {}
-  async createPostForSpecifiedBlog(
+export class PostsSqlRepository extends PostsRepositoryAdapter {
+  constructor(private prisma: PrismaService) {
+    super();
+  }
+  public async createPostForSpecifiedBlog(
     createPostDto: CreatePostDto,
   ): Promise<CreatePostModel> {
     return this.prisma.post.create({
@@ -36,10 +38,12 @@ export class PostsSqlRepository {
       },
     });
   }
-  async findPostById(id: string): Promise<Post | null> {
+  public async findPostById(id: string): Promise<Post | null> {
     return this.prisma.post.findUnique({ where: { id } });
   }
-  async findPostWithBloggerIdById(id: string) {
+  public async findPostWithBloggerIdById(
+    id: string,
+  ): Promise<PostWithBloggerId | null> {
     return this.prisma.post.findUnique({
       where: { id },
       select: {
@@ -57,21 +61,31 @@ export class PostsSqlRepository {
       },
     });
   }
-  async updatePostById(
+  public async updatePostById(
     id: string,
     updatePostForBloggerDto: UpdatePostForBloggerDto,
-  ) {
-    return this.prisma.post.update({
-      where: { id },
-      data: {
-        title: updatePostForBloggerDto.title,
-        content: updatePostForBloggerDto.content,
-        shortDescription: updatePostForBloggerDto.shortDescription,
-      },
-    });
+  ): Promise<Post> {
+    try {
+      return this.prisma.post.update({
+        where: { id },
+        data: {
+          title: updatePostForBloggerDto.title,
+          content: updatePostForBloggerDto.content,
+          shortDescription: updatePostForBloggerDto.shortDescription,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
-  async deletePostById(id: string) {
-    return this.prisma.post.delete({ where: { id } });
+  public async deletePostById(id: string): Promise<Post> {
+    try {
+      return this.prisma.post.delete({ where: { id } });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   public async findReactionToPost(
@@ -120,5 +134,9 @@ export class PostsSqlRepository {
       console.log(error);
       throw error;
     }
+  }
+
+  public async deleteAll() {
+    return this.prisma.post.deleteMany({});
   }
 }

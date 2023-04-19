@@ -9,7 +9,6 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { CommentsService } from '../comments.service';
 import { UpdateReactionCommentDto } from '../dto/update-reaction-comment.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
@@ -24,16 +23,12 @@ import { CommentViewModel } from '../index';
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateReactionToCommentCommand } from '../use-cases/update-reaction-to-comment-use-case';
 import { UpdateCommentCommand } from '../use-cases/update-comment-use-case';
-import {
-  DeleteCommentCommand,
-  DeleteCommentUseCase,
-} from '../use-cases/delete-comment-use-case';
+import { DeleteCommentCommand } from '../use-cases/delete-comment-use-case';
 
 @SkipThrottle()
 @Controller('comments')
 export class CommentsController {
   constructor(
-    private readonly commentsService: CommentsService,
     private readonly commentsQueryRepositoryAdapter: CommentsQueryRepositoryAdapter,
     private jwtService: JwtService,
     private commandBus: CommandBus,

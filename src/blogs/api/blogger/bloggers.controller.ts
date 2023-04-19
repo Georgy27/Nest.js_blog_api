@@ -4,21 +4,16 @@ import {
   Delete,
   Get,
   HttpCode,
-  NotFoundException,
   Param,
   Post,
   Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsService } from '../../blogs.service';
 import { CreateBlogDto } from '../../dto/create.blog.dto';
 import { UpdateBlogDto } from '../../dto/update.blog.dto';
 import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
-import { PostsQueryRepository } from '../../../posts/repositories/mongo/posts.query.repository';
 import { CreatePostByBlogIdDto } from '../../dto/create.post.blogId.dto';
-import { PostsService } from '../../../posts/posts.service';
-import { JwtService } from '@nestjs/jwt';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateBlogCommand } from '../../use-cases/create-blog-use-case';
@@ -31,25 +26,21 @@ import { UpdatePostForBloggerDto } from '../../dto/update.post.blogger.dto';
 import { UpdatePostCommand } from '../../../posts/use-cases/update-post-use-case';
 import { DeletePostCommand } from '../../../posts/use-cases/delete-post-use-case';
 import { GetJwtAtPayloadDecorator } from '../../../common/decorators/getJwtAtPayload.decorator';
-import { CommentsQueryRepository } from '../../../comments/repositories/mongo/comments.query.repository';
 import { BlogsSQLQueryRepository } from '../../repositories/PostgreSQL/blogs.query.sql.repository';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { BlogViewModel } from '../../types';
 import { CreatePostModel } from '../../../posts/types';
-import { PostsQuerySqlRepository } from '../../../posts/repositories/PostgreSQL/posts.query.sql.repository';
 import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
+import { PostsQueryRepositoryAdapter } from '../../../posts/repositories/adapters/posts-query-repository.adapter';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
 export class BloggersController {
   constructor(
-    private readonly blogsService: BlogsService,
     private readonly blogsSQLQueryRepository: BlogsSQLQueryRepository,
-    private readonly postsQueryRepository: PostsQueryRepository,
-    private readonly postsQuerySqlRepository: PostsQuerySqlRepository,
-    private readonly postsService: PostsService,
-    private readonly commentsQueryRepository: CommentsQueryRepository,
-    private jwtService: JwtService,
+
+    private readonly postsQueryRepositoryAdapter: PostsQueryRepositoryAdapter,
+
     private commandBus: CommandBus,
   ) {}
   @UseGuards(AuthGuard('jwt'))

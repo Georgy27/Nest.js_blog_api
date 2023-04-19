@@ -2,8 +2,6 @@ import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Comment, CommentSchema } from './schemas/comment.schema';
 import { CommentsController } from './api/comments.controller';
-import { CommentsService } from './comments.service';
-import { CommentsQueryRepository } from './repositories/mongo/comments.query.repository';
 import { CommentsRepository } from './repositories/mongo/comments.repository';
 import { UsersModule } from '../users/users.module';
 import { ReactionsModule } from '../reactions/reactions.module';
@@ -34,7 +32,7 @@ const CommentsQueryRepositoryProvider = {
   provide: CommentsQueryRepositoryAdapter,
   useClass: CommentsQuerySqlRepository,
 };
-const Providers = [CommentsRepositoryProvider, CommentsQueryRepositoryProvider];
+const adapters = [CommentsRepositoryProvider, CommentsQueryRepositoryProvider];
 @Module({
   imports: [
     CqrsModule,
@@ -49,18 +47,11 @@ const Providers = [CommentsRepositoryProvider, CommentsQueryRepositoryProvider];
   ],
   controllers: [CommentsController],
   providers: [
-    CommentsService,
-    CommentsQueryRepository,
     CommentsRepository,
     CommentsSqlRepository,
-    ...Providers,
+    ...adapters,
     ...useCases,
   ],
-  exports: [
-    CommentsQueryRepository,
-    CommentsRepository,
-    CommentsService,
-    ...Providers,
-  ],
+  exports: [CommentsRepository, ...adapters],
 })
 export class CommentsModule {}

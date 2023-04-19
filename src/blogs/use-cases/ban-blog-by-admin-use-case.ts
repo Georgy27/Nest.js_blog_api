@@ -1,8 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BanBlogAdminDto } from '../dto/ban.blog.admin.dto';
 import { NotFoundException } from '@nestjs/common';
-import { PostsSqlRepository } from '../../posts/repositories/PostgreSQL/posts.sql.repository';
-import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
 import { BlogsSqlRepository } from '../repositories/PostgreSQL/blogs.sql.repository';
 
 export class BanBlogByAdminCommand {
@@ -12,11 +10,7 @@ export class BanBlogByAdminCommand {
 export class BanBlogByAdminUseCase
   implements ICommandHandler<BanBlogByAdminCommand>
 {
-  constructor(
-    private readonly blogsSqlRepository: BlogsSqlRepository,
-    private readonly usersSqlRepository: UsersSQLRepository,
-    private readonly postsSqlRepository: PostsSqlRepository,
-  ) {}
+  constructor(private readonly blogsSqlRepository: BlogsSqlRepository) {}
 
   async execute(command: BanBlogByAdminCommand): Promise<void> {
     // find blog

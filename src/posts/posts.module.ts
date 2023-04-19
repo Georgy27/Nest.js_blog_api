@@ -17,12 +17,23 @@ import { UpdatePostUseCase } from './use-cases/update-post-use-case';
 import { DeletePostUseCase } from './use-cases/delete-post-use-case';
 import { PostsSqlRepository } from './repositories/PostgreSQL/posts.sql.repository';
 import { PostsQuerySqlRepository } from './repositories/PostgreSQL/posts.query.sql.repository';
+import { PostsRepositoryAdapter } from './repositories/adapters/posts-repository.adapter';
+import { PostsQueryRepositoryAdapter } from './repositories/adapters/posts-query-repository.adapter';
 
 const useCases = [
   CreatePostForSpecifiedBlogUseCase,
   UpdatePostUseCase,
   DeletePostUseCase,
 ];
+const PostsRepositoryProvider = {
+  provide: PostsRepositoryAdapter,
+  useClass: PostsSqlRepository,
+};
+const PostsQueryRepositoryProvider = {
+  provide: PostsQueryRepositoryAdapter,
+  useClass: PostsQuerySqlRepository,
+};
+const adapters = [PostsRepositoryProvider, PostsQueryRepositoryProvider];
 @Module({
   imports: [
     CqrsModule,
@@ -44,13 +55,8 @@ const useCases = [
     PostsSqlRepository,
     PostsQuerySqlRepository,
     ...useCases,
+    ...adapters,
   ],
-  exports: [
-    PostsQueryRepository,
-    PostsService,
-    PostsRepository,
-    PostsSqlRepository,
-    PostsQuerySqlRepository,
-  ],
+  exports: [...adapters],
 })
 export class PostsModule {}

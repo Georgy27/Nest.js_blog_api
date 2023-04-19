@@ -2,10 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { useContainer, ValidationError } from 'class-validator';
-import { prepareErrorResult } from './pipes/validation.pipe';
+import { prepareErrorResult } from './common/pipes/validation.pipe';
 import { HttpExceptionFilter } from './http.exception-filter';
 import cookieParser from 'cookie-parser';
-import { TrimPipe } from './pipes/trim.pipe';
+import { TrimPipe } from './common/pipes/trim.pipe';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

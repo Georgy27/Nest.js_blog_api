@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostsSqlRepository } from '../repositories/PostgreSQL/posts.sql.repository';
 import { BlogsSqlRepository } from '../../blogs/repositories/PostgreSQL/blogs.sql.repository';
 import { UpdateReactionPostDto } from '../dto/update-reaction-post.dto';
 import { NotFoundException } from '@nestjs/common';
 import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
+import { PostsRepositoryAdapter } from '../repositories/adapters/posts-repository.adapter';
 
 export class UpdateReactionToPostCommand {
   constructor(
@@ -17,7 +17,7 @@ export class UpdateReactionToPostUseCase
   implements ICommandHandler<UpdateReactionToPostCommand>
 {
   constructor(
-    private readonly postsSqlRepository: PostsSqlRepository,
+    private readonly postsRepositoryAdapter: PostsRepositoryAdapter,
 
     private readonly blogsSqlRepository: BlogsSqlRepository,
     private readonly usersSqlRepository: UsersSQLRepository,
@@ -25,7 +25,7 @@ export class UpdateReactionToPostUseCase
   async execute(command: UpdateReactionToPostCommand) {
     const { postId, updateReactionPostDto, userId } = command;
     // check if post exists
-    const post = await this.postsSqlRepository.findPostById(postId);
+    const post = await this.postsRepositoryAdapter.findPostById(postId);
 
     if (!post) throw new NotFoundException();
 
@@ -34,19 +34,19 @@ export class UpdateReactionToPostUseCase
 
     if (!user) throw new NotFoundException();
 
-    const isReaction = await this.postsSqlRepository.findReactionToPost(
+    const isReaction = await this.postsRepositoryAdapter.findReactionToPost(
       userId,
       postId,
     );
 
     if (!isReaction)
-      return this.postsSqlRepository.createReactionToPost(
+      return this.postsRepositoryAdapter.createReactionToPost(
         userId,
         postId,
         updateReactionPostDto,
       );
 
-    await this.postsSqlRepository.updateReactionToPost(
+    await this.postsRepositoryAdapter.updateReactionToPost(
       isReaction.id,
       updateReactionPostDto,
     );

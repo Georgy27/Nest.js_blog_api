@@ -2,7 +2,6 @@ import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './schemas/blog.schema';
 import { BloggersController } from './api/blogger/bloggers.controller';
-import { BlogsService } from './blogs.service';
 import { BlogsRepository } from './repositories/mongo/blogs.repository';
 import { BlogsQueryRepository } from './repositories/mongo/blogs.query.repository';
 import { PostsModule } from '../posts/posts.module';
@@ -39,7 +38,6 @@ const useCases = [
   ],
   controllers: [BloggersController, BlogsController, BlogsSuperAdminController],
   providers: [
-    BlogsService,
     BlogsRepository,
     BlogsQueryRepository,
     BlogsSqlRepository,

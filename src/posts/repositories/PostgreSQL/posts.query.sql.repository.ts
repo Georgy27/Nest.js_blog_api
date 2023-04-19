@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { CreatePostModel, PostDbModel, PostViewModel } from '../../types';
+import { PostDbModel, PostViewModel } from '../../types';
 import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
-import { Post } from '@prisma/client';
+
 import {
   postQueryFilter,
   postsQueryFilter,
 } from '../../../helpers/filter/post.query.filter';
+import { PostsQueryRepositoryAdapter } from '../adapters/posts-query-repository.adapter';
 @Injectable()
-export class PostsQuerySqlRepository {
-  constructor(private prisma: PrismaService) {}
-  // async getMappedPost(post: CreatePostModel) {
-  //
-  // }
-  async findPosts(
+export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
+  constructor(private prisma: PrismaService) {
+    super();
+  }
+
+  public async findPosts(
     pageSize: number,
     sortBy: string,
     pageNumber: number,
     sortDirection: string,
     blogId?: string,
-  ) {
+  ): Promise<PaginationViewModel<PostViewModel[]>> {
     const postsFilter = postsQueryFilter(blogId);
 
     const posts: PostDbModel[] = await this.prisma.post.findMany({
@@ -58,7 +59,7 @@ export class PostsQuerySqlRepository {
     );
   }
 
-  async findPost(id: string) {
+  public async findPost(id: string): Promise<PostReactionViewModel | null> {
     const postFilter = postQueryFilter(id);
 
     const post = await this.prisma.post.findFirst({

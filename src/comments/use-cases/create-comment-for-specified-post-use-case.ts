@@ -2,9 +2,9 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateCommentForPostDto } from '../../posts/dto/createCommentForPost.dto';
 import { JwtAtPayload } from '../../auth/strategies';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { PostsSqlRepository } from '../../posts/repositories/PostgreSQL/posts.sql.repository';
 import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
 import { CommentsRepositoryAdapter } from '../repositories/adapters/comments-repository.adapter';
+import { PostsRepositoryAdapter } from '../../posts/repositories/adapters/posts-repository.adapter';
 
 export class CreateCommentForSpecifiedPostCommand {
   constructor(
@@ -18,14 +18,14 @@ export class CreateCommentForSpecifiedPostUseCase
   implements ICommandHandler<CreateCommentForSpecifiedPostCommand>
 {
   constructor(
-    private readonly postsSqlRepository: PostsSqlRepository,
+    private readonly postsRepositoryAdapter: PostsRepositoryAdapter,
     private readonly usersSqlRepository: UsersSQLRepository,
     private readonly commentsRepositoryAdapter: CommentsRepositoryAdapter,
   ) {}
   async execute(command: CreateCommentForSpecifiedPostCommand) {
     const { postId, jwtAtPayload, createCommentForPostDto } = command;
     // check if the post exists
-    const isPost = await this.postsSqlRepository.findPostWithBloggerIdById(
+    const isPost = await this.postsRepositoryAdapter.findPostWithBloggerIdById(
       postId,
     );
     if (!isPost) throw new NotFoundException();
@@ -38,7 +38,7 @@ export class CreateCommentForSpecifiedPostUseCase
     const isUserBannedByBlogger =
       await this.usersSqlRepository.findBannedUserByBlogger(
         isUser.id,
-        isPost.blog.bloggerId,
+        isPost.blog!.bloggerId,
         isPost.blogId,
       );
     if (isUserBannedByBlogger)

@@ -9,13 +9,14 @@ import { ReactionsRepository } from '../../reactions/reactions.repository';
 import { UsersSQLRepository } from '../../users/repositories/PostgreSQL/users.sql.repository';
 import { SecurityDevicesSQLRepository } from '../../security-devices/repositories/security.devices.sql.repository';
 import { BlogsSqlRepository } from '../../blogs/repositories/PostgreSQL/blogs.sql.repository';
+import { PostsRepositoryAdapter } from '../../posts/repositories/adapters/posts-repository.adapter';
 
 @SkipThrottle()
 @Controller('testing/all-data')
 export class TestingController {
   constructor(
     private readonly blogsSQLRepository: BlogsSqlRepository,
-    private readonly postsRepository: PostsRepository,
+    private readonly postsRepositoryAdapter: PostsRepositoryAdapter,
     private readonly usersSQLRepository: UsersSQLRepository,
     private readonly commentsRepository: CommentsRepository,
     private readonly securityDevicesSQLRepository: SecurityDevicesSQLRepository,
@@ -26,7 +27,7 @@ export class TestingController {
   async deleteAllData(): Promise<string | void> {
     await Promise.all([
       this.blogsSQLRepository.clearBlogs(),
-      this.postsRepository.clearPosts(),
+      this.postsRepositoryAdapter.deleteAll(),
       this.usersSQLRepository.clearUsers(),
       this.commentsRepository.clearComments(),
       this.securityDevicesSQLRepository.clearSessions(),

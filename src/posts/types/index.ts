@@ -25,3 +25,9 @@ export interface PostDbModel extends Post {
 export interface PostViewModel extends Post {
   blogName: string;
 }
+
+export interface PostWithBloggerId extends Post {
+  blog: {
+    bloggerId: string;
+  } | null;
+}

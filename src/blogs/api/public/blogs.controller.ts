@@ -6,7 +6,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsService } from '../../blogs.service';
 import { BlogsPaginationQueryDto } from '../../../helpers/pagination/dto/blogs.pagination.query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -15,16 +14,15 @@ import { BlogViewModel } from '../../types';
 import { ExtractUserPayloadFromAt } from '../../../common/guards/exctract-payload-from-AT.guard';
 import { GetUserIdFromAtDecorator } from '../../../common/decorators/getUserIdFromAt.decorator';
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/posts.pagination.query.dto';
-import { PostsQuerySqlRepository } from '../../../posts/repositories/PostgreSQL/posts.query.sql.repository';
+import { PostsQueryRepositoryAdapter } from '../../../posts/repositories/adapters/posts-query-repository.adapter';
 
 @SkipThrottle()
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private readonly blogsService: BlogsService,
     private readonly blogsSqlQueryRepository: BlogsSQLQueryRepository,
 
-    private readonly postsSqlQueryRepository: PostsQuerySqlRepository,
+    private readonly postsQueryRepositoryAdapter: PostsQueryRepositoryAdapter,
   ) {}
   @Get()
   async getAllBlogs(
@@ -58,7 +56,7 @@ export class BlogsController {
     if (!blog) throw new NotFoundException();
 
     // return all posts for this blog
-    return this.postsSqlQueryRepository.findPosts(
+    return this.postsQueryRepositoryAdapter.findPosts(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
       postsPaginationDto.pageNumber,

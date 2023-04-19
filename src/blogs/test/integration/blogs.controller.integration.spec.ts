@@ -4,14 +4,14 @@ import { Connection } from 'mongoose';
 import { DatabaseService } from '../../../database/database.service';
 import request from 'supertest';
 import { blogStub } from '../stubs/blog.stub';
-import { TrimPipe } from '../../../pipes/trim.pipe';
+import { TrimPipe } from '../../../common/pipes/trim.pipe';
 import {
   BadRequestException,
   HttpStatus,
   ValidationPipe,
 } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
-import { prepareErrorResult } from '../../../pipes/validation.pipe';
+import { prepareErrorResult } from '../../../common/pipes/validation.pipe';
 import { HttpExceptionFilter } from '../../../http.exception-filter';
 import { authStub } from '../stubs/auth.stub';
 import { helperFunctionsForTesting } from '../helpers/helper-functions';
