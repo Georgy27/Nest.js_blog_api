@@ -1,22 +1,34 @@
-export const userStatusQueryFilter = function (
+export const userCommentStatusQueryFilter = function (
   commentId: string,
   userId: string,
 ) {
   return {
-    AND: [
-      {
-        commentId: commentId,
+    commentId,
+    userId,
+    user: {
+      banInfo: {
+        isBanned: false,
       },
-      {
-        userId: userId,
+    },
+  };
+};
+
+export const userPostStatusQueryFilter = function (
+  postId: string,
+  userId: string,
+) {
+  return {
+    postId,
+    userId,
+    user: {
+      banInfo: {
+        isBanned: false,
       },
-      {
-        user: {
-          banInfo: {
-            isBanned: false,
-          },
-        },
+    },
+    blog: {
+      bannedBlogs: {
+        isBanned: false,
       },
-    ],
+    },
   };
 };

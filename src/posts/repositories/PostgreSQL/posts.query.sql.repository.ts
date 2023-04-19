@@ -3,12 +3,14 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { PostDbModel, PostViewModel } from '../../types';
 import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
-
 import {
   postQueryFilter,
   postsQueryFilter,
 } from '../../../helpers/filter/post.query.filter';
 import { PostsQueryRepositoryAdapter } from '../adapters/posts-query-repository.adapter';
+import { postReactionQueryFilter } from '../../../helpers/filter/reaction.query.filter';
+import { reactionStatusEnumKeys } from '../../../helpers/reaction';
+import { userPostStatusQueryFilter } from '../../../helpers/filter/user-status.query.filter';
 @Injectable()
 export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
   constructor(private prisma: PrismaService) {
@@ -20,6 +22,7 @@ export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
     sortBy: string,
     pageNumber: number,
     sortDirection: string,
+    userId: string | null,
     blogId?: string,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
     const postsFilter = postsQueryFilter(blogId);
@@ -45,12 +48,17 @@ export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
         },
       },
     });
+
+    const postsWithLikesInfo = await Promise.all(
+      posts.map((post) => {
+        return this.addReactionsInfoToPost(post, userId);
+      }),
+    );
+
     const numberOfPosts = await this.prisma.post.count({
       where: postsFilter,
     });
-    const postsWithLikesInfo = posts.map((post) => {
-      return new PostReactionViewModel(post);
-    });
+
     return new PaginationViewModel<PostViewModel[]>(
       numberOfPosts,
       pageNumber,
@@ -59,10 +67,13 @@ export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
     );
   }
 
-  public async findPost(id: string): Promise<PostReactionViewModel | null> {
+  public async findPost(
+    id: string,
+    userId: string,
+  ): Promise<PostReactionViewModel | null> {
     const postFilter = postQueryFilter(id);
 
-    const post = await this.prisma.post.findFirst({
+    const post: PostDbModel | null = await this.prisma.post.findFirst({
       where: postFilter,
       select: {
         id: true,
@@ -78,7 +89,67 @@ export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
         },
       },
     });
-    if (post) return new PostReactionViewModel(post);
+    if (post) return this.addReactionsInfoToPost(post, userId);
     return null;
+  }
+
+  private async addReactionsInfoToPost(
+    post: PostDbModel,
+    userId: string | null,
+  ) {
+    const likes = await this.prisma.postLikeStatus.count({
+      where: postReactionQueryFilter(post.id, 'Like'),
+    });
+    const dislikes = await this.prisma.postLikeStatus.count({
+      where: postReactionQueryFilter(post.id, 'Dislike'),
+    });
+    const newestLikes = await this.prisma.postLikeStatus.findMany({
+      take: 3,
+      where: postReactionQueryFilter(post.id, 'Like'),
+      orderBy: {
+        addedAt: 'desc',
+      },
+      select: {
+        addedAt: true,
+        userId: true,
+        user: {
+          select: {
+            login: true,
+          },
+        },
+      },
+    });
+
+    const mappedNewestLikes = newestLikes.map((likes) => {
+      return {
+        addedAt: likes.addedAt.toISOString(),
+        userId: likes.userId,
+        login: likes.user!.login,
+      };
+    });
+
+    let myStatus: reactionStatusEnumKeys = 'None';
+    if (userId) {
+      const userReactionStatus = await this.prisma.postLikeStatus.findFirst({
+        where: userPostStatusQueryFilter(post.id, userId),
+      });
+      if (userReactionStatus) myStatus = userReactionStatus.likeStatus;
+    }
+
+    return {
+      id: post.id,
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blog.name,
+      createdAt: post.createdAt,
+      extendedLikesInfo: {
+        likesCount: likes,
+        dislikesCount: dislikes,
+        myStatus: myStatus,
+        newestLikes: mappedNewestLikes,
+      },
+    };
   }
 }

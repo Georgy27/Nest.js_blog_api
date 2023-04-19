@@ -1,22 +1,39 @@
-export const reactionQueryFilter = function (
+export const commentReactionQueryFilter = function (
   commentId: string,
   status: 'Like' | 'Dislike',
 ) {
   return {
-    AND: [
-      {
-        commentId: commentId,
+    commentId,
+    likeStatus: status,
+    user: {
+      banInfo: {
+        isBanned: false,
       },
-      {
-        likeStatus: status,
+    },
+    blog: {
+      bannedBlogs: {
+        isBanned: false,
       },
-      {
-        user: {
-          banInfo: {
-            isBanned: false,
-          },
-        },
+    },
+  };
+};
+
+export const postReactionQueryFilter = function (
+  postId: string,
+  status: 'Like' | 'Dislike',
+) {
+  return {
+    postId,
+    likeStatus: status,
+    user: {
+      banInfo: {
+        isBanned: false,
       },
-    ],
+    },
+    blog: {
+      bannedBlogs: {
+        isBanned: false,
+      },
+    },
   };
 };

@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { PostPaginationQueryDto } from '../../helpers/pagination/dto/posts.pagination.query.dto';
 import { PaginationViewModel } from '../../helpers/pagination/pagination.view.model.wrapper';
-import { PostsService } from '../posts.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateCommentForPostDto } from '../dto/createCommentForPost.dto';
 import { GetJwtAtPayloadDecorator } from '../../common/decorators/getJwtAtPayload.decorator';
@@ -23,19 +22,19 @@ import { ExtractUserPayloadFromAt } from '../../common/guards/exctract-payload-f
 import { GetUserIdFromAtDecorator } from '../../common/decorators/getUserIdFromAt.decorator';
 import { BlogsQueryRepository } from '../../blogs/repositories/mongo/blogs.query.repository';
 import { PostViewModel } from '../types';
-import { PostsQuerySqlRepository } from '../repositories/PostgreSQL/posts.query.sql.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentForSpecifiedPostCommand } from '../../comments/use-cases/create-comment-for-specified-post-use-case';
 import { CommentsQueryRepositoryAdapter } from '../../comments/repositories/adapters/comments-query-repository.adapter';
 import { getMappedComment } from '../../comments/helpers/getMappedComment';
 import { UpdateReactionPostDto } from '../dto/update-reaction-post.dto';
+import { PostsQueryRepositoryAdapter } from '../repositories/adapters/posts-query-repository.adapter';
+import { UpdateReactionToPostCommand } from '../use-cases/update-reaction-to-post-use-case';
 
 @SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(
-    private readonly postsService: PostsService,
-    private readonly postsSqlQueryRepository: PostsQuerySqlRepository,
+    private readonly postsQueryRepositoryAdapter: PostsQueryRepositoryAdapter,
     private readonly commentsQueryRepositoryAdapter: CommentsQueryRepositoryAdapter,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private commandBus: CommandBus,
@@ -46,11 +45,12 @@ export class PostsController {
     @Query() postsPaginationDto: PostPaginationQueryDto,
     @GetUserIdFromAtDecorator() userId: string | null,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
-    return this.postsSqlQueryRepository.findPosts(
+    return this.postsQueryRepositoryAdapter.findPosts(
       postsPaginationDto.pageSize,
       postsPaginationDto.sortBy,
       postsPaginationDto.pageNumber,
       postsPaginationDto.sortDirection,
+      userId,
     );
   }
   @UseGuards(ExtractUserPayloadFromAt)
@@ -59,7 +59,7 @@ export class PostsController {
     @Param('id') id: string,
     @GetUserIdFromAtDecorator() userId: string | null,
   ) {
-    const post = await this.postsSqlQueryRepository.findPost(id);
+    const post = await this.postsQueryRepositoryAdapter.findPost(id, userId);
 
     if (!post) throw new NotFoundException();
     return post;
@@ -71,7 +71,10 @@ export class PostsController {
     @Param('postId') postId: string,
     @GetUserIdFromAtDecorator() userId: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
-    const isPost = await this.postsSqlQueryRepository.findPost(postId);
+    const isPost = await this.postsQueryRepositoryAdapter.findPost(
+      postId,
+      userId,
+    );
     if (!isPost) throw new NotFoundException();
 
     return this.commentsQueryRepositoryAdapter.findCommentsByPostId(
@@ -108,10 +111,12 @@ export class PostsController {
     @Body() updateReactionPostDto: UpdateReactionPostDto,
     @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
   ): Promise<void> {
-    return this.postsService.updateReactionToPost(
-      postId,
-      updateReactionPostDto,
-      jwtAtPayload.userId,
+    return this.commandBus.execute(
+      new UpdateReactionToPostCommand(
+        postId,
+        updateReactionPostDto,
+        jwtAtPayload.userId,
+      ),
     );
   }
 }

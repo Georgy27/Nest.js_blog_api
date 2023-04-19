@@ -4,14 +4,14 @@ import { CommentsQueryRepositoryAdapter } from '../adapters/comments-query-repos
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/posts.pagination.query.dto';
 
 import { reactionStatusEnumKeys } from '../../../helpers/reaction';
-import { reactionQueryFilter } from '../../../helpers/filter/reaction.query.filter';
-import { userStatusQueryFilter } from '../../../helpers/filter/user-status.query.filter';
+import { commentReactionQueryFilter } from '../../../helpers/filter/reaction.query.filter';
 import { CommentDbModel, CommentViewModel } from '../../index';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import {
   commentQueryFilter,
   commentsQueryFilter,
 } from '../../../helpers/filter/comment.query.filter';
+import { userCommentStatusQueryFilter } from '../../../helpers/filter/user-status.query.filter';
 
 @Injectable()
 export class CommentsQuerySqlRepository extends CommentsQueryRepositoryAdapter {
@@ -91,15 +91,15 @@ export class CommentsQuerySqlRepository extends CommentsQueryRepositoryAdapter {
     userId: string | null,
   ): Promise<CommentViewModel> {
     const likes = await this.prisma.commentLikeStatus.count({
-      where: reactionQueryFilter(comment.id, 'Like'),
+      where: commentReactionQueryFilter(comment.id, 'Like'),
     });
     const dislikes = await this.prisma.commentLikeStatus.count({
-      where: reactionQueryFilter(comment.id, 'Dislike'),
+      where: commentReactionQueryFilter(comment.id, 'Dislike'),
     });
     let myStatus: reactionStatusEnumKeys = 'None';
     if (userId) {
       const userReactionStatus = await this.prisma.commentLikeStatus.findFirst({
-        where: userStatusQueryFilter(comment.id, userId),
+        where: userCommentStatusQueryFilter(comment.id, userId),
       });
       if (userReactionStatus) myStatus = userReactionStatus.likeStatus;
     }

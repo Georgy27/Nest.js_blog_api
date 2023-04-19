@@ -10,8 +10,12 @@ export abstract class PostsQueryRepositoryAdapter {
     sortBy: string,
     pageNumber: number,
     sortDirection: string,
+    userId: string | null,
     blogId?: string,
   ): Promise<PaginationViewModel<PostViewModel[]>>;
 
-  public abstract findPost(id: string): Promise<PostReactionViewModel | null>;
+  public abstract findPost(
+    id: string,
+    userId: string | null,
+  ): Promise<PostReactionViewModel | null>;
 }
