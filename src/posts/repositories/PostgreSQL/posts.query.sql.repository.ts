@@ -11,6 +11,7 @@ import { PostsQueryRepositoryAdapter } from '../adapters/posts-query-repository.
 import { postReactionQueryFilter } from '../../../helpers/filter/reaction.query.filter';
 import { reactionStatusEnumKeys } from '../../../helpers/reaction';
 import { userPostStatusQueryFilter } from '../../../helpers/filter/user-status.query.filter';
+import { Blog, Post } from '@prisma/client';
 @Injectable()
 export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
   constructor(private prisma: PrismaService) {
@@ -92,6 +93,23 @@ export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
     if (post) return this.addReactionsInfoToPost(post, userId);
     return null;
   }
+
+  public async findAllPostsForAllBloggerBlogs(blogs: Blog[]): Promise<Post[]> {
+    const [...posts] = await Promise.all(
+      blogs.map((blog) => {
+        return this.prisma.post.findMany({ where: { blogId: blog.id } });
+      }),
+    );
+
+    return posts.flat();
+  }
+
+  // (async() => {
+  //   const [...ret] = await Promise.all([
+  //                                        func(),
+  //                                        func(),
+  //                                        func(),
+  //                                      ]);
 
   private async addReactionsInfoToPost(
     post: PostDbModel,

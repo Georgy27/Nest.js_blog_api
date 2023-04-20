@@ -5,13 +5,22 @@ import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/posts.pa
 
 import { reactionStatusEnumKeys } from '../../../helpers/reaction';
 import { commentReactionQueryFilter } from '../../../helpers/filter/reaction.query.filter';
-import { CommentDbModel, CommentViewModel } from '../../index';
+import {
+  CommentDbModel,
+  CommentViewModel,
+  CommentWithOrWithoutPostInfo,
+  CommentWithPostInfoDbModel,
+} from '../../index';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination.view.model.wrapper';
 import {
+  allCommentsForAllPostsQueryFilter,
   commentQueryFilter,
   commentsQueryFilter,
 } from '../../../helpers/filter/comment.query.filter';
 import { userCommentStatusQueryFilter } from '../../../helpers/filter/user-status.query.filter';
+import { Comment, Post } from '@prisma/client';
+import { CommentsPaginationQueryDto } from '../../../helpers/pagination/dto/comments.pagination.dto';
+import { determineCommentType } from '../../helpers/determineCommentType';
 
 @Injectable()
 export class CommentsQuerySqlRepository extends CommentsQueryRepositoryAdapter {
@@ -86,10 +95,68 @@ export class CommentsQuerySqlRepository extends CommentsQueryRepositoryAdapter {
 
     return await this.addReactionsInfoToComment(comment, userId);
   }
+
+  public async getAllCommentsForAllPostsByBlogger(
+    userId: string,
+    commentsForPostsPaginationDto: CommentsPaginationQueryDto,
+  ): Promise<PaginationViewModel<CommentViewModel[]>> {
+    const { pageNumber, pageSize, sortBy, sortDirection } =
+      commentsForPostsPaginationDto;
+    const allCommentsFilter = allCommentsForAllPostsQueryFilter(userId);
+
+    const allComments: CommentWithPostInfoDbModel[] =
+      await this.prisma.comment.findMany({
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+        orderBy: {
+          [sortBy]: sortDirection,
+        },
+        where: allCommentsFilter,
+        select: {
+          id: true,
+          content: true,
+          postId: true,
+          createdAt: true,
+          userId: true,
+          user: {
+            select: {
+              login: true,
+            },
+          },
+          post: {
+            select: {
+              title: true,
+              blogId: true,
+              blog: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    const commentsWithLikesInfo = await Promise.all(
+      allComments.map(async (comment) => {
+        return this.addReactionsInfoToComment(comment, userId);
+      }),
+    );
+
+    const numberOfComments = await this.prisma.comment.count({
+      where: allCommentsFilter,
+    });
+    return new PaginationViewModel<CommentViewModel[]>(
+      numberOfComments,
+      pageNumber,
+      pageSize,
+      commentsWithLikesInfo,
+    );
+  }
+
   private async addReactionsInfoToComment(
-    comment: CommentDbModel,
+    comment: CommentWithOrWithoutPostInfo,
     userId: string | null,
-  ): Promise<CommentViewModel> {
+  ) {
     const likes = await this.prisma.commentLikeStatus.count({
       where: commentReactionQueryFilter(comment.id, 'Like'),
     });
@@ -104,6 +171,28 @@ export class CommentsQuerySqlRepository extends CommentsQueryRepositoryAdapter {
       if (userReactionStatus) myStatus = userReactionStatus.likeStatus;
     }
 
+    if (determineCommentType(comment)) {
+      return {
+        id: comment.id,
+        content: comment.content,
+        commentatorInfo: {
+          userId: comment.userId,
+          userLogin: comment.user!.login,
+        },
+        createdAt: comment.createdAt,
+        postInfo: {
+          id: comment.postId,
+          title: comment.post?.title,
+          blogId: comment.post?.blogId,
+          blogName: comment.post?.blog.name,
+        },
+        likesInfo: {
+          likesCount: likes,
+          dislikesCount: dislikes,
+          myStatus: myStatus,
+        },
+      };
+    }
     return {
       id: comment.id,
       content: comment.content,

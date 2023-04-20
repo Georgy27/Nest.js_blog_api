@@ -70,10 +70,10 @@ model BannedUsers {
   createdAt String
   blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
   blogId    String
-  bloggerId String?
+  bloggerId String
   blogger   Blogger? @relation(fields: [bloggerId], references: [bloggerId], onDelete: Cascade)
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String?
+  userId    String
 }
 
 model DeviceSessions {

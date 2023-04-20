@@ -172,4 +172,11 @@ export class BlogsSQLQueryRepository {
       mappedViewBlogs,
     );
   }
+
+  async findBlogsForBloggerWithoutPagination(
+    bloggerId: string,
+  ): Promise<Blog[]> {
+    const blogFilter = blogQueryFilter(null, bloggerId);
+    return this.prisma.blog.findMany({ where: blogFilter });
+  }
 }

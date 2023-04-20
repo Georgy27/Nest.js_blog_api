@@ -17,3 +17,20 @@ export interface CommentDbModel extends Omit<Comment, 'postId'> {
     login: string;
   } | null;
 }
+
+export interface CommentWithPostInfoDbModel extends Comment {
+  post: {
+    title: string;
+    blogId: string;
+    blog: {
+      name: string;
+    };
+  } | null;
+  user: {
+    login: string;
+  } | null;
+}
+
+export type CommentWithOrWithoutPostInfo =
+  | CommentDbModel
+  | CommentWithPostInfoDbModel;

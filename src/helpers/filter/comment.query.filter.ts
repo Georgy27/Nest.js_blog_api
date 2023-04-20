@@ -33,3 +33,32 @@ export const commentQueryFilter = function (id: string) {
     },
   };
 };
+
+export const allCommentsForAllPostsQueryFilter = function (userId: string) {
+  return {
+    AND: [
+      {
+        post: {
+          blog: {
+            bloggerId: userId,
+            bannedBlogs: {
+              isBanned: false,
+            },
+          },
+        },
+      },
+      {
+        user: {
+          banInfo: {
+            isBanned: false,
+          },
+          bannedUsers: {
+            none: {
+              bloggerId: userId,
+            },
+          },
+        },
+      },
+    ],
+  };
+};

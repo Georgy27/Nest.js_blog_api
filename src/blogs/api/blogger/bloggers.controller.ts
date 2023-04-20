@@ -32,6 +32,8 @@ import { BlogViewModel } from '../../types';
 import { CreatePostModel } from '../../../posts/types';
 import { PostReactionViewModel } from '../../../helpers/reaction/reaction.view.model.wrapper';
 import { PostsQueryRepositoryAdapter } from '../../../posts/repositories/adapters/posts-query-repository.adapter';
+import { CommentsPaginationQueryDto } from '../../../helpers/pagination/dto/comments.pagination.dto';
+import { CommentsQueryRepositoryAdapter } from '../../../comments/repositories/adapters/comments-query-repository.adapter';
 
 @SkipThrottle()
 @Controller('blogger/blogs')
@@ -40,6 +42,7 @@ export class BloggersController {
     private readonly blogsSQLQueryRepository: BlogsSQLQueryRepository,
 
     private readonly postsQueryRepositoryAdapter: PostsQueryRepositoryAdapter,
+    private readonly commentsQueryRepositoryAdapter: CommentsQueryRepositoryAdapter,
 
     private commandBus: CommandBus,
   ) {}
@@ -58,28 +61,37 @@ export class BloggersController {
       jwtAtPayload,
     );
   }
-  // @UseGuards(AuthGuard('jwt'))
-  // @Get('comments')
-  // async getAllCommentsForAllPostsByBlogger(
-  //   @Query() commentsForPostsPaginationDto: CommentsPaginationQueryDto,
-  //   @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
-  // ) {
-  //   // find all blogs that were not banned and made by blogger
-  //   const allBlogs = await this.blogsQueryRepository.findBlogsWithoutPagination(
-  //     jwtAtPayload.userId,
-  //   );
-  //   // find all posts made by blogger
-  //   const allPosts = await this.postsQueryRepository.findPostsForBlogger(
-  //     jwtAtPayload.userId,
-  //   );
-  //   // return all comments for posts
-  //   return this.commentsQueryRepository.getAllCommentsForAllPostsByBlogger(
-  //     allPosts,
-  //     allBlogs,
-  //     commentsForPostsPaginationDto,
-  //     jwtAtPayload.userId,
-  //   );
-  // }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('comments')
+  async getAllCommentsForAllPostsByBlogger(
+    @Query() commentsForPostsPaginationDto: CommentsPaginationQueryDto,
+    @GetJwtAtPayloadDecorator() jwtAtPayload: JwtAtPayload,
+  ) {
+    // find all blogs that were not banned by admin and made by blogger
+    // const allBlogs =
+    //   await this.blogsSQLQueryRepository.findBlogsForBloggerWithoutPagination(
+    //     jwtAtPayload.userId,
+    //   );
+    // console.log('ALL BLOGS', allBlogs);
+    // // find all posts for all blogs made by blogger
+    // const allPosts =
+    //   await this.postsQueryRepositoryAdapter.findAllPostsForAllBloggerBlogs(
+    //     allBlogs,
+    //   );
+    // console.log('ALL POSTS', allPosts);
+    // return all comments for all posts
+
+    return this.commentsQueryRepositoryAdapter.getAllCommentsForAllPostsByBlogger(
+      jwtAtPayload.userId,
+      commentsForPostsPaginationDto,
+    );
+    // return this.commentsQueryRepository.getAllCommentsForAllPostsByBlogger(
+    //   allPosts,
+    //   allBlogs,
+    //   commentsForPostsPaginationDto,
+    //   jwtAtPayload.userId,
+    // );
+  }
   @UseGuards(AuthGuard('jwt'))
   @Post()
   @HttpCode(201)
