@@ -94,22 +94,15 @@ export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
     return null;
   }
 
-  public async findAllPostsForAllBloggerBlogs(blogs: Blog[]): Promise<Post[]> {
-    const [...posts] = await Promise.all(
-      blogs.map((blog) => {
-        return this.prisma.post.findMany({ where: { blogId: blog.id } });
-      }),
-    );
-
-    return posts.flat();
-  }
-
-  // (async() => {
-  //   const [...ret] = await Promise.all([
-  //                                        func(),
-  //                                        func(),
-  //                                        func(),
-  //                                      ]);
+  // public async findAllPostsForAllBloggerBlogs(blogs: Blog[]): Promise<Post[]> {
+  //   const [...posts] = await Promise.all(
+  //     blogs.map((blog) => {
+  //       return this.prisma.post.findMany({ where: { blogId: blog.id } });
+  //     }),
+  //   );
+  //
+  //   return posts.flat();
+  // }
 
   private async addReactionsInfoToPost(
     post: PostDbModel,

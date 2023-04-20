@@ -25,9 +25,11 @@ export const userPostStatusQueryFilter = function (
         isBanned: false,
       },
     },
-    blog: {
-      bannedBlogs: {
-        isBanned: false,
+    post: {
+      blog: {
+        bannedBlogs: {
+          isBanned: false,
+        },
       },
     },
   };

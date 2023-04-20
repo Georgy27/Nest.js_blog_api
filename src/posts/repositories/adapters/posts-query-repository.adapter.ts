@@ -20,7 +20,7 @@ export abstract class PostsQueryRepositoryAdapter {
     userId: string | null,
   ): Promise<PostReactionViewModel | null>;
 
-  public abstract findAllPostsForAllBloggerBlogs(
-    blogs: Blog[],
-  ): Promise<Post[]>;
+  // public abstract findAllPostsForAllBloggerBlogs(
+  //   blogs: Blog[],
+  // ): Promise<Post[]>;
 }
