@@ -12,6 +12,7 @@ import { postReactionQueryFilter } from '../../../helpers/filter/reaction.query.
 import { reactionStatusEnumKeys } from '../../../helpers/reaction';
 import { userPostStatusQueryFilter } from '../../../helpers/filter/user-status.query.filter';
 import { Blog, Post } from '@prisma/client';
+import { postsQuerySorting } from '../../../helpers/sorting/post-sorting';
 @Injectable()
 export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
   constructor(private prisma: PrismaService) {
@@ -22,18 +23,17 @@ export class PostsQuerySqlRepository extends PostsQueryRepositoryAdapter {
     pageSize: number,
     sortBy: string,
     pageNumber: number,
-    sortDirection: string,
+    sortDirection: 'asc' | 'desc',
     userId: string | null,
     blogId?: string,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
     const postsFilter = postsQueryFilter(blogId);
+    const postsSorting = postsQuerySorting(sortBy, sortDirection);
 
     const posts: PostDbModel[] = await this.prisma.post.findMany({
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
-      orderBy: {
-        [sortBy]: sortDirection,
-      },
+      orderBy: postsSorting,
       where: postsFilter,
       select: {
         id: true,
