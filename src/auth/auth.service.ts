@@ -55,16 +55,16 @@ export class AuthService {
         { userId, userLogin, deviceId },
         {
           secret: this.config.get<string>('JWT_AT_SECRET'),
-          // expiresIn: '10hours',
-          expiresIn: '9s',
+          expiresIn: '10hours',
+          // expiresIn: '9s',
         },
       ),
       this.jwtService.signAsync(
         { userId, userLogin, deviceId },
         {
           secret: this.config.get<string>('JWT_RT_SECRET'),
-          // expiresIn: '24hours',
-          expiresIn: '19s',
+          expiresIn: '24hours',
+          // expiresIn: '19s',
         },
       ),
     ]);
