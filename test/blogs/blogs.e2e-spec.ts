@@ -9,12 +9,12 @@ import {
 } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { authStub } from './stubs/auth.stub';
-import { helperFunctionsForTesting } from './helpers/helper-functions';
+import { helperFunctionsForTesting } from '../helpers/helper-functions';
 import { prepareErrorResult } from '../../src/common/pipes/validation.pipe';
-import { HttpExceptionFilter } from "../../src/http.exception-filter";
-import { TrimPipe } from "../../src/common/pipes/trim.pipe";
-import { AppModule } from "../../src/app.module";
-import { DatabaseService } from "../../src/database/database.service";
+import { HttpExceptionFilter } from '../../src/http.exception-filter';
+import { TrimPipe } from '../../src/common/pipes/trim.pipe';
+import { AppModule } from '../../src/app.module';
+import { DatabaseService } from '../../src/database/database.service';
 
 describe('BlogsController', () => {
   let dbConnection: Connection;
