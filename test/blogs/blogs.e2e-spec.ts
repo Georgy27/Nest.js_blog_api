@@ -1,20 +1,20 @@
-import { AppModule } from '../../../app.module';
 import { Test } from '@nestjs/testing';
 import { Connection } from 'mongoose';
-import { DatabaseService } from '../../../database/database.service';
 import request from 'supertest';
-import { blogStub } from '../stubs/blog.stub';
-import { TrimPipe } from '../../../common/pipes/trim.pipe';
+import { blogStub } from './stubs/blog.stub';
 import {
   BadRequestException,
   HttpStatus,
   ValidationPipe,
 } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
-import { prepareErrorResult } from '../../../common/pipes/validation.pipe';
-import { HttpExceptionFilter } from '../../../http.exception-filter';
-import { authStub } from '../stubs/auth.stub';
-import { helperFunctionsForTesting } from '../helpers/helper-functions';
+import { authStub } from './stubs/auth.stub';
+import { helperFunctionsForTesting } from './helpers/helper-functions';
+import { prepareErrorResult } from '../../src/common/pipes/validation.pipe';
+import { HttpExceptionFilter } from "../../src/http.exception-filter";
+import { TrimPipe } from "../../src/common/pipes/trim.pipe";
+import { AppModule } from "../../src/app.module";
+import { DatabaseService } from "../../src/database/database.service";
 
 describe('BlogsController', () => {
   let dbConnection: Connection;
