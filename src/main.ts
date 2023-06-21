@@ -15,6 +15,6 @@ async function bootstrap() {
   useGlobalPipes(app);
   useGlobalFilters(app);
 
-  await app.listen(3000);
+  await app.listen(3500);
 }
 bootstrap();
