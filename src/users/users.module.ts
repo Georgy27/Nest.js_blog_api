@@ -17,6 +17,9 @@ import { BanOrUnbanUserByBloggerUseCase } from './use-cases/ban-unban-user-blogg
 import { BlogsModule } from '../blogs/blogs.module';
 import { UsersSQLRepository } from './repositories/PostgreSQL/users.sql.repository';
 import { UsersSQLQueryRepository } from './repositories/PostgreSQL/users.sql.query.repository';
+import { TypeormModule } from '../typeorm/typeorm.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PasswordRecovery } from './entities/passwordRecovery.entity';
 
 const useCases = [
   CreateUserByAdminUseCase,
@@ -30,6 +33,7 @@ const useCases = [
     forwardRef(() => BlogsModule),
     CqrsModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    TypeOrmModule.forFeature([User, PasswordRecovery]),
     SecurityDevicesModule,
     ReactionsModule,
     BlogsModule,

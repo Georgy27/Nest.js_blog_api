@@ -15,12 +15,14 @@ import { APP_GUARD } from '@nestjs/core';
 import { DatabaseModule } from './database/database.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TypeormModule } from './typeorm/typeorm.module';
+import DatabaseConfig from './config/database.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
+      load: [DatabaseConfig],
     }),
     // ThrottlerModule.forRoot({
     //   ttl: 10,

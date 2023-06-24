@@ -18,7 +18,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "typeorm": "ts-node ./node_modules/typeorm/cli.js -d ./db/typeorm.config.ts",
+    "migration:generate": "yarn typeorm migration:generate ./db/migrations/migration",
+    "migration:run": "yarn typeorm migration:run"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",
