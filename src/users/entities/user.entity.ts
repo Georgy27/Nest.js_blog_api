@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   OneToMany,
   OneToOne,
@@ -22,7 +23,7 @@ export class User {
   email: string;
   @Column()
   hash: string;
-  @Column()
+  @CreateDateColumn({ type: 'varchar' })
   createdAt: string;
   @OneToOne(() => PasswordRecovery, (passwordRecovery) => passwordRecovery.user)
   passwordRecovery: PasswordRecovery;

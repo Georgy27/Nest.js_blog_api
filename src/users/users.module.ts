@@ -17,9 +17,14 @@ import { BanOrUnbanUserByBloggerUseCase } from './use-cases/ban-unban-user-blogg
 import { BlogsModule } from '../blogs/blogs.module';
 import { UsersSQLRepository } from './repositories/PostgreSQL/users.sql.repository';
 import { UsersSQLQueryRepository } from './repositories/PostgreSQL/users.sql.query.repository';
-import { TypeormModule } from '../typeorm/typeorm.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PasswordRecovery } from './entities/passwordRecovery.entity';
+import { BanInfo } from './entities/banInfo.entity';
+import { Blogger } from './entities/blogger.entity';
+import { EmailConfirmation } from './entities/emailConfirmation.entity';
+import { CreateUserTransaction } from './transactions/create-user.transaction';
+import { BaseTransaction } from '../common/abstract-transaction-class';
+import { User as UserEntity } from './entities/user.entity';
 
 const useCases = [
   CreateUserByAdminUseCase,
@@ -27,13 +32,24 @@ const useCases = [
   BanOrUnbanUserByBloggerUseCase,
   DeleteUserByAdminUseCase,
 ];
+// const CreateUserTransactionProvider = {
+//   provide: BaseTransaction,
+//   useClass: CreateUserTransaction,
+// };
+// const adapters = [CreateUserTransactionProvider];
 @Module({
   imports: [
     forwardRef(() => CommentsModule),
     forwardRef(() => BlogsModule),
     CqrsModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    TypeOrmModule.forFeature([User, PasswordRecovery]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      PasswordRecovery,
+      BanInfo,
+      Blogger,
+      EmailConfirmation,
+    ]),
     SecurityDevicesModule,
     ReactionsModule,
     BlogsModule,
@@ -45,6 +61,7 @@ const useCases = [
     UsersRepository,
     UsersSQLRepository,
     UsersSQLQueryRepository,
+    CreateUserTransaction,
     ...useCases,
   ],
   exports: [
@@ -53,6 +70,7 @@ const useCases = [
     UsersQueryRepository,
     UsersSQLRepository,
     UsersSQLQueryRepository,
+    CreateUserTransaction,
   ],
 })
 export class UsersModule {}

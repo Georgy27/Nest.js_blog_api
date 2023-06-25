@@ -14,6 +14,9 @@ import { ActiveUserDevicesUseCase } from './use-cases/user-devices-with-active-s
 import { CqrsModule } from '@nestjs/cqrs';
 import { DeleteAllSessionsButActiveUseCase } from './use-cases/delete-all-sessions-but-active-use-case';
 import { DeleteSessionUseCase } from './use-cases/delete-session-use-case';
+import { TypeormModule } from '../typeorm/typeorm.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DeviceSessions } from './entities/deviceSessions.entity';
 
 const useCases = [
   ActiveUserDevicesUseCase,
@@ -26,6 +29,7 @@ const useCases = [
     MongooseModule.forFeature([
       { name: SecurityDevices.name, schema: SecurityDevicesSchema },
     ]),
+    TypeOrmModule.forFeature([DeviceSessions]),
   ],
   controllers: [SecurityDevicesController],
   providers: [

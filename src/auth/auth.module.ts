@@ -16,6 +16,7 @@ import { LoginUserUseCase } from './use-cases/login-user-use-case';
 import { LogoutUserUseCase } from './use-cases/logout-user-use-case';
 import { PasswordRecoveryUseCase } from './use-cases/user-password-recovery-use-case';
 import { NewPasswordUseCase } from './use-cases/new-password-use-case';
+import { CreateUserTransaction } from '../users/transactions/create-user.transaction';
 
 const useCases = [
   RegisterUserUseCase,

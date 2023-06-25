@@ -1,14 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../prisma/prisma.service';
-import {
-  BanInfo,
-  BannedUsers,
-  EmailConfirmation,
-  PasswordRecovery,
-  User,
-  User as UserModel,
-} from '@prisma/client';
+
 import { UserViewModel } from '../../types/user.view.model';
 import { CreateUserDto } from '../../dto/create.user.dto';
 import { randomUUID } from 'crypto';
@@ -18,58 +11,46 @@ import {
   UserWithPasswordRecoveryInfo,
 } from '../../../auth/types';
 import { BanUserByBloggerDto } from '../../dto/ban.user.blogger.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
+import { User } from '../../entities/user.entity';
 @Injectable()
 export class UsersSQLRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private readonly entityManager: EntityManager,
+  ) {}
 
-  async createUser(
-    createUserDto: CreateUserDto,
-    hash: string,
-  ): Promise<UserViewModel> {
-    return this.prisma.user.create({
-      data: {
+  async createUserTransaction(createUserDto: CreateUserDto, hash: string) {
+    await this.entityManager.transaction(async (entityManager) => {
+      const user = await this.userRepo.create({
         login: createUserDto.login,
         email: createUserDto.email,
-        hash: hash,
-        createdAt: new Date().toISOString(),
-        banInfo: {
-          create: {
-            isBanned: false,
-            banDate: null,
-            banReason: null,
-          },
-        },
-        emailConfirmation: {
-          create: {
-            confirmationCode: randomUUID(),
-            expirationDate: add(new Date(), {
-              minutes: 1,
-            }).toISOString(),
-            isConfirmed: false,
-          },
-        },
-        blogger: { create: {} },
-        passwordRecovery: { create: {} },
-      },
-      select: {
-        id: true,
-        login: true,
-        email: true,
-        createdAt: true,
-        banInfo: {
-          select: {
-            isBanned: true,
-            banDate: true,
-            banReason: true,
-          },
-        },
-      },
+        hash,
+      });
     });
+    // return this.userRepo.create({
+    //   login: createUserDto.login,
+    //   email: createUserDto.email,
+    //   hash,
+    //   emailConfirmation: {
+    //     confirmationCode: randomUUID(),
+    //     expirationDate: add(new Date(), {
+    //       minutes: 1,
+    //     }).toISOString(),
+    //     isConfirmed: false,
+    //   },
+    //   banInfo: {
+    //     isBanned: false,
+    //     banDate: null,
+    //     banReason: null,
+    //   },
+    //   blogger: {},
+    //   passwordRecovery: {},
+    // });
   }
-  async updateUserBanInfoByAdmin(
-    userId: string,
-    updateBanInfo: any,
-  ): Promise<BanInfo> {
+  async updateUserBanInfoByAdmin(userId: string, updateBanInfo: any) {
     return this.prisma.banInfo.update({
       where: { userId: userId },
       data: {
@@ -84,7 +65,7 @@ export class UsersSQLRepository {
     userId: string,
     bloggerId: string,
     blogId: string,
-  ): Promise<BannedUsers | null> {
+  ) {
     return this.prisma.bannedUsers.findFirst({
       where: {
         userId,
@@ -114,24 +95,18 @@ export class UsersSQLRepository {
   async unbanUserByBlogger(id: string) {
     return this.prisma.bannedUsers.delete({ where: { id } });
   }
-  async getEmailConfirmationCode(
-    userEmail: string,
-  ): Promise<EmailConfirmation | null> {
+  async getEmailConfirmationCode(userEmail: string) {
     return this.prisma.emailConfirmation.findUnique({
       where: { userEmail: userEmail },
     });
   }
-  async updateEmailConfirmationCode(
-    userEmail: string,
-  ): Promise<EmailConfirmation> {
+  async updateEmailConfirmationCode(userEmail: string) {
     return this.prisma.emailConfirmation.update({
       where: { userEmail },
       data: { isConfirmed: true },
     });
   }
-  async updateEmailConfirmationInfo(
-    userEmail: string,
-  ): Promise<EmailConfirmation> {
+  async updateEmailConfirmationInfo(userEmail: string) {
     return this.prisma.emailConfirmation.update({
       where: { userEmail },
       data: {
@@ -142,7 +117,7 @@ export class UsersSQLRepository {
       },
     });
   }
-  async updatePasswordRecoveryInfo(userId: string): Promise<PasswordRecovery> {
+  async updatePasswordRecoveryInfo(userId: string) {
     return this.prisma.passwordRecovery.update({
       where: { userId },
       data: {
@@ -160,7 +135,7 @@ export class UsersSQLRepository {
       },
     });
   }
-  async updateUserHash(id: string, hash: string): Promise<UserModel> {
+  async updateUserHash(id: string, hash: string) {
     return this.prisma.user.update({ where: { id }, data: { hash } });
   }
   async deleteUserById(id: string) {
@@ -170,11 +145,11 @@ export class UsersSQLRepository {
   async findUserById(id: string) {
     return this.prisma.user.findUnique({ where: { id: id } });
   }
-  async findUserByLogin(login: string): Promise<UserModel | null> {
-    return this.prisma.user.findUnique({ where: { login: login } });
+  async findUserByLogin(login: string) {
+    return this.userRepo.findOne({ where: { login } });
   }
-  async findUserByEmail(email: string): Promise<UserModel | null> {
-    return this.prisma.user.findUnique({ where: { email: email } });
+  async findUserByEmail(email: string) {
+    return this.userRepo.findOne({ where: { email } });
   }
   async findUserByLoginOrEmail(loginOrEmail: string) {
     return this.prisma.user.findFirst({

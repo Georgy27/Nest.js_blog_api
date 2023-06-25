@@ -15,7 +15,7 @@ export class CreateUserByAdminUseCase
   implements ICommandHandler<CreateUserByAdminCommand>
 {
   constructor(private readonly usersSQLRepository: UsersSQLRepository) {}
-  async execute(command: CreateUserByAdminCommand): Promise<UserViewModel> {
+  async execute(command: CreateUserByAdminCommand) {
     const { password, login, email } = command.createUserDto;
     // check that user with the given login or email does not exist
     const checkUserLogin = await this.usersSQLRepository.findUserByLogin(login);
@@ -31,9 +31,9 @@ export class CreateUserByAdminUseCase
     // generate salt and hash
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, passwordSalt);
-    return this.usersSQLRepository.createUser(
-      command.createUserDto,
-      passwordHash,
-    );
+    // return this.usersSQLRepository.createUser(
+    //   command.createUserDto,
+    //   passwordHash,
+    // );
   }
 }

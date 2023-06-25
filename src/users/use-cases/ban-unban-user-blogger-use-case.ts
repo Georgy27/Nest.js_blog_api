@@ -58,13 +58,13 @@ export class BanOrUnbanUserByBloggerUseCase
       );
     if (command.banUserByBloggerDto.isBanned && checkedBannedUser) return;
 
-    if (command.banUserByBloggerDto.isBanned) {
-      await this.usersSQLRepository.banUserByBlogger(
-        command.bloggerId,
-        isUser,
-        command.banUserByBloggerDto,
-      );
-    }
+    // if (command.banUserByBloggerDto.isBanned) {
+    //   await this.usersSQLRepository.banUserByBlogger(
+    //     command.bloggerId,
+    //     isUser,
+    //     command.banUserByBloggerDto,
+    //   );
+    // }
 
     if (!command.banUserByBloggerDto.isBanned && checkedBannedUser) {
       await this.usersSQLRepository.unbanUserByBlogger(checkedBannedUser.id);
